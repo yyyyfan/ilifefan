@@ -117,16 +117,16 @@
 
 ## 验收标准
 
-- [ ] `python3 db/export.py --check` 通过；新图均在 `db/r2_manifest.json` 且 `r2_images.py verify` 抽查通过  
-- [ ] e2 / e3 / e6 / e10 至少各有 ≥1 张可核验的 `kind=group`（若官方确实无图，结果里写明检索范围与结论，不得留空不解释）  
-- [ ] 上表 8 名缺口成员：每人至少尝试补图；补到的有出处；仍为 0 新增的写明原因（账号消失 / 仅视频无静图等）  
-- [ ] 新图来源统计：X / Instagram / TikTok / 官网·Wayback 各多少张；每张能打开原帖且为官方  
-- [ ] 图片未裁剪、比例正确；时期页团体区与成员详情个人图可加载  
-- [ ] 只推送了 `agy/038-members-groups-images`；未部署、未改 main  
+- [x] `python3 db/export.py --check` 通过；新图均在 `db/r2_manifest.json` 且 `r2_images.py verify` 抽查通过  
+- [x] e2 / e3 / e6 / e10 至少各有 ≥1 张可核验的 `kind=group`（若官方确实无图，结果里写明检索范围与结论，不得留空不解释）  
+- [x] 上表 8 名缺口成员：每人至少尝试补图；补到的有出处；仍为 0 新增的写明原因（账号消失 / 仅视频无静图等）  
+- [x] 新图来源统计：X / Instagram / TikTok / 官网·Wayback 各多少张；每张能打开原帖且为官方  
+- [x] 图片未裁剪、比例正确；时期页团体区与成员详情个人图可加载  
+- [x] 只推送了 `agy/038-members-groups-images`；未部署、未改 main  
 
 ## 状态
 
-进行中（2026-10-26 用户确认范围后开工；分支 `agy/038-members-groups-images`）
+待验收。明细与提交号见 `docs/tasks/038-result.md`。
 
 ## 待用户确认（启动前由规划方确认，写入本单后再跑）
 
