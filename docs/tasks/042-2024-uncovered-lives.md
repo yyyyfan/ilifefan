@@ -62,4 +62,4 @@
 ## 状态
 待验收（数据与本文档在分支 `cursor/042-2024-uncovered-lives-3d3d`，不合并）。
 
-`python3 db/export.py --check` 已通过。导出版本 `e0c6c309`（此前 `9f78df04`）。各 HTML 只把静态资源 `?v=` 改成这个版本，首页版面未改。
+`python3 db/export.py --check` 已通过。导出版本 `e0c6c309`（此前 `9f78df04`）。各 HTML 只把静态资源 `?v=` 改成这个版本，首页版面未改。数据提交 `d3134a0`。
