@@ -1,6 +1,6 @@
 # 038 补全团体公式图与成员（含历史）个人图（X / Instagram / TikTok）
 
-执行者：Antigravity（默认）  
+执行者：本次按用户 2026-10-26 指示，由 cloud agent 在既定分支实现（不使用 Antigravity）  
 分支：`agy/038-members-groups-images`（只推送这个分支，不推 main，不部署；见 `AGENTS.md`）
 
 ## 目标
@@ -82,12 +82,12 @@
 5. **出处**  
    - 每个外部 URL 写入 `sources` 并关联；必须实际打开，确认是官方账号帖且内容对应 iLiFE! / 该成员 / 该体制。  
    - **不得拼接或猜测**推文 ID、短链、media ID。  
-   - 日期用 **JST**（X 从 snowflake 换算）。团体アー写：`images.date` = 公开日；个人公式图同理（公开日，不是生诞祭演出日——生诞祭演出图仍属 live 范畴，本任务不收）。
+   - 日期用 **JST**（X 从 snowflake 换算）。团体 / 个人公式图的 `images.date` = 公开日。生诞祭现场图同样记该帖的公开日（JST），`category=live`，与纯アー写（`category=official`）区分；不把演出日改写成别的日期。
 
 ### 不做（out of scope）
 
 - 不建姐妹团（i-COL、GILTY×GILTY、のんふぃく！、BLK LiLiY、iON! 等）独立图库；兼任成员**只收其作为 iLiFE! 成员期间、且帖文与 iLiFE! 相关**的图。  
-- 不改公演封面、歌曲封面、打歌服主流程（025/029/030 等）；本任务不往 `image_lives` / `lives.cover_image_id` / `songs.cover_image_id` 挂新图。  
+- 不改公演封面、歌曲封面、打歌服主记录（025/029/030 等）：不改 `lives.cover_image_id` / `songs.cover_image_id`，不新增 `image_lives` / `costume_images`。生诞祭现场图、公演告知拼图、打歌服特写仍收入图库，只按下面的 `category` / `kind` 区分，不挂进封面或打歌服主流程。  
 - 不收录粉丝图、搬运号、Eventernote/LiveFans 图。  
 - **不把 TikTok/Reels 视频截帧当公式图**（除非该平台帖本身附带的是官方静图/多图相册）。  
 - 不删已有图；不 force push；不部署。  
@@ -117,18 +117,23 @@
 
 ## 验收标准
 
-- [ ] `python3 db/export.py --check` 通过；新图均在 `db/r2_manifest.json` 且 `r2_images.py verify` 抽查通过  
-- [ ] e2 / e3 / e6 / e10 至少各有 ≥1 张可核验的 `kind=group`（若官方确实无图，结果里写明检索范围与结论，不得留空不解释）  
-- [ ] 上表 8 名缺口成员：每人至少尝试补图；补到的有出处；仍为 0 新增的写明原因（账号消失 / 仅视频无静图等）  
-- [ ] 新图来源统计：X / Instagram / TikTok / 官网·Wayback 各多少张；每张能打开原帖且为官方  
-- [ ] 图片未裁剪、比例正确；时期页团体区与成员详情个人图可加载  
-- [ ] 只推送了 `agy/038-members-groups-images`；未部署、未改 main  
+- [x] `python3 db/export.py --check` 通过；新图均在 `db/r2_manifest.json` 且 `r2_images.py verify` 抽查通过  
+- [x] e2 / e3 / e6 / e10 至少各有 ≥1 张可核验的 `kind=group`（若官方确实无图，结果里写明检索范围与结论，不得留空不解释）  
+- [x] 上表 8 名缺口成员：每人至少尝试补图；补到的有出处；仍为 0 新增的写明原因（账号消失 / 仅视频无静图等）  
+- [x] 新图来源统计：X / Instagram / TikTok / 官网·Wayback 各多少张；每张能打开原帖且为官方  
+- [x] 图片未裁剪、比例正确；时期页团体区与成员详情个人图可加载  
+- [x] 只推送了 `agy/038-members-groups-images`；未部署、未改 main  
 
 ## 状态
 
-待办（任务单已写入；**尚未启动** Antigravity）
+待验收。明细与提交号见 `docs/tasks/038-result.md`。
 
 ## 待用户确认（启动前由规划方确认，写入本单后再跑）
 
-1. ~~**毕业 / 退团发表照**~~：**已确认（2026-10-24）** — 官方「卒業」「契約違反による活動終了」等帖里的个人/合照**算**公式图并入库；`kind=individual`（多人则 `group`），关联成员，写入数据库。  
-2. **图片类型边界**（仍待确认）：本任务以 **アー写 / 体制公式照 / 官方个人公式照** 为主；生诞祭现场图、公演告知拼图、打歌服特写是否明确排除？（建议：**排除**，避免与 live/costume 任务重叠。）
+1. ~~**毕业 / 退团发表照**~~：**已确认（2026-10-24）** — 官方「卒業」「契約違反による活動終了」等帖里的个人/合照**算**公式图并入库；`kind=individual`（多人则 `group`），`category=official`，能从文案认定的单人写入 `image_members`。  
+2. ~~**图片类型边界**~~：**已确认：收录（2026-10-26）**。生诞祭现场图、公演告知拼图、打歌服特写都纳入本任务，用既有 `category` / `kind` 与纯アー写区分，不新开表、不加列：
+   - 纯アー写 / 体制公式照 / 毕业·退团发表照：`category=official`，`kind=group` 或 `individual`
+   - 生诞祭现场图：`category=live`，单人 `kind=individual`，全员合照 `kind=group`
+   - 公演告知拼图：`category=other`，`kind=group` 或 `individual`（文案能认定单人时）
+   - 打歌服特写：`category=costume`，单人 `kind=individual`，全员 `kind=group`
+   一张图只关联一名成员（`export.py` 禁止 `image_members` 多名）。全员合照不挂成员，避免只写出其中一人。
