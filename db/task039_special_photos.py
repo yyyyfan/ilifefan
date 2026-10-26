@@ -227,6 +227,113 @@ def main():
             cur.execute('INSERT INTO image_members(image_id, member_id) VALUES(?,?)', (iid, member))
         report['new'].append({'id': iid, 'local': local, 'date': date, 'post': post_url, 'kind': kind, 'category': category, 'member': member, 'source_id': sid})
 
+    # 历史年份缺口：文案用公开昵称点名的单人衣装，以及两张未标的全员衣装。
+    # 昵称依据：成员名本身含该昵称，或官方アー写文案已用同一称呼（らむずっきゅん）。
+    nick_note = '任务039：官方文案用该成员的公开昵称点名，画面是单人衣装'
+    zukk_note = '任务039：角色名くまずっきゅん与深月らむ官方アー写文案「らむずっきゅん」一致，画面是单人衣装'
+    handle_note = '任务039：称呼与官方新体制介绍里的账号名一致，画面是单人衣装'
+    ramu_note = '任务039：昵称含「らむ」，是同一套巧克力衣装里其余成员已用官方账号名点名后剩下的一人，画面是单人衣装'
+    # 2022-02 巧克力衣装的称呼对应新体制介绍（id 264）里的账号：
+    # Yua=@iLiFE_yua 甘音ゆあ，Ena=@iLiFE_ena 向日えな，ShiL=@iLiFE_ShiL 琥珀しえる，
+    # Shiori=@iLiFE_shiori 天羽しおり，Luna=@iLiFE_luna 有栖るな，Riri=@iLiFE_riri 心花りり。
+    nick = {
+        595: 17, 596: 17, 599: 1, 600: 1, 601: 21, 602: 21,
+        605: 14, 606: 14, 607: 16, 608: 16, 613: 15,
+        638: 16, 639: 16, 643: 1, 644: 1, 648: 14, 649: 14,
+        640: 15, 641: 15,
+        287: 1,
+        334: 14, 337: 17, 340: 13, 344: 16, 347: 21, 354: 1,
+        351: 15,
+    }
+    handle_ids = {334, 337, 340, 344, 347, 354}
+
+    def hist_note(iid):
+        if iid in (640, 641):
+            return zukk_note
+        if iid in handle_ids:
+            return handle_note
+        if iid == 351:
+            return ramu_note
+        return nick_note
+
+    report['hist_individual'] = []
+    for iid, mid in nick.items():
+        row = cur.execute('SELECT date,kind,key_order,local FROM images WHERE id=?', (iid,)).fetchone()
+        if not row:
+            raise SystemExit(f'缺少图片 id={iid}')
+        if row['kind'] not in (None, 'individual'):
+            report['skip'].append(f'{iid} kind={row["kind"]}')
+            continue
+        if cur.execute('SELECT 1 FROM image_members WHERE image_id=? AND member_id!=?', (iid, mid)).fetchone():
+            raise SystemExit(f'id={iid} 已挂其他成员')
+        dup = cur.execute(
+            'SELECT id FROM images WHERE local=? AND id<>? AND kind IS NOT NULL',
+            (row['local'], iid)).fetchone()
+        if dup:
+            report['skip'].append(f'{iid} 与已标注的 {dup[0]} 同文件')
+            continue
+        era = era_of(cur, row['date'])
+        order = append_tokens(row['key_order'], ['kind', 'era', 'member', 'review', 'review_note'])
+        note = hist_note(iid)
+        report['hist_individual'].append({'id': iid, 'era': era, 'member': mid, 'local': row['local']})
+        if row['kind'] == 'individual':
+            continue
+        if not DRY:
+            cur.execute(
+                '''UPDATE images SET kind='individual', era=?, category='costume',
+                   review='confirmed', review_note=?, key_order=? WHERE id=? AND kind IS NULL''',
+                (era, note, order, iid))
+            cur.execute('INSERT OR IGNORE INTO image_members(image_id, member_id) VALUES(?,?)', (iid, mid))
+
+    # 画面核对过的全员主题静图。1477–1480 与 1475/1476 同文件，不标。
+    report['hist_group'] = []
+    for iid in (235, 1174, 289, 821, 1475, 1476, 1642, 1690, 1691, 1839, 2328, 2329, 2462, 2541, 3192):
+        row = cur.execute('SELECT date,kind,key_order,local FROM images WHERE id=?', (iid,)).fetchone()
+        if not row:
+            raise SystemExit(f'缺少图片 id={iid}')
+        if members(iid):
+            raise SystemExit(f'id={iid} 已挂成员')
+        earlier = cur.execute(
+            'SELECT id FROM images WHERE local=? AND id<? AND kind IS NOT NULL',
+            (row['local'], iid)).fetchone()
+        if earlier:
+            report['skip'].append(f'{iid} 与 {earlier[0]} 同文件')
+            continue
+        era = era_of(cur, row['date'])
+        order = append_tokens(row['key_order'], ['kind', 'era'])
+        report['hist_group'].append({'id': iid, 'era': era, 'local': row['local']})
+        if row['kind'] == 'group':
+            continue
+        if not DRY:
+            cur.execute(
+                '''UPDATE images SET kind='group', era=?, category='costume', key_order=?
+                   WHERE id=? AND kind IS NULL''',
+                (era, order, iid))
+
+    # 已经挂了唯一成员、也已确认，但分类仍是 other，时期页因此不显示。
+    # 只改诊所 / 圣诞 / 情人节 / 白色情人节这几套单人衣装的分类。
+    hist_cat_sql = '''
+    SELECT i.id FROM images i
+    WHERE i.kind='individual' AND i.category='other' AND i.era IS NOT NULL
+      AND i.review='confirmed' AND i.date < '2026-01-01'
+      AND (SELECT count(*) FROM image_members m WHERE m.image_id=i.id)=1
+      AND (
+        i.text LIKE '%アイライフクリニック%'
+        OR i.text LIKE '%Xmas%' OR i.text LIKE '%クリスマス%'
+        OR i.text LIKE '%VALENTINE%' OR i.text LIKE '%バレンタイン%'
+        OR i.text LIKE '%White Day%' OR i.text LIKE '%ホワイトデー%'
+      )
+      AND i.text NOT LIKE '%新ヴィジュアル%'
+      AND i.text NOT LIKE '%サポートメンバー%'
+      AND i.text NOT LIKE '%イラスト%'
+      AND i.text NOT LIKE '%販売%'
+      AND i.text NOT LIKE '%チケット%'
+    '''
+    report['hist_cat'] = [r[0] for r in cur.execute(hist_cat_sql)]
+    if not DRY:
+        cur.execute(
+            f"UPDATE images SET category='costume' WHERE id IN ({hist_cat_sql}) AND category='other'")
+
     if DRY:
         c.rollback()
     else:
