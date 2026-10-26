@@ -2,6 +2,8 @@
 
 分支：`cursor/039-special-costume-images-2975`（只推了这个分支，没有合并 main，没有部署，没有 force push）
 
+提交：`b4aac05` 收录数据、清单、导出与任务说明。本文件补上该提交号。
+
 导出检查：`python3 db/export.py --check` 通过。版本 `29319ec6`。新图 11 张在 R2 桶 `ilife-images`，已写入 `db/r2_manifest.json`。公开地址 `https://img.ilifefan.dpdns.org/` 抽查 7 张，HTTP 200，字节数与 md5 与清单一致。本地打开时期页：e12 团体公式图 21 张、个人公式图 92 张；e5 团体 14 张、个人 95 张；e8 团体 12 张。抽看的图 `naturalWidth` 不为 0。桌面宽约 1280、手机宽 390 都能排出格子。
 
 改动脚本：`db/task039_special_photos.py`（可重复跑：已有 `local` 或已有 `kind` 会跳过）。
