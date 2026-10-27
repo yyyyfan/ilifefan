@@ -4,6 +4,8 @@
   Cache-Control: no-cache
 /calendar
   Cache-Control: no-cache
+/draw
+  Cache-Control: no-cache
 /eras
   Cache-Control: no-cache
 /gallery

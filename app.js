@@ -4,7 +4,7 @@ const $=s=>document.querySelector(s),J=f=>fetch('data/'+f+'.json'+(V?'?v='+V:'')
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 /* 备注里的裸 URL 转成可点链接（先转义再链接化，尾部标点不吞进 href） */
 const lk=s=>esc(s).replace(/https?:\/\/[^\s<>"）】]+/g,u=>{const m=u.match(/[.,;:、。；：]+$/),t=m?u.slice(0,-m[0].length):u;return `<a href="${t}" target=_blank rel=noopener>${t}</a>${m?m[0]:''}`});
-const NAV=[['index','home','HOME','首页'],['members','members','MEMBER','成员'],['songs','songs','SONG','歌曲'],['lives','lives','LIVE','公演'],['venues','venues','VENUE','场地'],['calendar','calendar','SCHEDULE','日历'],['eras','eras','PROFILE','时期/公式图'],['gallery','gallery','PHOTO','图库']];
+const NAV=[['index','home','HOME','首页'],['members','members','MEMBER','成员'],['songs','songs','SONG','歌曲'],['draw','draw','DRAW','抽签'],['lives','lives','LIVE','公演'],['venues','venues','VENUE','场地'],['calendar','calendar','SCHEDULE','日历'],['eras','eras','PROFILE','时期/公式图'],['gallery','gallery','PHOTO','图库']];
 $('header').innerHTML=`<div class=hd><a class=logo href="index.html">iLiFE<b>!</b><small>FAN DATABASE · 应援资料库</small></a><button id=burger aria-label=menu>☰</button><nav>${NAV.map(([f,p,e,c])=>`<a href="${f}.html" class="${p==P?'on':''}">${e}<span>${c}</span></a>`).join('')}</nav></div>`;
 $('#burger').onclick=()=>$('nav').classList.toggle('open');
 document.body.insertAdjacentHTML('beforeend',`<footer><b>iLiFE! FAN DATABASE</b>非官方粉丝站。图片版权归 iLiFE! / HEROINES / imaginate 及原发布者所有，均标注来源。数据来源：@iLiFE_official、ilife-heroines.com（Wayback 存档）、日文维基百科。</footer><div id=lb><span class=x>×</span><span class=pv>‹</span><img><p></p><span class=nx>›</span></div>`);
@@ -261,6 +261,264 @@ if(P=='songs'){const S=await J('songs');let filter=q.get('f')||'all';
   imgDone(m);
  };
  window.addEventListener('popstate',render);
+ render();return}
+if(P=='draw'){
+ const [S,M,I]=await Promise.all([J('songs'),J('members'),J('images')]);
+ const KEY='ilifefan-draw-v1';
+ const wait=ms=>new Promise(r=>setTimeout(r,ms));
+ const reduceMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const jstDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const empty=()=>({v:1,prefs:{mode:'song',songFilter:'all',includeFormer:false},first:{song:'',member:''},history:{song:[],member:[]}});
+ const dayOk=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'');
+ const normalize=raw=>{
+  const base=empty();
+  if(!raw||typeof raw!='object')return base;
+  const prefs=raw.prefs||{};
+  if(prefs.mode=='member')base.prefs.mode='member';
+  if(prefs.songFilter=='group'||prefs.songFilter=='solo')base.prefs.songFilter=prefs.songFilter;
+  base.prefs.includeFormer=!!prefs.includeFormer;
+  ['song','member'].forEach(k=>{
+   if(raw.first&&dayOk(raw.first[k]))base.first[k]=raw.first[k];
+   const arr=raw.history&&Array.isArray(raw.history[k])?raw.history[k]:[];
+   base.history[k]=arr.filter(x=>x&&Number.isFinite(Number(x.id))&&dayOk(x.day)).slice(0,20).map(x=>({id:Number(x.id),day:x.day,at:typeof x.at=='string'?x.at:'',first:!!x.first}));
+  });
+  return base;
+ };
+ const load=()=>{try{return normalize(JSON.parse(localStorage.getItem(KEY)||''))}catch(e){return empty()}};
+ let st=load(),view=null,busy=false,enterAnim=false,toastT=0;
+ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){toast('这个浏览器无法保存抽签记录')}};
+ const toast=msg=>{let t=$('#dtoast');if(!t){document.body.insertAdjacentHTML('beforeend','<div id=dtoast role=status></div>');t=$('#dtoast')}t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2400)};
+ if(!$('#dpetals'))document.body.insertAdjacentHTML('beforeend','<div id=dpetals aria-hidden=true></div>');
+ const safeHex=h=>/^#[0-9a-fA-F]{6}$/.test(h||'')?h:'#e4007f';
+ const lightHex=h=>{const n=h.slice(1),r=parseInt(n.slice(0,2),16),g=parseInt(n.slice(2,4),16),b=parseInt(n.slice(4,6),16);return (r*299+g*587+b*114)/1000>186};
+ const accentOf=hex=>lightHex(hex)? '#e4007f':hex;
+ const randIndex=n=>{
+  if(n<=1)return 0;
+  const buf=new Uint32Array(1),limit=Math.floor(0x100000000/n)*n;
+  let x;do{crypto.getRandomValues(buf);x=buf[0]}while(x>=limit);
+  return x%n;
+ };
+ const isSq=im=>im&&im.w&&im.h&&Math.abs(im.w/im.h-1)<0.08;
+ const songSrc=s=>{
+  const v=(s.videos||[])[0],cov=s.cover;
+  const cos=(s.costumes||[]).flatMap(c=>(c.images&&c.images.length?c.images:(c.image?[c.image]:[])));
+  if(isSq(cov))return cov.local||cov.url||'';
+  if(v&&v.thumb)return v.thumb;
+  if(cov&&(cov.local||cov.url))return cov.local||cov.url;
+  if(cos[0])return cos[0].local||cos[0].url||'';
+  const im=(s.images||[])[0];
+  return im?(im.local||im.url||''):'';
+ };
+ const memberSrc=mem=>{const p=latestPhoto(I,mem.name);return p?(p.local||p.url||''):''};
+ const songById=id=>S.find(s=>s.id==id);
+ const memberById=id=>M.find(mem=>mem.id==id);
+ const pool=()=>{
+  if(st.prefs.mode=='song'){
+   const f=st.prefs.songFilter;
+   return S.filter(s=>f=='all'?1:f=='group'?!s.member:!!s.member);
+  }
+  return M.filter(mem=>st.prefs.includeFormer||mem.status=='现役');
+ };
+ const counts=()=>({all:S.length,group:S.filter(s=>!s.member).length,solo:S.filter(s=>!!s.member).length,active:M.filter(mem=>mem.status=='现役').length,allM:M.length});
+ const burst=hex=>{
+  if(reduceMotion())return;
+  const layer=$('#dpetals'),card=m.querySelector('.dcard');if(!layer||!card)return;
+  const r=card.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+Math.min(r.height*0.34,220);
+  const col=accentOf(safeHex(hex));
+  const colors=[col,'#e4007f','#ffb3d6','#fff6fb',col];
+  for(let i=0;i<16;i++){
+   const p=document.createElement('span');p.className='dpetal';
+   const ang=(Math.PI*2*i)/16+(Math.random()-.5)*0.5,dist=86+Math.random()*120;
+   p.style.left=cx+'px';p.style.top=cy+'px';p.style.background=colors[i%colors.length];
+   p.style.setProperty('--dx',(Math.cos(ang)*dist)+'px');
+   p.style.setProperty('--dy',(Math.sin(ang)*dist-36)+'px');
+   p.style.setProperty('--rot',((Math.random()*220)-110)+'deg');
+   layer.appendChild(p);setTimeout(()=>p.remove(),1400);
+  }
+ };
+ const fileName=()=>{
+  const kind=view.mode=='song'?'song':'member';
+  const label=String(view.mode=='song'?view.item.title:view.item.name).replace(/[\\/:*?"<>|\s]+/g,'');
+  return `ilifefan-${kind}-${label}-${view.day}.png`;
+ };
+ const caption=()=>view.mode=='song'
+  ?`iLiFE! 应援资料库\n${view.day} 抽歌\n${view.item.title}${view.item.kana?'（'+view.item.kana+'）':''}`
+  :`iLiFE! 应援资料库\n${view.day} 抽推\n${view.item.name}${view.item.kana?'（'+view.item.kana+'）':''}`;
+ const loadImg=src=>new Promise(res=>{
+  if(!src)return res(null);
+  const im=new Image();im.crossOrigin='anonymous';
+  im.onload=()=>res(im.naturalWidth?im:null);im.onerror=()=>res(null);im.src=src;
+ });
+ const roundRect=(ctx,x,y,w,h,r)=>{
+  const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
+ };
+ const wrapLines=(ctx,text,max)=>{
+  const lines=[];let line='';
+  for(const ch of [...String(text||'')]){
+   const t=line+ch;
+   if(line&&ctx.measureText(t).width>max){lines.push(line);line=ch}else line=t;
+  }
+  if(line)lines.push(line);return lines;
+ };
+ const buildCanvas=async()=>{
+  try{await Promise.race([document.fonts.load('700 48px "Noto Sans SC"'),wait(1800)])}catch(e){}
+  const W=1080,H=1620,c=document.createElement('canvas');c.width=W;c.height=H;
+  const x=c.getContext('2d');x.imageSmoothingQuality='high';
+  const F='"Noto Sans SC",Roboto,"PingFang SC",sans-serif';
+  const song=view.mode=='song',item=view.item;
+  const hex=song?'#e4007f':safeHex(item.hex),accent=accentOf(hex);
+  const src=song?songSrc(item):memberSrc(item);
+  const img=await loadImg(src);
+  x.fillStyle='#fbf8f4';x.fillRect(0,0,W,H);
+  const blob=(cx,cy,r,col)=>{const g=x.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,col);g.addColorStop(1,'rgba(251,248,244,0)');x.fillStyle=g;x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.fill()};
+  blob(120,80,340,'rgba(228,0,127,.18)');blob(980,200,300,'rgba(255,179,214,.55)');blob(860,1480,360,'rgba(228,0,127,.12)');
+  x.save();x.shadowColor='rgba(228,0,127,.18)';x.shadowBlur=40;x.shadowOffsetY=16;x.fillStyle='#fff';roundRect(x,56,56,W-112,H-112,48);x.fill();x.restore();
+  x.save();roundRect(x,56,56,W-112,H-112,48);x.clip();x.fillStyle=accent;x.fillRect(56,56,W-112,18);x.restore();
+  x.textAlign='center';x.textBaseline='middle';x.fillStyle='#8a8a8a';x.font='500 22px '+F;x.fillText('FAN DATABASE',W/2,128);
+  x.font='900 68px '+F;x.fillStyle='#2b2b2b';
+  const brand='iLiFE',bang='!';
+  const bw=x.measureText(brand).width;x.font='900 68px '+F;const bangW=x.measureText(bang).width;
+  const start=(W-bw-bangW)/2;x.textAlign='left';x.fillStyle='#2b2b2b';x.fillText(brand,start,196);x.fillStyle='#e4007f';x.fillText(bang,start+bw,196);x.textAlign='center';
+  x.fillStyle='#8a8a8a';x.font='500 30px '+F;x.fillText('应援资料库',W/2,252);
+  const bits=[view.day.replace(/-/g,'.'),song?'抽歌':'抽推'];if(view.first)bits.push('今日首抽');
+  x.fillStyle=accent;x.font='700 28px '+F;x.fillText(bits.join('  ·  '),W/2,318);
+  const fw=song?680:600,fh=song?680:760,fx=(W-fw)/2,fy=372;
+  roundRect(x,fx,fy,fw,fh,28);x.save();x.clip();
+  x.fillStyle=song?'#f6e7ee':'#fbf3f7';x.fillRect(fx,fy,fw,fh);
+  if(!song){x.fillStyle=hex;x.globalAlpha=lightHex(hex)?0.16:0.22;x.fillRect(fx,fy,fw,fh);x.globalAlpha=1}
+  if(img){
+   const s=Math.min(fw/img.width,fh/img.height),dw=img.width*s,dh=img.height*s;
+   x.drawImage(img,fx+(fw-dw)/2,fy+(fh-dh)/2,dw,dh);
+  }else{
+   const g=x.createLinearGradient(fx,fy,fx+fw,fy+fh);g.addColorStop(0,'#ffd0e6');g.addColorStop(1,'#e4007f');x.fillStyle=g;x.fillRect(fx,fy,fw,fh);
+   x.fillStyle='#fff';x.font='700 42px '+F;x.textAlign='center';
+   wrapLines(x,song?item.title:item.name,fw-80).slice(0,3).forEach((ln,i)=>x.fillText(ln,W/2,fy+fh/2-28+i*52));
+  }
+  x.restore();
+  let y=fy+fh+56;
+  if(!song){
+   x.fillStyle=hex;roundRect(x,fx,fy+fh+18,fw,12,6);x.fill();
+   if(lightHex(hex)){x.strokeStyle='#e6dfd9';x.lineWidth=2;x.stroke()}
+   y=fy+fh+62;
+  }
+  x.textAlign='center';x.fillStyle='#e4007f';x.font='700 24px '+F;
+  x.fillText(song?(item.member?'个人曲 · '+item.member:'团体曲'):((item.status||'')+(item.color?' · '+item.color:'')),W/2,y);
+  y+=58;x.fillStyle='#2b2b2b';x.font='700 52px '+F;
+  wrapLines(x,song?item.title:item.name,W-220).slice(0,2).forEach(ln=>{x.fillText(ln,W/2,y);y+=62});
+  const kana=item.kana||'';if(kana){x.fillStyle='#8a8a8a';x.font='500 28px '+F;x.fillText(kana,W/2,y);y+=48}
+  if(song){x.fillStyle='#6f8b97';x.font='500 28px '+F;wrapLines(x,[item.duration,item.release].filter(Boolean).join(' · ')||'—',W-220).slice(0,2).forEach(ln=>{x.fillText(ln,W/2,y);y+=40})}
+  else if(item.catch){x.fillStyle='#2b2b2b';x.font='500 30px '+F;wrapLines(x,item.catch,W-220).slice(0,2).forEach(ln=>{x.fillText(ln,W/2,y);y+=42})}
+  x.fillStyle='#8a8a8a';x.font='500 22px '+F;x.fillText('非官方粉丝站',W/2,H-108);
+  return c;
+ };
+ const downloadBlob=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2500)};
+ const saveCard=async share=>{
+  if(!view||busy)return;
+  const btn=$(share?'#drawShare':'#drawSave');if(btn)btn.disabled=true;
+  try{
+   const canvas=await buildCanvas();
+   const blob=await new Promise(res=>canvas.toBlob(res,'image/png'));
+   if(!blob)throw new Error('png');
+   const name=fileName();
+   if(share&&navigator.share){
+    const file=new File([blob],name,{type:'image/png'});
+    const payload={title:'iLiFE! 抽签',text:caption()};
+    if(navigator.canShare&&navigator.canShare({files:[file]}))payload.files=[file];
+    await navigator.share(payload);toast('已打开分享');return;
+   }
+   downloadBlob(blob,name);toast('已保存卡片');
+  }catch(e){if(e&&e.name=='AbortError')return;toast('没能生成卡片')}
+  finally{if(btn)btn.disabled=false}
+ };
+ const render=()=>{
+  document.title='DRAW · 抽签 | iLiFE! 应援资料库';
+  const mode=st.prefs.mode,list=pool(),n=counts(),anim=enterAnim&&!reduceMotion();enterAnim=false;
+  const glow=view&&view.mode=='member'?accentOf(safeHex(view.item.hex)):'#e4007f';
+  const media=(src,alt,href,bg)=>`<a class=dmedia href="${href}"${bg?` style="background:${bg}"`:''}>${src?`<img src="${esc(src)}" alt="${esc(alt)}">`:`<span class=songph><b>${esc(alt)}</b><small>无官方图片</small></span>`}</a>`;
+  let card;
+  if(!view){
+   card=`<article class="dcard"><div class=dface><p class=dface-k>DRAW</p><p class=dface-logo>iLiFE<b>!</b></p><p class=dface-t>${mode=='song'?'今日的一首歌':'今日的一位推'}</p><p class=dface-n>${list.length?`池子里有 ${list.length} ${mode=='song'?'首':'人'}`:'这个范围是空的'}</p></div></article>`;
+  }else if(view.mode=='song'){
+   const s=view.item;
+   card=`<article class="dcard${anim?' is-in':''}"><div class=sr aria-live=polite>抽到 ${esc(s.title)}</div>${view.first?'<span class=dbadge>今日首抽</span>':''}${media(songSrc(s),s.title,'songs.html?s='+s.id)}<div class=dbody><p class=dkind>${s.member?'个人曲 · '+esc(s.member):'团体曲'}</p><h2>${esc(s.title)}</h2>${s.kana?`<p class=dkana>${esc(s.kana)}</p>`:''}<p class=dmeta>${esc([s.duration,s.release].filter(Boolean).join(' · ')||'—')}</p></div></article>`;
+  }else{
+   const mem=view.item,hex=safeHex(mem.hex);
+   card=`<article class="dcard mem${anim?' is-in':''}"><div class=sr aria-live=polite>抽到 ${esc(mem.name)}</div>${view.first?'<span class=dbadge>今日首抽</span>':''}${media(memberSrc(mem),mem.name,'members.html?m='+encodeURIComponent(mem.name),`color-mix(in srgb, ${hex} 22%, #fbf3f7)`)}<div class=dbar style="background:${hex}${lightHex(hex)?';box-shadow:inset 0 0 0 1px #e6dfd9':''}"></div><div class=dbody><p class=dkind><span class=dot style="background:${hex}"></span>${esc(mem.status||'')}${mem.color?' · '+esc(mem.color):''}</p><h2>${esc(mem.name)}</h2>${mem.kana?`<p class=dkana>${esc(mem.kana)}</p>`:''}${mem.catch?`<p class=dcatch>${esc(mem.catch)}</p>`:''}</div></article>`;
+  }
+  const shareable=typeof navigator.share=='function';
+  const acts=`<div class=dacts><button type=button class=go id=drawGo ${busy||!list.length?'disabled':''}>${view?'再抽一次':'抽取'}</button>${view?'<button type=button class=off id=drawSave>保存卡片</button>':''}${view&&shareable?'<button type=button class=off id=drawShare>分享</button>':''}${view?`<a class="pill off" href="${view.mode=='song'?'songs.html?s='+view.item.id:'members.html?m='+encodeURIComponent(view.item.name)}">${view.mode=='song'?'查看歌曲':'查看成员'}</a>`:''}</div>`;
+  const filters=mode=='song'
+   ?`<p class=filters role=group aria-label=曲目范围>${[['all','全部',n.all],['group','团体曲',n.group],['solo','个人曲',n.solo]].map(([k,lb,c])=>`<button type=button class="${st.prefs.songFilter==k?'':'off'}" data-sf=${k} aria-pressed=${st.prefs.songFilter==k}>${lb} ${c}</button>`).join('')}</p><p class=dpool>${list.length?`从 ${list.length} 首里抽`:'这个范围里没有歌'}</p>`
+   :`<p class=filters><span class=lb>${st.prefs.includeFormer?'全部成员 '+n.allM+' 人':'只抽现役 '+n.active+' 人'}</span><button type=button id=drawFormer class="${st.prefs.includeFormer?'':'off'}" aria-pressed=${st.prefs.includeFormer}>含前成员</button></p><p class=dpool>${list.length?`从 ${list.length} 人里抽`:'这个范围里没有成员'}</p>`;
+  const hist=st.history[mode].map(h=>{
+   const item=mode=='song'?songById(h.id):memberById(h.id);if(!item)return '';
+   const src=mode=='song'?songSrc(item):memberSrc(item),label=mode=='song'?item.title:item.name;
+   const on=view&&view.at===h.at;
+   return `<button type=button class="dhi${on?' on':''}" data-hid=${h.id} data-hat="${esc(h.at)}"><span class=ph>${src?`<img alt="" src="${esc(src)}">`:`<b>${esc(label.slice(0,1))}</b>`}</span><b>${esc(label)}</b>${h.first?'<i>首抽</i>':''}</button>`;
+  }).join('');
+  m.innerHTML=`<div class=crumb><a href=index.html>首页</a> / 抽签</div><h1 class=ttl>DRAW</h1><p class=sub>抽一首歌来听，或抽一位推。</p><div class=dtop><div class=dmode role=tablist aria-label=抽签模式><button type=button role=tab data-mode=song aria-selected=${mode=='song'}>抽歌</button><button type=button role=tab data-mode=member aria-selected=${mode=='member'}>抽推</button></div>${filters}<div class=dstage><div class=dglow style="background:radial-gradient(circle, ${glow}55, transparent 68%)"></div>${card}</div>${acts}</div>${hist?'<section class=dhist><h2>最近</h2><div class=dstrip>'+hist+'</div></section>':''}<section class=darch><p>记录只留在这台浏览器里。可以导出 JSON，换浏览器时再导入。</p><p class=dacts><button type=button class=off id=drawExport>导出存档</button><button type=button class=off id=drawImport>导入存档</button><button type=button class=off id=drawClear>清空记录</button><input id=drawFile type=file accept="application/json,.json" hidden></p></section>`;
+  m.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{if(busy||b.dataset.mode==st.prefs.mode)return;st.prefs.mode=b.dataset.mode;view=null;save();render()});
+  m.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{if(busy)return;st.prefs.songFilter=b.dataset.sf;if(view&&view.mode=='song'&&!pool().some(s=>s.id==view.item.id))view=null;save();render()});
+  const former=$('#drawFormer');if(former)former.onclick=()=>{if(busy)return;st.prefs.includeFormer=!st.prefs.includeFormer;if(view&&view.mode=='member'&&!pool().some(mem=>mem.id==view.item.id))view=null;save();render()};
+  $('#drawGo').onclick=()=>{draw()};
+  const sv=$('#drawSave');if(sv)sv.onclick=()=>saveCard(false);
+  const sh=$('#drawShare');if(sh)sh.onclick=()=>saveCard(true);
+  m.querySelectorAll('[data-hid]').forEach(b=>b.onclick=()=>{
+   if(busy)return;
+   const h=st.history[mode].find(x=>String(x.id)==b.dataset.hid&&x.at==b.dataset.hat);if(!h)return;
+   const item=mode=='song'?songById(h.id):memberById(h.id);if(!item)return;
+   view={mode,item,first:!!h.first,day:h.day,at:h.at,hist:true};render();
+  });
+  $('#drawExport').onclick=()=>{
+   const blob=new Blob([JSON.stringify({key:KEY,exportedAt:new Date().toISOString(),...st},null,2)],{type:'application/json'});
+   downloadBlob(blob,`ilifefan-draw-${jstDay()}.json`);toast('已导出存档');
+  };
+  $('#drawImport').onclick=()=>$('#drawFile').click();
+  $('#drawFile').onchange=()=>{
+   const f=$('#drawFile').files&&$('#drawFile').files[0];$('#drawFile').value='';if(!f)return;
+   const rd=new FileReader();
+   rd.onload=()=>{
+    try{
+     const raw=JSON.parse(String(rd.result||''));
+     if(!raw||typeof raw!='object'||!(raw.prefs||raw.history||raw.key==KEY))throw new Error('shape');
+     st=normalize(raw);view=null;save();render();toast('已导入存档');
+    }catch(e){toast('这份文件不是抽签存档')}
+   };
+   rd.readAsText(f);
+  };
+  $('#drawClear').onclick=()=>{
+   if(busy)return;
+   if(!confirm('清空这台浏览器里的抽签记录？'))return;
+   const prefs=st.prefs;st=empty();st.prefs=prefs;view=null;save();render();toast('已清空记录');
+  };
+  imgDone(m);
+ };
+ const draw=async()=>{
+  if(busy)return;
+  const list=pool();
+  if(!list.length){toast('这个范围里没有可抽的');return}
+  if(!globalThis.crypto||!crypto.getRandomValues){toast('这个浏览器不能公平抽取');return}
+  busy=true;const go=$('#drawGo');if(go)go.disabled=true;
+  try{
+   const reduce=reduceMotion();
+   const card=m.querySelector('.dcard');
+   if(card&&!reduce){card.classList.add('is-out');await wait(280)}
+   const item=list[randIndex(list.length)];
+   const day=jstDay(),mode=st.prefs.mode,first=st.first[mode]!==day;
+   if(first)st.first[mode]=day;
+   const at=new Date().toISOString();
+   st.history[mode]=[{id:item.id,day,at,first},...st.history[mode]].slice(0,20);
+   save();
+   view={mode,item,first,day,at,hist:false};
+   enterAnim=!reduce;
+   render();
+   if(!reduce)burst(mode=='member'?item.hex:'#e4007f');
+   const shown=m.querySelector('.dcard');
+   if(shown)shown.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'});
+   if(!reduce)await wait(680);
+  }finally{busy=false;const b=$('#drawGo');if(b)b.disabled=false}
+ };
  render();return}
 })();
 /* column control: one shared control per page type, saved in localStorage */
