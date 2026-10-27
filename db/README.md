@@ -5,7 +5,8 @@
 ## 表结构（见 `schema.sql`）
 - `members` 成员；`member_fields_sources` 每个字段的出处；`member_periods` 在籍区间（type：r=正式，s=支援，n=非正式/候补生）
 - `eras` 时期；`era_members` 各时期阵容（role：支援/副支援/休止，空=正式）；`timeline_marks` 时间轴标记；`meta` 杂项
-- `lives` 公演；`venues` 会场；`songs` 歌曲（待填）；`costumes` 服装（待填）
+- `lives` 公演；`venues` 会场；`region_geo` 场地足迹图锚点（都道府县厅所在城市坐标；海外和未确认不上图）。新的 `venues.pref` 必须补一行，否则导出失败
+- `songs` 歌曲（待填）；`costumes` 服装（待填）
 - `images` 图片（尺寸、R2 对象键 `local`（导出时拼成 `export.py` 中 `IMG_BASE` 的完整地址）、来源推文 `post_id`、日期、类别、复核状态 review/pending）；`image_members`、`image_eras` 关联
 - `sources` 所有出处 URL
 - `key_order` 列记录原 JSON 键顺序，保证导出逐字节一致；新增记录时按已有同类记录填写即可。

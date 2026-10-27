@@ -251,4 +251,74 @@ body.cols-on .photos{grid-template-columns:repeat(var(--cols),1fr)!important}
  .ath{width:48px;height:48px}
 }
 
+/* VENUE footprint map */
+body[data-page=venues] main{padding-top:12px;padding-bottom:28px}
+body[data-page=venues] h1.ttl{font:900 30px/1 Roboto;margin:0 0 2px;color:var(--pink);letter-spacing:normal}
+body[data-page=venues] .sub{color:var(--sub);margin:0 0 8px;font-size:13px}
+.vlayout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,360px);gap:18px;align-items:start}
+.vmap-card,.vpanel{min-width:0}
+.vmap-card{background:linear-gradient(180deg,#fff 0%,#fff7f8 70%,#fff 100%);border:1px solid #f3e4ea;border-radius:24px;padding:14px 14px 8px;box-shadow:0 10px 32px #e4007f0e}
+.vmap-hd{display:flex;align-items:baseline;gap:10px;padding:2px 8px 0}
+.vmap-hd b{font:700 12px "Noto Sans SC";letter-spacing:.18em;color:var(--pink)}
+.vmap-hd span{font-size:12px;color:var(--sub)}
+.vsvg{display:block;width:min(100%,calc((100dvh - 300px) * var(--ar,.96)));max-width:100%;max-height:calc(100dvh - 300px);height:auto;margin:0 auto}
+.vsea{fill:#fff8f7}
+.vland{fill:#f4e6d4;stroke:#ead9c6;stroke-width:1;vector-effect:non-scaling-stroke}
+.vstem{fill:none;stroke:#e7b4c8;stroke-width:1;vector-effect:non-scaling-stroke}
+.vanchor{fill:#e4007f;opacity:.8}
+.vpin .hit{fill:transparent}
+.vpin .ring{fill:none;stroke:#e4007f;stroke-width:1.6;opacity:0;vector-effect:non-scaling-stroke}
+.vpin .core{fill:#e4007f;stroke:#fff;stroke-width:1.6;vector-effect:non-scaling-stroke}
+.vpin .vnum{fill:#fff;font:700 11px Roboto,sans-serif;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.vpin.is-on .core{fill:#fff;stroke:#e4007f;stroke-width:2.4}
+.vpin.is-on .vnum{fill:#e4007f}
+.vpin.is-on .ring,.vpin.is-hot .ring,.vpin:focus-visible .ring{opacity:1}
+.vpin.is-dim,.vlab.is-dim,.oki-link.is-dim{opacity:.38}
+.vlab text{font:600 12px "Noto Sans SC","PingFang SC",sans-serif;fill:#5c534e}
+.vlab.is-on text,.vlab.is-hot text{fill:#e4007f;font-weight:700}
+.vtip-t{font:600 12px "Noto Sans SC",Roboto,sans-serif;fill:#5c534e}
+#vtip{pointer-events:none}
+.oki-box{fill:#fffdfb;stroke:#f0dde6;stroke-width:1}
+.oki-link.is-on .oki-box{stroke:#e4007f;stroke-width:1.6}
+.oki-t{font:600 11px "Noto Sans SC",sans-serif;fill:#c48aa6}
+.oki-link.is-on .oki-t{fill:#e4007f}
+.vnote{margin:0 8px 8px;font-size:11px;line-height:1.65;color:var(--sub)}
+.vpanel{position:sticky;top:72px;max-height:calc(100vh - 88px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 12px 12px;box-shadow:0 8px 24px #e4007f0c;scrollbar-width:thin;scroll-margin-top:72px}
+.vpanel h2{margin:0 4px 2px;padding:0;font:700 18px/1.35 "Noto Sans SC",Roboto;color:var(--ink);overflow-wrap:anywhere}
+.vpanel h2:before{content:none}
+.vph{margin:0 4px 8px;font-size:12px;color:var(--sub);line-height:1.6}
+.vsearch{display:block;width:100%;box-sizing:border-box;margin:0 0 8px;border:1px solid var(--line);background:#fbf8f4;border-radius:999px;padding:8px 14px;font:16px/1.4 "Noto Sans SC",Roboto,sans-serif;color:inherit}
+.vsearch:focus{outline:none;border-color:#f3b6d4;box-shadow:0 0 0 3px #e4007f14}
+.vsearch[hidden]{display:none}
+a.vrow{position:relative;display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:transparent;color:inherit;border-radius:12px;padding:7px 8px;margin:1px 0;overflow:hidden}
+a.vrow:before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w,0%);background:#fff1f6;border-radius:12px;z-index:0}
+a.vrow>*{position:relative;z-index:1}
+a.vrow:hover{color:inherit;background:#fff7fa}
+a.vrow:hover .vn{color:var(--pink)}
+a.vrow.on{background:#fde8f2;color:var(--pink)}
+a.vrow.on .vc{color:var(--pink)}
+.vdot{width:8px;height:8px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 3px #e4007f14;flex:none}
+a.vrow.offmap .vdot{background:transparent;box-shadow:inset 0 0 0 1.5px #e7b4c8}
+a.vrow.offmap:before{display:none}
+.vn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.vs{flex:none;font-size:11px;color:var(--sub)}
+.vc{margin-left:auto;font:600 12px Roboto;color:var(--sub);flex:none}
+.vsec{margin:12px 8px 4px;font-size:11px;letter-spacing:.14em;color:#c48aa6}
+a.vback{display:inline-block;margin:0 4px 6px;color:var(--pink);font-size:12px;font-weight:700}
+a.vlive{display:grid;grid-template-columns:92px minmax(0,1fr);gap:2px 8px;align-items:start;padding:8px 6px;border-radius:12px;color:inherit}
+a.vlive:hover{color:inherit;background:#fff7fa}
+a.vlive:hover b{color:var(--pink)}
+a.vlive .d{grid-row:1 / span 2;font:500 12px Roboto;color:var(--sub);padding-top:2px}
+a.vlive .vt{min-width:0}
+a.vlive .vt b{font-size:13px;font-weight:700;line-height:1.35}
+a.vlive .meta{grid-column:2;font-size:11px;color:var(--sub)}
+@media(min-width:761px){.vsearch{font-size:13px}}
+@media(max-width:760px){
+  body[data-page=venues] h1.ttl{font-size:26px}
+  .vlayout{grid-template-columns:1fr;gap:12px}
+  .vpanel{position:static;max-height:none}
+  .vmap-card{padding:10px 8px 6px}
+  .vsvg{width:min(100%,calc(54vh * var(--ar,.96)));max-height:54vh}
+}
+
 
