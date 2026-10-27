@@ -4,10 +4,119 @@ const $=s=>document.querySelector(s),J=f=>fetch('data/'+f+'.json'+(V?'?v='+V:'')
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 /* 备注里的裸 URL 转成可点链接（先转义再链接化，尾部标点不吞进 href） */
 const lk=s=>esc(s).replace(/https?:\/\/[^\s<>"）】]+/g,u=>{const m=u.match(/[.,;:、。；：]+$/),t=m?u.slice(0,-m[0].length):u;return `<a href="${t}" target=_blank rel=noopener>${t}</a>${m?m[0]:''}`});
-const NAV=[['index','home','HOME','首页'],['members','members','MEMBER','成员'],['songs','songs','SONG','歌曲'],['draw','draw','DRAW','抽签'],['lives','lives','LIVE','公演'],['venues','venues','VENUE','场地'],['calendar','calendar','SCHEDULE','日历'],['eras','eras','PROFILE','时期/公式图'],['gallery','gallery','PHOTO','图库']];
+const NAV=[['index','home','HOME','首页'],['members','members','MEMBER','成员'],['songs','songs','SONG','歌曲'],['lives','lives','LIVE','公演'],['venues','venues','VENUE','场地'],['calendar','calendar','SCHEDULE','日历'],['eras','eras','PROFILE','时期/公式图'],['gallery','gallery','PHOTO','图库']];
 $('header').innerHTML=`<div class=hd><a class=logo href="index.html">iLiFE<b>!</b><small>FAN DATABASE · 应援资料库</small></a><button id=burger aria-label=menu>☰</button><nav>${NAV.map(([f,p,e,c])=>`<a href="${f}.html" class="${p==P?'on':''}">${e}<span>${c}</span></a>`).join('')}</nav></div>`;
 $('#burger').onclick=()=>$('nav').classList.toggle('open');
 document.body.insertAdjacentHTML('beforeend',`<footer><b>iLiFE! FAN DATABASE</b>非官方粉丝站。图片版权归 iLiFE! / HEROINES / imaginate 及原发布者所有，均标注来源。数据来源：@iLiFE_official、ilife-heroines.com（Wayback 存档）、日文维基百科。</footer><div id=lb><span class=x>×</span><span class=pv>‹</span><img><p></p><span class=nx>›</span></div>`);
+
+/* iLiFE! 官方吉祥物「アイラビット」悬浮抽签入口（可拖动、卡哇伊交互） */
+(()=>{
+ const m=document.createElement('div');
+ m.id='dmascot';
+ m.className='dmascot'+(P=='draw'?' on-draw':'');
+ m.setAttribute('role','button');
+ m.setAttribute('aria-label','今日抽签');
+ m.setAttribute('tabindex','0');
+ m.setAttribute('title','今日抽签（拖动调整位置，点击求签）');
+ m.innerHTML=`<div class="dmascot-bubble" aria-hidden="true"><span>今日抽签 💕</span></div><div class="dmascot-ring"></div><div class="dmascot-avatar" aria-hidden="true"></div><div class="dmascot-badge" aria-hidden="true">🐰</div>`;
+ document.body.appendChild(m);
+
+ let dragging=false, startX=0, startY=0, initLeft=0, initTop=0, moved=false, pid=null;
+ const getPos=()=>{
+  const r=m.getBoundingClientRect();
+  return {x:r.left, y:r.top};
+ };
+ const clamp=(x,y)=>{
+  const pad=12, w=m.offsetWidth||64, h=m.offsetHeight||64;
+  const maxX=window.innerWidth-w-pad, maxY=window.innerHeight-h-pad;
+  return {x:Math.max(pad,Math.min(maxX,x)), y:Math.max(pad,Math.min(maxY,y))};
+ };
+ const setPos=(x,y)=>{
+  m.style.left=x+'px'; m.style.top=y+'px';
+  m.style.right='auto'; m.style.bottom='auto';
+ };
+
+ const burstKawaii=()=>{
+  m.classList.remove('is-pop');
+  void m.offsetWidth;
+  m.classList.add('is-pop');
+  const emojis=['💖','✨','🌸','🐰','🎀','💕','🌟'];
+  const r=m.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+  for(let i=0;i<8;i++){
+   const s=document.createElement('span');
+   s.className='dmascot-sparkle';
+   s.textContent=emojis[i%emojis.length];
+   const ang=(Math.PI*2*i)/8+(Math.random()-.5)*0.5;
+   const dist=45+Math.random()*45;
+   s.style.left=cx+'px'; s.style.top=cy+'px';
+   s.style.setProperty('--dx',(Math.cos(ang)*dist)+'px');
+   s.style.setProperty('--dy',(Math.sin(ang)*dist-20)+'px');
+   s.style.setProperty('--rot',((Math.random()*120)-60)+'deg');
+   document.body.appendChild(s);
+   setTimeout(()=>s.remove(),900);
+  }
+ };
+
+ m.addEventListener('pointerdown',e=>{
+  if(e.button&&e.button!==0)return;
+  dragging=true; moved=false;
+  pid=e.pointerId;
+  try{m.setPointerCapture(pid)}catch(err){}
+  startX=e.clientX; startY=e.clientY;
+  const pos=getPos();
+  initLeft=pos.x; initTop=pos.y;
+  m.classList.add('is-dragging');
+ });
+
+ m.addEventListener('pointermove',e=>{
+  if(!dragging)return;
+  const dx=e.clientX-startX, dy=e.clientY-startY;
+  if(Math.hypot(dx,dy)>5) moved=true;
+  if(moved){
+   const n=clamp(initLeft+dx, initTop+dy);
+   setPos(n.x, n.y);
+  }
+ });
+
+ const activateMascot=()=>{
+  burstKawaii();
+  if(P!='draw'){
+   setTimeout(()=>{ location.href='draw.html'; }, 320);
+  }else{
+   const go=$('#drawGo');
+   if(go){
+    go.scrollIntoView({behavior:'smooth',block:'center'});
+    go.classList.add('is-kawaii-hint');
+    setTimeout(()=>go.classList.remove('is-kawaii-hint'),1200);
+   }
+  }
+ };
+
+ const endDrag=e=>{
+  if(!dragging)return;
+  dragging=false;
+  m.classList.remove('is-dragging');
+  try{if(pid!==null)m.releasePointerCapture(pid)}catch(err){}
+  if(!moved){
+   activateMascot();
+  }else{
+   const pos=getPos(), midX=window.innerWidth/2;
+   const pad=16, w=m.offsetWidth||64;
+   const snapX = pos.x < midX ? pad : window.innerWidth-w-pad;
+   m.style.transition='left .3s cubic-bezier(.2,1,.3,1), top .3s cubic-bezier(.2,1,.3,1)';
+   setPos(snapX, pos.y);
+   setTimeout(()=>{ m.style.transition=''; }, 320);
+  }
+ };
+ m.addEventListener('pointerup',endDrag);
+ m.addEventListener('pointercancel',endDrag);
+ m.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===' '){
+   e.preventDefault();
+   activateMascot();
+  }
+ });
+})();
 // lightbox
 let LB=[],LI=0;const lbShow=()=>{const i=LB[LI];$('#lb img').src=i.local||i.url;$('#lb p').innerHTML=`${esc(i.date)}${i.member?' · '+esc(i.member):''} · <a href="${i.post}" target=_blank>来源 ↗</a><br>${esc((i.text||'').slice(0,120))}`;$('#lb').classList.add('on')};
 const lbClose=()=>$('#lb').classList.remove('on');$('#lb .x').onclick=lbClose;$('#lb').onclick=e=>{if(e.target.id=='lb')lbClose()};
@@ -647,7 +756,7 @@ if(P=='draw'){
  const wait=ms=>new Promise(r=>setTimeout(r,ms));
  const reduceMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
  const jstDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
- const empty=()=>({v:1,prefs:{mode:'song',songFilter:'all',includeFormer:false},first:{song:'',member:''},history:{song:[],member:[]}});
+ const empty=()=>({v:1,prefs:{mode:'member',songFilter:'all',includeFormer:false},first:{song:'',member:''},history:{song:[],member:[]}});
  const dayOk=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'');
  const dayLabel=day=>{
   if(!dayOk(day))return '';
@@ -658,7 +767,7 @@ if(P=='draw'){
   const base=empty();
   if(!raw||typeof raw!='object')return base;
   const prefs=raw.prefs||{};
-  if(prefs.mode=='member')base.prefs.mode='member';
+  base.prefs.mode=(prefs.mode=='song')?'song':'member';
   if(prefs.songFilter=='group'||prefs.songFilter=='solo')base.prefs.songFilter=prefs.songFilter;
   base.prefs.includeFormer=!!prefs.includeFormer;
   ['song','member'].forEach(k=>{
@@ -817,12 +926,14 @@ if(P=='draw'){
   for(let ly=96;ly<H-70;ly+=32){x.beginPath();x.moveTo(64,ly);x.lineTo(W-64,ly);x.stroke()}
   x.restore();
   x.textAlign='center';x.textBaseline='middle';
-  x.fillStyle='#8a8a8a';x.font='700 18px '+F;x.letterSpacing='6px';x.fillText('DRAW',W/2,102);x.letterSpacing='0px';
+  x.fillStyle='#8a8a8a';x.font='700 18px '+F;x.letterSpacing='6px';x.fillText('iLiFE! DRAW',W/2,102);x.letterSpacing='0px';
   x.fillStyle='#2b2b2b';x.font='500 22px '+F;x.fillText(dayLabel(view.day),W/2,142);
-  x.fillStyle='#e4007f';x.font='700 16px '+F;x.letterSpacing='3px';x.fillText("TODAY'S DRAW",W/2,176);x.letterSpacing='0px';
-  x.fillStyle='#8a8a8a';x.font='500 20px '+F;x.fillText('今日的签',W/2,206);
+  x.fillStyle='#e4007f';x.font='700 16px '+F;x.letterSpacing='3px';x.fillText(song?"TODAY'S SONG":"TODAY'S OSHI",W/2,176);x.letterSpacing='0px';
+  x.fillStyle='#8a8a8a';x.font='500 20px '+F;x.fillText(song?'今日的歌 🎵':'今日的推 💕',W/2,206);
   const photoW=song?480:400,photoH=song?460:480,pad=22,capH=88;
   const frameW=photoW+pad*2,frameH=pad+photoH+capH,frameX=(W-frameW)/2,frameY=236;
+  // 和纸胶带
+  x.save();x.translate(W/2,frameY);x.rotate(-1.5*Math.PI/180);x.fillStyle='rgba(255,183,213,.75)';roundRect(x,-65,-12,130,24,3);x.fill();x.restore();
   x.save();
   x.translate(W/2,frameY+frameH/2);x.rotate(-1.5*Math.PI/180);x.translate(-W/2,-(frameY+frameH/2));
   x.save();x.shadowColor='rgba(43,43,43,.16)';x.shadowBlur=24;x.shadowOffsetY=10;x.fillStyle='#fff';roundRect(x,frameX,frameY,frameW,frameH,8);x.fill();x.restore();
@@ -945,41 +1056,42 @@ if(P=='draw'){
   document.title='DRAW · 抽签 | iLiFE! 应援资料库';
   const mode=st.prefs.mode,list=pool(),n=counts(),anim=enterAnim&&!reduceMotion();enterAnim=false;
   const phase=shaking?'shake':view?'show':'idle';
-  const hero=!view&&!shaking?(mode=='song'
-   ?'<p class=dkick>DRAW</p><h1 class=dhero>今日抽一首歌</h1><p class=dlead>从曲库里随机听一首。不限次数。</p>'
-   :'<p class=dkick>DRAW</p><h1 class=dhero>今日抽一位推</h1><p class=dlead>从成员里随机看一位。不限次数。</p>'):'';
-  const slip=shake=>`<div class="dslip${shake?' is-shake':''}" aria-hidden=true><div class=dslip-seal>i<b>!</b></div><p class=dslip-k>DRAW</p><p class=dslip-t>抽签</p></div>`;
+  const hero=!view&&!shaking?(mode=='member'
+   ?'<p class=dkick>TODAY\'S OSHI · 今日抽推</p><h1 class=dhero>今日抽一位推 💕</h1><p class=dlead>心跳指引！看看今天与哪位成员最有缘分。不限次数 ✨</p>'
+   :'<p class=dkick>TODAY\'S SONG · 今日抽歌</p><h1 class=dhero>今日抽一首歌 🎵</h1><p class=dlead>单曲循环预定！随机掉落今天的主题歌。不限次数 ✨</p>'):'';
+  const slip=shake=>`<div class="dslip${shake?' is-shake':''}" aria-hidden=true><div class="dslip-ears"><span></span><span></span></div><div class=dslip-seal><span class=dslip-rabbit>🐰</span></div><p class=dslip-k>${mode=='member'?'TODAY\'S OSHI':'TODAY\'S SONG'}</p><p class=dslip-t>${mode=='member'?'求一位推 💕':'求一首歌 🎵'}</p><div class="dslip-deco"><i>✨</i><i>💕</i><i>🌸</i></div></div>`;
   const frame=(src,alt,href,mem)=>{
    const inner=src?`<img src="${esc(src)}" alt="${esc(alt)}">`:`<span class=songph><b>${esc(alt)}</b><small>无官方图片</small></span>`;
    return `<a class="dframe${mem?' mem':''}" href="${href}">${inner}</a>`;
   };
-  const luckBlock=(f,sealCol)=>f?`<section class=dluck><p class=dmicro>今日运势</p><div class=dluck-q><span>签语 · ${esc(f.kichi||'吉')}</span><b>「${esc(f.motto)}」</b></div><div class=dluck-rows><p><span>运势</span><b class=dkichi style="${sealCol?`color:${sealCol}`:''}">${esc(f.kichi||'吉')}</b></p><p><span>幸运色</span><b><i class="dswatch${lightHex(f.color)?' light':''}" style="background:${f.color}"></i>${esc(f.colorName)}</b></p><p><span>幸运物品</span><b>${esc(f.item)}</b></p><p><span>今日行动</span><b>${esc(f.action)}</b></p></div></section>`:'';
+  const luckBlock=(f,sealCol)=>f?`<section class=dluck><p class=dmicro>今日运势 · 占い 💕</p><div class=dluck-q><span${sealCol?` style="color:${sealCol}"`:''}>🎀 签语 · ${esc(f.kichi||'吉')}</span><b>「${esc(f.motto)}」</b></div><div class=dluck-rows><p><span>🔮 运势</span><b class=dkichi style="${sealCol?`color:${sealCol}`:''}">${esc(f.kichi||'吉')}</b></p><p><span>🎨 幸运色</span><b><i class="dswatch${lightHex(f.color)?' light':''}" style="background:${f.color}"></i>${esc(f.colorName)}</b></p><p><span>🎀 幸运物品</span><b>${esc(f.item)}</b></p><p><span>✨ 今日行动</span><b>${esc(f.action)}</b></p></div></section>`:'';
   let stage='';
   if(shaking){
-   stage=`${slip(true)}<p class=dshake-t>${mode=='song'?'正在抽歌…':'正在抽推…'}</p><p class=dshake-s>稍等一下</p><div class=dcharge aria-hidden=true><i></i></div><button type=button id=drawGo class=go disabled hidden>抽取</button>`;
+   stage=`${slip(true)}<p class=dshake-t>${mode=='member'?'正在为你感应命中之推… 💕':'正在为你挑选心动旋律… 🎵'}</p><p class=dshake-s>好运正在降临中 ✨</p><div class=dcharge aria-hidden=true><i></i></div><button type=button id=drawGo class=go disabled hidden>抽取</button>`;
   }else if(view&&view.mode=='song'){
    const s=view.item,href='songs.html?s='+s.id,kichi=(view.fortune&&view.fortune.kichi)||'吉';
    const sealHtml=`<div class="dseal${anim?' is-pop':''}">${view.first?'<span class=dseal-sub>今日首抽</span>':''}<b class=dseal-main>${esc(kichi)}</b></div>`;
-   stage=`<article class="dsheet${anim?' is-in':''}"><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S DRAW</p><p class=dsubk>今日的签</p><div class=dpolaroid>${frame(songSrc(s),s.title,href,false)}${sealHtml}<p class=dcap><b>${esc(s.title)}</b>${s.kana?`<span>${esc(s.kana)}</span>`:''}</p></div><div class="drows dmeta"><p><span>种类</span><b class=dkind>${s.member?'个人曲 · '+esc(s.member):'团体曲'}</b></p><p><span>时长</span><b>${esc(s.duration||'—')}</b></p><p><span>作品</span><b>${esc(s.release||'—')}</b></p></div>${luckBlock(view.fortune)}<div class=dsharebox><p class=dask>把今天的签存下来</p><button type=button class="go dcta" id=drawSave>保存卡片</button></div><div class=dacts><button type=button class=off id=drawGo ${busy?'disabled':''}>再抽一次</button><a class="pill off" href="${href}">查看歌曲</a></div><div class=sr aria-live=polite>抽到 ${esc(s.title)}</div></article>`;
+   stage=`<article class="dsheet${anim?' is-in':''}"><div class="dwashi" aria-hidden=true></div><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S SONG</p><p class=dsubk>今日的歌 🎵</p><div class=dpolaroid>${frame(songSrc(s),s.title,href,false)}${sealHtml}<p class=dcap><b>${esc(s.title)}</b>${s.kana?`<span>${esc(s.kana)}</span>`:''}</p></div><div class="drows dmeta"><p><span>种类</span><b class=dkind>${s.member?'个人曲 · '+esc(s.member):'团体曲'}</b></p><p><span>时长</span><b>${esc(s.duration||'—')}</b></p><p><span>作品</span><b>${esc(s.release||'—')}</b></p></div>${luckBlock(view.fortune)}<div class=dsharebox><p class=dask>把今天的专属签存下来 💕</p><button type=button class="go dcta" id=drawSave><span class="dcta-shine"></span>保存专属卡片 📸</button></div><div class=dacts><button type=button class=off id=drawGo ${busy?'disabled':''}>再抽一次 🎵</button><a class="pill off" href="${href}">查看歌曲 ↗</a></div><div class=sr aria-live=polite>抽到 ${esc(s.title)}</div></article>`;
   }else if(view){
    const mem=view.item,hex=safeHex(mem.hex),href='members.html?m='+encodeURIComponent(mem.name),kichi=(view.fortune&&view.fortune.kichi)||'吉',sealCol=accentOf(hex);
    const sealHtml=`<div class="dseal${anim?' is-pop':''}" style="border-color:${sealCol};color:${sealCol}">${view.first?'<span class=dseal-sub>今日首抽</span>':''}<b class=dseal-main>${esc(kichi)}</b></div>`;
-   stage=`<article class="dsheet mem${anim?' is-in':''}"><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S DRAW</p><p class=dsubk>今日的签</p><div class="dpolaroid mem">${frame(memberSrc(mem),mem.name,href,true)}${sealHtml}<p class=dcap><b>${esc(mem.name)}</b>${mem.kana?`<span>${esc(mem.kana)}</span>`:''}</p></div><div class="dbar${lightHex(hex)?' light':''}" style="background:${hex}"></div><div class=drows><p><span>状态</span><b class=dkind>${esc(mem.status||'')}${mem.color?' · '+esc(mem.color):''}</b></p>${mem.catch?`<p><span>口号</span><b>${esc(mem.catch)}</b></p>`:''}</div>${luckBlock(view.fortune,sealCol)}<div class=dsharebox><p class=dask>把今天的签存下来</p><button type=button class="go dcta" id=drawSave>保存卡片</button></div><div class=dacts><button type=button class=off id=drawGo ${busy?'disabled':''}>再抽一次</button><a class="pill off" href="${href}">查看成员</a></div><div class=sr aria-live=polite>抽到 ${esc(mem.name)}</div></article>`;
+   stage=`<article class="dsheet mem${anim?' is-in':''}" style="--mem-accent:${sealCol}"><div class="dwashi" aria-hidden=true></div><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S OSHI</p><p class=dsubk>今日的推 💕</p><div class="dpolaroid mem">${frame(memberSrc(mem),mem.name,href,true)}${sealHtml}<p class=dcap><b>${esc(mem.name)}</b>${mem.kana?`<span>${esc(mem.kana)}</span>`:''}</p></div><div class="dbar${lightHex(hex)?' light':''}" style="background:${hex}"></div><div class=drows><p><span>状态</span><b class=dkind>${esc(mem.status||'')}${mem.color?' · '+esc(mem.color):''}</b></p>${mem.catch?`<p><span>口号</span><b>${esc(mem.catch)}</b></p>`:''}</div>${luckBlock(view.fortune,sealCol)}<div class=dsharebox><p class=dask>把今天的专属签存下来 💕</p><button type=button class="go dcta" id=drawSave><span class="dcta-shine"></span>保存专属卡片 📸</button></div><div class=dacts><button type=button class=off id=drawGo ${busy?'disabled':''}>再抽一次 🐰</button><a class="pill off" href="${href}">查看成员 ↗</a></div><div class=sr aria-live=polite>抽到 ${esc(mem.name)}</div></article>`;
   }
   const filters=mode=='song'
    ?`<p class=filters role=group aria-label=曲目范围>${[['all','全部',n.all],['group','团体曲',n.group],['solo','个人曲',n.solo]].map(([k,lb,c])=>`<button type=button class="${st.prefs.songFilter==k?'':'off'}" data-sf=${k} aria-pressed=${st.prefs.songFilter==k}>${lb} ${c}</button>`).join('')}</p><p class=dpool>${list.length?`从 ${list.length} 首里抽`:'这个范围里没有歌'}</p>`
-   :`<p class=filters><span class=lb>${st.prefs.includeFormer?'全部成员 '+n.allM+' 人':'只抽现役 '+n.active+' 人'}</span><button type=button id=drawFormer class="${st.prefs.includeFormer?'':'off'}" aria-pressed=${st.prefs.includeFormer}>含前成员</button></p><p class=dpool>${list.length?`从 ${list.length} 人里抽`:'这个范围里没有成员'}</p>`;
-  const idleExtra=!view&&!shaking?`${slip(false)}<div class=dacts><button type=button class="go dcta" id=drawGo ${busy||!list.length?'disabled':''}>抽取</button></div>`:'';
-  const feats=!view&&!shaking?`<section class=dfeats><article class=dfeat><p class=k>SONG</p><h3>抽歌</h3><p>从曲库里抽一首歌。全部 ${n.all} 首，团体曲 ${n.group} 首，个人曲 ${n.solo} 首。</p></article><article class=dfeat><p class=k>MEMBER</p><h3>抽推</h3><p>从成员里抽一位推。现役 ${n.active} 人，含前成员一共 ${n.allM} 人。</p></article><article class=dfeat><p class=k>CARD</p><h3>分享</h3><p>把结果存成竖版卡片，发给同担，或留给自己。</p></article></section>`:'';
+   :`<p class=filters><span class=lb>${st.prefs.includeFormer?'全部成员 '+n.allM+' 人':'只抽现役 '+n.active+' 人'}</span><button type=button id=drawFormer class="${st.prefs.includeFormer?'':'off'}" aria-pressed=${st.prefs.includeFormer}>${st.prefs.includeFormer?'🌸 已含前成员':'✨ 仅现役'}</button></p><p class=dpool>${list.length?`从 ${list.length} 人里抽`:'这个范围里没有成员'}</p>`;
+  const ctaText=mode=='member'?'✨ 抽取今日之推 💕':'✨ 抽取今日之歌 🎵';
+  const idleExtra=!view&&!shaking?`${slip(false)}<div class=dacts><button type=button class="go dcta" id=drawGo ${busy||!list.length?'disabled':''}><span class="dcta-shine"></span>${ctaText}</button></div>`:'';
+  const feats=!view&&!shaking?`<section class=dfeats><article class=dfeat><p class=k>MEMBER · 抽推</p><h3>抽一位推 🐰</h3><p>心跳求签！现役 ${n.active} 人，含前成员一共 ${n.allM} 人。抽取今天的命中之推。</p></article><article class=dfeat><p class=k>SONG · 抽歌</p><h3>抽一首歌 🎵</h3><p>单曲循环！曲库全部 ${n.all} 首，团体曲 ${n.group} 首，个人曲 ${n.solo} 首。</p></article><article class=dfeat><p class=k>CARD · 分享</p><h3>保存卡片 📸</h3><p>生成 9:16 卡哇伊拍立得运势签，发给同担或做手机壁纸。</p></article></section>`:'';
   const hist=st.history[mode].map(h=>{
    const item=mode=='song'?songById(h.id):memberById(h.id);if(!item)return '';
    const src=mode=='song'?songSrc(item):memberSrc(item),label=mode=='song'?item.title:item.name;
    const on=view&&!shaking&&view.at===h.at,kichi=(h.fortune&&h.fortune.kichi)||'吉';
    return `<button type=button class="dhi${on?' on':''}" data-hid=${h.id} data-hat="${esc(h.at)}"><span class=ph>${src?`<img alt="" src="${esc(src)}">`:`<b>${esc(label.slice(0,1))}</b>`}</span><b>${esc(label)}</b><i>${esc(kichi)}${h.first?' · 首抽':''}</i></button>`;
   }).join('');
-  const histSec=!shaking&&hist?`<section class=dhist><p class=dmicro>最近</p><div class=dgrid>${hist}</div></section>`:'';
+  const histSec=!shaking&&hist?`<section class=dhist><p class=dmicro>最近记录 · 履歴 💕</p><div class=dgrid>${hist}</div></section>`:'';
   const arch=!shaking?`<section class=darch><p>记录只留在这台浏览器里。可以导出 JSON，换浏览器时再导入。</p><p class=dacts><button type=button class=off id=drawExport>导出存档</button><button type=button class=off id=drawImport>导入存档</button><button type=button class=off id=drawClear>清空记录</button><input id=drawFile type=file accept="application/json,.json" hidden></p></section>`:'';
-  const modeBar=`<div class=dmode role=tablist aria-label=抽签模式><button type=button role=tab data-mode=song aria-selected=${mode=='song'}>抽歌</button><button type=button role=tab data-mode=member aria-selected=${mode=='member'}>抽推</button></div>`;
+  const modeBar=`<div class=dmode role=tablist aria-label=抽签模式><button type=button role=tab data-mode=member aria-selected=${mode=='member'}><i class=dico>🐰</i>抽推</button><button type=button role=tab data-mode=song aria-selected=${mode=='song'}><i class=dico>🎵</i>抽歌</button></div>`;
   m.innerHTML=`<div class=dpage data-phase=${phase}><div class=crumb><a href=index.html>首页</a> / 抽签</div><div class=dcol>${hero}${shaking?'':modeBar+filters}${stage}${idleExtra}</div>${feats}${histSec}${arch}</div>`;
   m.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{if(busy||b.dataset.mode==st.prefs.mode)return;st.prefs.mode=b.dataset.mode;view=null;save();render()});
   m.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{if(busy)return;st.prefs.songFilter=b.dataset.sf;if(view&&view.mode=='song'&&!pool().some(s=>s.id==view.item.id))view=null;save();render()});
