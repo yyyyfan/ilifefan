@@ -117,6 +117,19 @@ for r in Q('SELECT i.id,i.era,e.era_id FROM images i LEFT JOIN image_eras e ON e
     bad(f'images.era 与日期推算时期不符: id={r[0]} {r[1]} != {r[2]}（时期起始日=新体制首批アー写或成员变动日）')
 for r in Q('SELECT id,local,w,h FROM images'):
     if r['local'] and (r['w'] is None) != (r['h'] is None): bad(f'图片尺寸不完整: id={r["id"]}')
+for r in Q('SELECT DISTINCT pref FROM venues'):
+    if not Q('SELECT 1 FROM region_geo WHERE pref=?', r['pref']):
+        bad(f'venues.pref 缺少 region_geo: {r["pref"]}')
+for r in Q('SELECT pref,name_ja,lat,lng,kind FROM region_geo'):
+    if r['kind'] not in ('pref', 'overseas', 'unknown'):
+        bad(f'region_geo.kind 非法: {r["pref"]} {r["kind"]!r}')
+    if r['kind'] == 'pref':
+        if r['lat'] is None or r['lng'] is None or not r['name_ja']:
+            bad(f'region_geo 都道府县缺少坐标或日文名: {r["pref"]}')
+        elif not (24 <= r['lat'] <= 46 and 122 <= r['lng'] <= 154):
+            bad(f'region_geo 坐标超出日本范围: {r["pref"]} {r["lat"]} {r["lng"]}')
+    elif r['lat'] is not None or r['lng'] is not None:
+        bad(f'region_geo 非地图地区不应有坐标: {r["pref"]}')
 if errs:
     print('完整性检查失败（%d 项）：' % len(errs), file=sys.stderr)
     for e in errs[:200]: print('  -', e, file=sys.stderr)
@@ -250,6 +263,16 @@ out['songs'] = [{
     'images': song_imgs_by_song.get(r['id'], []),
     'costumes': costumes_by_song.get(r['id'], [])
 } for r in Q('SELECT * FROM songs ORDER BY id')]
+
+def coord(v):
+    return None if v is None else round(float(v), 5)
+out['geo'] = [{
+    'pref': r['pref'],
+    'name_ja': r['name_ja'],
+    'lat': coord(r['lat']),
+    'lng': coord(r['lng']),
+    'kind': r['kind'],
+} for r in Q('SELECT pref,name_ja,lat,lng,kind FROM region_geo ORDER BY ord')]
 
 def dump(n, d):
     return json.dumps(d, ensure_ascii=False, separators=(',', ':')) if n == 'images' else json.dumps(d, ensure_ascii=False, indent=1)

@@ -70,6 +70,7 @@ ilifefan/
 | `lives` | 872 | 公演：日期(JST)、标题、会场、type（ワンマン/主催/対バン/フェス/リリイベ/生誕祭/配信/その他）、开场/开演、note、setlist、主出处 `source_id`、封面 `cover_image_id` |
 | `live_members` | 6572 | 每场出演成员（任务 028）：由 `member_periods` 按日期推导，`status`=出演/支援/非正式/休演/未出演 |
 | `venues` | 215 | 会场：名称、都道府县、地址、容量、URL |
+| `region_geo` | 26 | 场地足迹图锚点（任务 047）：`kind=pref` 为都道府县厅所在城市坐标；`overseas` / `unknown` 不上图 |
 | `images` | 4453 | 图片：原图 URL `url`/`orig`、R2 对象键 `local`（如 `img/xxx.webp`，导出时拼成 R2 完整地址）、日期、来源帖 `post_id`(→sources)、类别 category、宽高 w/h、复核 review |
 | `image_members` / `image_eras` / `image_lives` | 1348 / 4453 / 684 | 图片与成员 / 时期（按日期自动推导）/ 公演的关联 |
 | `sources` | 4321 | 所有出处 URL（唯一） |
