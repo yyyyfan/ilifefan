@@ -21,6 +21,6 @@
 - [x] 不合并、不部署
 
 ## 状态
-待验收（分支 `cursor/045-pre2025-taiban-fes-encore-8c8e`，不合并）。
+待验收（分支 `cursor/045-pre2025-taiban-fes-encore-8c8e`，数据提交 `0368a82`，不合并）。
 
 场次、帖子和仍缺的原因见 `docs/tasks/045-result.md`。
