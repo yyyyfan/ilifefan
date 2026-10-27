@@ -14,7 +14,7 @@
 
 静图在做这次任务之前就已经从 @iLiFE_official 入库并上传 R2，但没有挂到对应公演。本轮打开帖子核对作者、正文和张数之后，只做挂接、类别和封面。没有新文件名，所以没有新的 `r2_images.py add`。抽查 5 个已有键（`img/Go0jK2KaoAAgHH8.jpg`、`img/HNMX_zuaUAAQPNY.jpg`、`img/HQufzCxaAAAp3r-.jpg`、`img/G_0pbAcasAA1jnG.jpg`、`img/HBcJib4bwAAf0z0.jpg`）公开地址核对为 0 个问题。
 
-`python3 db/export.py --check` 通过。导出版本 `d54d9e40`。各 HTML 只把静态资源 `?v=` 改成这个版本。
+`python3 db/export.py --check` 通过。导出版本 `d54d9e40`。各 HTML 只把静态资源 `?v=` 改成这个版本。数据提交 `51e3bcf`。
 
 没有成员标注的新挂图片，`images.date` 改成演出日并重算了 `image_eras`（29 张）。已有 `image_members` 的沿用原日期（任务 016 的例外），所以少数封面的图片日期仍是发帖日，比演出日晚 1–2 天。
 
