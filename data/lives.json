@@ -18272,12 +18272,30 @@
   "pref": "东京",
   "open_time": "10:30",
   "start_time": "11:00",
-  "note": "仅非官方来源。",
+  "note": "TicketDive（https://ticketdive.com/event/hype_newyear）2024/1/7 豊洲PIT，出演者含 iLiFE!，开场 10:30 / 开演 11:00。封面为该页活动图，不是站点通用 ogp。补充：豊洲PIT 日程（https://toyosu.pia-pit.jp/schedule/202312/7008.html）写 01.07（周日）HYPE IDOL!New Year SP，出演含 iLiFE!。补充核验：https://www.eventernote.com/events/364648",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/364648",
-  "cover": null,
-  "images": [],
+  "source": "https://ticketdive.com/event/hype_newyear",
+  "cover": {
+   "id": 4598,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-503-3aad9d3d.webp",
+   "w": 1255,
+   "h": 2048,
+   "url": "https://storage.googleapis.com/playyte-ticket-prod_event/oSKEcfB0O9Zh8m0VSwuV_868778_1704541486116.webp",
+   "post": "https://ticketdive.com/event/hype_newyear",
+   "source": "TicketDive"
+  },
+  "images": [
+   {
+    "id": 4598,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-503-3aad9d3d.webp",
+    "w": 1255,
+    "h": 2048,
+    "url": "https://storage.googleapis.com/playyte-ticket-prod_event/oSKEcfB0O9Zh8m0VSwuV_868778_1704541486116.webp",
+    "post": "https://ticketdive.com/event/hype_newyear",
+    "source": "TicketDive"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -18434,10 +18452,10 @@
   "pref": "东京",
   "open_time": "13:00",
   "start_time": "14:00",
-  "note": "仅非官方来源。",
+  "note": "Ticket Village（https://ticketvillage.jp/events/12599）「でびぱっぱ冬祭 in 野音」OPEN 13:00 / START 14:00，出演含 iLiFE!。页头图未能读出 iLiFE!，未作封面。补充核验：https://www.eventernote.com/events/363287",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/363287",
+  "source": "https://ticketvillage.jp/events/12599",
   "cover": null,
   "images": [],
   "members": {
@@ -18729,12 +18747,12 @@
   "type": "フェス",
   "venue": "THE GRAND HALL",
   "pref": "东京",
-  "open_time": "11:40",
-  "start_time": "12:00",
-  "note": "仅非官方来源。",
+  "open_time": "12:00",
+  "start_time": "12:20",
+  "note": "共演方まねきケチャ官网（https://www.maneki-kecak.com/0203-2/）转载主办文案：2024-02-03 AGE FES PREMIUM，OPEN 12:00 / START 12:20，出演含 iLiFE!。开场由 11:40 改为 12:00，开演由 12:00 改为 12:20。无单独封面。补充核验：https://www.eventernote.com/events/368712",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/368712",
+  "source": "https://www.maneki-kecak.com/0203-2/",
   "cover": null,
   "images": [],
   "members": {
@@ -18803,12 +18821,30 @@
   "pref": "大阪",
   "open_time": "09:00",
   "start_time": "09:45",
-  "note": "补充核验：HEROINES VALENTINE【OSAKA】（https://www.eventernote.com/events/368364） 開場 09:00 開演 09:45 終演 19:30；HEROINES VALENTINE OSAKA（https://www.livefans.jp/events/2009396） 2024/02/10 (土)　19:00 出演 官方另说明原定「あいふぇす」取消，改为本活动；取消告知：https://x.com/iLiFE_official/status/1752274307785588762",
+  "note": "补充核验：HEROINES VALENTINE【OSAKA】（https://www.eventernote.com/events/368364） 開場 09:00 開演 09:45 終演 19:30；HEROINES VALENTINE OSAKA（https://www.livefans.jp/events/2009396） 2024/02/10 (土)　19:00 出演 官方另说明原定「あいふぇす」取消，改为本活动；取消告知：https://x.com/iLiFE_official/status/1752274307785588762 封面为该 TicketDive 活动页的活动图（不是站点通用 ogp.webp）。",
   "setlist": null,
   "is_headliner": 0,
   "source": "https://ticketdive.com/event/HEROINES_VD_OSAKA",
-  "cover": null,
-  "images": [],
+  "cover": {
+   "id": 4599,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-516-0f7f8910.webp",
+   "w": 1440,
+   "h": 2037,
+   "url": "https://storage.googleapis.com/playyte-ticket-prod_event/hThwpP4BS1p5KVXJ9e3a_94446_1706588874801.webp",
+   "post": "https://ticketdive.com/event/HEROINES_VD_OSAKA",
+   "source": "TicketDive"
+  },
+  "images": [
+   {
+    "id": 4599,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-516-0f7f8910.webp",
+    "w": 1440,
+    "h": 2037,
+    "url": "https://storage.googleapis.com/playyte-ticket-prod_event/hThwpP4BS1p5KVXJ9e3a_94446_1706588874801.webp",
+    "post": "https://ticketdive.com/event/HEROINES_VD_OSAKA",
+    "source": "TicketDive"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -19712,12 +19748,30 @@
   "pref": "东京",
   "open_time": "13:30",
   "start_time": "14:00",
-  "note": "仅非官方来源。 补充核验：LEADING ID #いどみん生誕祭 2024（https://www.livefans.jp/events/1664747） 2024/04/10 (水)　17:25 出演",
+  "note": "Ticket Village（https://ticketvillage.jp/events/12781）LEADING ID #いどみん生誕祭 2024，OPEN 13:30 / START 14:00，出演含 iLiFE!。封面为该页活动头图。补充：#Mooove! 日程（https://mooove.world/schedule/schedule-1112/）同样列出 iLiFE! 与同一开场开演。补充核验：LEADING ID #いどみん生誕祭 2024（https://www.livefans.jp/events/1664747） 2024/04/10 (水) 17:25 出演",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/374463",
-  "cover": null,
-  "images": [],
+  "source": "https://ticketvillage.jp/events/12781",
+  "cover": {
+   "id": 4600,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-537-d9db0f1b.webp",
+   "w": 2048,
+   "h": 1755,
+   "url": "https://dhp4cwtuq43xg.cloudfront.net/production/images/event_header/tv_images_event_header_12781_1_CuEOcdNedRpj_2x.jpg",
+   "post": "https://ticketvillage.jp/events/12781",
+   "source": "Ticket Village"
+  },
+  "images": [
+   {
+    "id": 4600,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-537-d9db0f1b.webp",
+    "w": 2048,
+    "h": 1755,
+    "url": "https://dhp4cwtuq43xg.cloudfront.net/production/images/event_header/tv_images_event_header_12781_1_CuEOcdNedRpj_2x.jpg",
+    "post": "https://ticketvillage.jp/events/12781",
+    "source": "Ticket Village"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -19838,12 +19892,30 @@
   "pref": "爱知",
   "open_time": "13:00",
   "start_time": "13:45",
-  "note": "仅非官方来源。",
+  "note": "Ticket Village（https://ticketvillage.jp/events/12805）アンスぱーくっ!!!!! in 名古屋，OPEN 13:00 / START 13:45，第1弾出演含 iLiFE!。封面为该页活动头图。补充核验：https://www.eventernote.com/events/374477",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/374477",
-  "cover": null,
-  "images": [],
+  "source": "https://ticketvillage.jp/events/12805",
+  "cover": {
+   "id": 4601,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-540-815a5edb.webp",
+   "w": 1447,
+   "h": 2048,
+   "url": "https://dhp4cwtuq43xg.cloudfront.net/production/images/event_header/tv_images_event_header_12805_1_5x6aMrz8cT6_2x.jpeg",
+   "post": "https://ticketvillage.jp/events/12805",
+   "source": "Ticket Village"
+  },
+  "images": [
+   {
+    "id": 4601,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-540-815a5edb.webp",
+    "w": 1447,
+    "h": 2048,
+    "url": "https://dhp4cwtuq43xg.cloudfront.net/production/images/event_header/tv_images_event_header_12805_1_5x6aMrz8cT6_2x.jpeg",
+    "post": "https://ticketvillage.jp/events/12805",
+    "source": "Ticket Village"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -19953,14 +20025,32 @@
   "type": "対バン",
   "venue": "GORILLA HALL OSAKA",
   "pref": "大阪",
-  "open_time": "12:30",
-  "start_time": "13:15",
-  "note": "仅非官方来源。 补充核验：GiRLS SUMMiT IN GORILLA HALL OSAKA（https://www.livefans.jp/events/1654934） 2024/04/29 (月)",
+  "open_time": "13:30",
+  "start_time": "14:15",
+  "note": "GORILLA HALL 日程（https://gorillahall.jp/archives/schedule/2024/03/1214）2024-04-29 GiRLS SUMMiT IN GORILLA HALL OSAKA，出演 iLiFE!、Jams Collection、真っ白なキャンバス、Appare!、Devil ANTHEM.、CROWN POP，OPEN 13:30 / START 14:15。开场由 12:30 改为 13:30，开演由 13:15 改为 14:15。封面为该页宣传单。补充核验：https://www.eventernote.com/events/374132 ；GiRLS SUMMiT IN GORILLA HALL OSAKA（https://www.livefans.jp/events/1654934） 2024/04/29 (月)",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/374132",
-  "cover": null,
-  "images": [],
+  "source": "https://gorillahall.jp/archives/schedule/2024/03/1214",
+  "cover": {
+   "id": 4602,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-543-fd87a12a.webp",
+   "w": 1536,
+   "h": 2048,
+   "url": "https://gorillahall.jp/wp-content/uploads/2024/03/girlssummit_A4-scaled.jpg",
+   "post": "https://gorillahall.jp/archives/schedule/2024/03/1214",
+   "source": "GORILLA HALL"
+  },
+  "images": [
+   {
+    "id": 4602,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-543-fd87a12a.webp",
+    "w": 1536,
+    "h": 2048,
+    "url": "https://gorillahall.jp/wp-content/uploads/2024/03/girlssummit_A4-scaled.jpg",
+    "post": "https://gorillahall.jp/archives/schedule/2024/03/1214",
+    "source": "GORILLA HALL"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -20621,12 +20711,30 @@
   "pref": "东京",
   "open_time": "16:30",
   "start_time": "17:30",
-  "note": "仅非官方来源。 补充核验：@JAM 2024（https://www.livefans.jp/events/1659598） 2024/05/26 (日)",
+  "note": "@JAM 活动页（https://atjam.jp/event/detail/aHfoCTeUF1NER4QO6SQw）2024/05/25–26 Zepp DiverCity，阵容含 iLiFE!。活动说明中 Day2 2部开场 16:30 / 开演 17:30，且 2部出演含 iLiFE!。封面为官方时间表图，图中 19:00- 一栏为 iLiFE!。开场开演不改。补充核验：@JAM 2024（https://www.livefans.jp/events/1659598） 2024/05/26 (日)",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/377026",
-  "cover": null,
-  "images": [],
+  "source": "https://atjam.jp/event/detail/aHfoCTeUF1NER4QO6SQw",
+  "cover": {
+   "id": 4603,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-558-fb4e3b47.webp",
+   "w": 1107,
+   "h": 2048,
+   "url": "https://storage.googleapis.com/atjam-jp.appspot.com/content/event/aHfoCTeUF1NER4QO6SQw/timeTable/image/f8ac867531835bdc669620de43d1620c.jpeg",
+   "post": "https://atjam.jp/event/detail/aHfoCTeUF1NER4QO6SQw",
+   "source": "@JAM公式"
+  },
+  "images": [
+   {
+    "id": 4603,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-558-fb4e3b47.webp",
+    "w": 1107,
+    "h": 2048,
+    "url": "https://storage.googleapis.com/atjam-jp.appspot.com/content/event/aHfoCTeUF1NER4QO6SQw/timeTable/image/f8ac867531835bdc669620de43d1620c.jpeg",
+    "post": "https://atjam.jp/event/detail/aHfoCTeUF1NER4QO6SQw",
+    "source": "@JAM公式"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -21548,12 +21656,30 @@
   "pref": "神奈川",
   "open_time": "09:00",
   "start_time": "10:00",
-  "note": "官方售票楽天チケット的【15日出演者】区块单独列出iLiFE!（并另列候補生），2024年7月15日 SPARK2024 @川崎市東扇島東公園，開場09:00/開演10:00。 补充核验：SPARK 2024 in KAWASAKI【15日(月祝)】（https://www.eventernote.com/events/383108） 补充核验：SPARK 2024 in KAWASAKI（https://www.livefans.jp/events/1687279） 2024/07/15 (月)",
+  "note": "官方售票楽天チケット的【15日出演者】区块单独列出iLiFE!（并另列候補生），2024年7月15日 SPARK2024 @川崎市東扇島東公園，開場09:00/開演10:00。 补充核验：SPARK 2024 in KAWASAKI【15日(月祝)】（https://www.eventernote.com/events/383108） 补充核验：SPARK 2024 in KAWASAKI（https://www.livefans.jp/events/1687279） 2024/07/15 (月) 补充核验：官方时间表（https://sparkfes.com/2024/timetable/）2024-07-15 SPARK STAGE 列出 iLiFE! 19:10-19:40（图 https://sparkfes.com/2024/wp-content/uploads/2024/07/0715_LIVETT_02.jpg）。开场/开演仍以楽天チケット 09:00/10:00 为准。 封面即该 SPARK STAGE 时间表图。",
   "setlist": null,
   "is_headliner": 0,
   "source": "https://r-t.jp/spark2024",
-  "cover": null,
-  "images": [],
+  "cover": {
+   "id": 4604,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-579-5199414f.webp",
+   "w": 1070,
+   "h": 2048,
+   "url": "https://sparkfes.com/2024/wp-content/uploads/2024/07/0715_LIVETT_02.jpg",
+   "post": "https://sparkfes.com/2024/timetable/",
+   "source": "SPARK公式サイト"
+  },
+  "images": [
+   {
+    "id": 4604,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-579-5199414f.webp",
+    "w": 1070,
+    "h": 2048,
+    "url": "https://sparkfes.com/2024/wp-content/uploads/2024/07/0715_LIVETT_02.jpg",
+    "post": "https://sparkfes.com/2024/timetable/",
+    "source": "SPARK公式サイト"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -21573,12 +21699,12 @@
   "type": "対バン",
   "venue": "桃配運動公園(関ヶ原町)",
   "pref": "岐阜",
-  "open_time": "08:30",
+  "open_time": "08:15",
   "start_time": "09:30",
-  "note": "仅非官方来源。 补充核验：SEKIGAHARA IDOL WARS 2024 -関ケ原唄姫合戦-（https://www.livefans.jp/events/1683643） 2024/07/20 (土)",
+  "note": "官方时间表（https://sekigahara-idolwars.net/2024/live/）2024-07-20 DAY2：8:15 OPEN，iLiFE 19:50-20:15（同页另有 iLiFE!候補生 13:05-13:25）。开场由 08:30 改为 08:15。补充核验：https://www.eventernote.com/events/384207 ；https://www.livefans.jp/events/1683643",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/384207",
+  "source": "https://sekigahara-idolwars.net/2024/live/",
   "cover": null,
   "images": [],
   "members": {
@@ -21600,12 +21726,12 @@
   "type": "対バン",
   "venue": "桃配運動公園(関ヶ原町)",
   "pref": "岐阜",
-  "open_time": "08:30",
+  "open_time": "08:15",
   "start_time": "09:30",
-  "note": "仅非官方来源。 补充核验：SEKIGAHARA IDOL WARS 2024 -関ケ原唄姫合戦-（https://www.livefans.jp/events/1691076） 2024/07/21 (日)",
+  "note": "官方时间表（https://sekigahara-idolwars.net/2024/live/）2024-07-21 DAY3：8:15 OPEN，iLiFE! 17:10-17:35（同页另有 iLiFE!候補生 12:20-12:35 与 15:25-15:45）。开场由 08:30 改为 08:15。补充核验：https://www.eventernote.com/events/384414 ；https://www.livefans.jp/events/1691076",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/384414",
+  "source": "https://sekigahara-idolwars.net/2024/live/",
   "cover": null,
   "images": [],
   "members": {
@@ -22061,10 +22187,10 @@
   "pref": "东京",
   "open_time": "11:00",
   "start_time": "11:45",
-  "note": "仅非官方来源。 补充核验：NEO KASSEN 2024（https://www.livefans.jp/events/1667540） 2024/08/15 (木)　19:05 出演",
+  "note": "Ticket Village（https://ticketvillage.jp/events/12852）NEO KASSEN2024，OPEN 11:00，第1弾出演含 iLiFE!（同页另有 iLiFE!候補生）。页头图未能读出 iLiFE!，未作封面。该页未写单一开演时刻，开演 11:45 仍沿用原记录。补充核验：NEO KASSEN 2024（https://www.livefans.jp/events/1667540） 2024/08/15 (木) 19:05 出演",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/377644",
+  "source": "https://ticketvillage.jp/events/12852",
   "cover": null,
   "images": [],
   "members": {
@@ -22088,12 +22214,30 @@
   "pref": "福岛",
   "open_time": "10:15",
   "start_time": "11:00",
-  "note": "仅非官方来源。",
+  "note": "Devil ANTHEM. 官网时间表（https://devilanthem.net/news/public/_/c50s6sev6tffhupl.html）东の阵 2024-08-17 三崎公園野外音楽堂，OPEN 10:15 / START 11:00，出演含 iLiFE!。封面为东の阵时间表图，图中 iLiFE! 为 13:05–13:20 与 17:15–17:35（不覆盖全场开场开演）。告知页（https://devilanthem.net/news/public/_/ocpv2hyds32wkrp7.html）与 Ticket Village（https://ticketvillage.jp/events/12876）同样列出。",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/381088",
-  "cover": null,
-  "images": [],
+  "source": "https://devilanthem.net/news/public/_/c50s6sev6tffhupl.html",
+  "cover": {
+   "id": 4605,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-592-b2356616.webp",
+   "w": 1200,
+   "h": 1806,
+   "url": "https://devilanthem.net/news/public/_/images/kugo97vkcmcxthonswid61bycxdu1f.jpg",
+   "post": "https://devilanthem.net/news/public/_/c50s6sev6tffhupl.html",
+   "source": "Devil ANTHEM.公式"
+  },
+  "images": [
+   {
+    "id": 4605,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-592-b2356616.webp",
+    "w": 1200,
+    "h": 1806,
+    "url": "https://devilanthem.net/news/public/_/images/kugo97vkcmcxthonswid61bycxdu1f.jpg",
+    "post": "https://devilanthem.net/news/public/_/c50s6sev6tffhupl.html",
+    "source": "Devil ANTHEM.公式"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -22475,12 +22619,30 @@
   "pref": "石川",
   "open_time": "10:00",
   "start_time": "11:00",
-  "note": "仅非官方来源。 补充核验：かがやきフェス 2024（https://www.livefans.jp/events/1680376） 2024/09/08 (日)　16:35 出演",
+  "note": "かがやきフェス官方时间表（https://kagayaki-fes.jp/2024/timetable/）「9月8日タイムテーブル」全尺寸图中有 iLiFE!。开场 10:00 / 开演 11:00 不改。补充核验：かがやきフェス 2024（https://www.livefans.jp/events/1680376） 2024/09/08 (日) 16:35 出演",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/391249",
-  "cover": null,
-  "images": [],
+  "source": "https://kagayaki-fes.jp/2024/timetable/",
+  "cover": {
+   "id": 4606,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-600-7652b1ef.webp",
+   "w": 2048,
+   "h": 1152,
+   "url": "https://kagayaki-fes.jp/assets/img/timetable/timetable240908.jpg",
+   "post": "https://kagayaki-fes.jp/2024/timetable/",
+   "source": "かがやきフェス公式"
+  },
+  "images": [
+   {
+    "id": 4606,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-600-7652b1ef.webp",
+    "w": 2048,
+    "h": 1152,
+    "url": "https://kagayaki-fes.jp/assets/img/timetable/timetable240908.jpg",
+    "post": "https://kagayaki-fes.jp/2024/timetable/",
+    "source": "かがやきフェス公式"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -22543,12 +22705,30 @@
   "pref": "神奈川",
   "open_time": "09:00",
   "start_time": "09:55",
-  "note": "仅非官方来源。 补充核验：@JAM EXPO 2024（https://www.livefans.jp/events/1716737） 2024/09/14 (土)　13:15 出演",
+  "note": "@JAM EXPO 2024 官方 lineup（https://atjam.jp/expo2024/lineup）。页面由官方内容接口渲染；已打开的接口结果中 iLiFE! 出演日为 2024-09-14、2024-09-15、2024-09-16。本场为 9/14。封面为官方时间表（https://atjam.jp/expo2024/timetable）9/14 大图，图中有 iLiFE!。全场开场 09:00 / 开演 09:55 不改。补充核验：@JAM EXPO 2024（https://www.livefans.jp/events/1716737） 2024/09/14 (土) 13:15 出演",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/380436",
-  "cover": null,
-  "images": [],
+  "source": "https://atjam.jp/expo2024/lineup",
+  "cover": {
+   "id": 4607,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-602-ee61ed3f.webp",
+   "w": 2048,
+   "h": 1567,
+   "url": "https://storage.googleapis.com/atjam-jp.appspot.com/content/timetable/Ai2ulDLzISv8X8ZnZ9tv/largeImage/6ea282d9fb50ff7ff5767748361931fd.jpg",
+   "post": "https://atjam.jp/expo2024/timetable",
+   "source": "@JAM公式"
+  },
+  "images": [
+   {
+    "id": 4607,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-602-ee61ed3f.webp",
+    "w": 2048,
+    "h": 1567,
+    "url": "https://storage.googleapis.com/atjam-jp.appspot.com/content/timetable/Ai2ulDLzISv8X8ZnZ9tv/largeImage/6ea282d9fb50ff7ff5767748361931fd.jpg",
+    "post": "https://atjam.jp/expo2024/timetable",
+    "source": "@JAM公式"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -22568,12 +22748,30 @@
   "pref": "神奈川",
   "open_time": "09:00",
   "start_time": "10:00",
-  "note": "仅非官方来源。 补充核验：@JAM EXPO 2024（https://www.livefans.jp/events/1696544） 2024/09/15 (日)　18:40 出演",
+  "note": "@JAM EXPO 2024 官方 lineup（https://atjam.jp/expo2024/lineup）。页面由官方内容接口渲染；已打开的接口结果中 iLiFE! 出演日为 2024-09-14、2024-09-15、2024-09-16。本场为 9/15。封面为官方时间表（https://atjam.jp/expo2024/timetable）9/15 大图，图中有 iLiFE!。全场开场 09:00 / 开演 10:00 不改。补充核验：@JAM EXPO 2024（https://www.livefans.jp/events/1696544） 2024/09/15 (日) 18:40 出演",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/380437",
-  "cover": null,
-  "images": [],
+  "source": "https://atjam.jp/expo2024/lineup",
+  "cover": {
+   "id": 4608,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-603-a9c6a5b7.webp",
+   "w": 2048,
+   "h": 1573,
+   "url": "https://storage.googleapis.com/atjam-jp.appspot.com/content/timetable/ElKuRYfX3LJPc6pIUUiK/largeImage/277ece3056c2c0eb167db5905c6d0d5c.jpg",
+   "post": "https://atjam.jp/expo2024/timetable",
+   "source": "@JAM公式"
+  },
+  "images": [
+   {
+    "id": 4608,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-603-a9c6a5b7.webp",
+    "w": 2048,
+    "h": 1573,
+    "url": "https://storage.googleapis.com/atjam-jp.appspot.com/content/timetable/ElKuRYfX3LJPc6pIUUiK/largeImage/277ece3056c2c0eb167db5905c6d0d5c.jpg",
+    "post": "https://atjam.jp/expo2024/timetable",
+    "source": "@JAM公式"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -22593,12 +22791,30 @@
   "pref": "神奈川",
   "open_time": "09:00",
   "start_time": "10:00",
-  "note": "仅非官方来源。",
+  "note": "@JAM EXPO 2024 官方 lineup（https://atjam.jp/expo2024/lineup）。页面由官方内容接口渲染；已打开的接口结果中 iLiFE! 出演日为 2024-09-14、2024-09-15、2024-09-16。本场为 9/16。封面为官方时间表（https://atjam.jp/expo2024/timetable）9/16 大图，图中有 iLiFE!。全场开场 09:00 / 开演 10:00 不改。补充核验：https://www.eventernote.com/events/380438",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/380438",
-  "cover": null,
-  "images": [],
+  "source": "https://atjam.jp/expo2024/lineup",
+  "cover": {
+   "id": 4609,
+   "local": "https://img.ilifefan.dpdns.org/img/live-2024-604-fc1ab398.webp",
+   "w": 2048,
+   "h": 1572,
+   "url": "https://storage.googleapis.com/atjam-jp.appspot.com/content/timetable/J2PaIQIA0g7WjGmpKTzc/largeImage/2db705bedd675f2a70ac148029961fa7.jpg",
+   "post": "https://atjam.jp/expo2024/timetable",
+   "source": "@JAM公式"
+  },
+  "images": [
+   {
+    "id": 4609,
+    "local": "https://img.ilifefan.dpdns.org/img/live-2024-604-fc1ab398.webp",
+    "w": 2048,
+    "h": 1572,
+    "url": "https://storage.googleapis.com/atjam-jp.appspot.com/content/timetable/J2PaIQIA0g7WjGmpKTzc/largeImage/2db705bedd675f2a70ac148029961fa7.jpg",
+    "post": "https://atjam.jp/expo2024/timetable",
+    "source": "@JAM公式"
+   }
+  ],
   "members": {
    "1": "出演",
    "2": "出演",
@@ -23862,10 +24078,10 @@
   "pref": "爱知",
   "open_time": "09:30",
   "start_time": "10:00",
-  "note": "仅非官方来源。 补充核验：ART SOUND pre. \"SOUND GARDEN 2024\" supported by テレビ愛知（https://www.livefans.jp/events/1718498） 2024/11/24 (日)　19:25 出演",
+  "note": "#ババババンビ官网（https://babababambi.com/schedule/schedule-3022/）第一弾出演者写 iLiFE!（24日），开场/开演写未定。本库开场 09:30 / 开演 10:00 保持不改。无可用封面。补充核验：ART SOUND pre. \"SOUND GARDEN 2024\" supported by テレビ愛知（https://www.livefans.jp/events/1718498） 2024/11/24 (日) 19:25 出演",
   "setlist": null,
   "is_headliner": 0,
-  "source": "https://www.eventernote.com/events/394934",
+  "source": "https://babababambi.com/schedule/schedule-3022/",
   "cover": null,
   "images": [],
   "members": {
