@@ -363,27 +363,37 @@ if(P=='draw'){
  };
  const buildCanvas=async()=>{
   try{await Promise.race([document.fonts.load('700 48px "Noto Sans SC"'),wait(1800)])}catch(e){}
-  const W=1080,H=1620,c=document.createElement('canvas');c.width=W;c.height=H;
-  const x=c.getContext('2d');x.imageSmoothingQuality='high';
-  const F='"Noto Sans SC",Roboto,"PingFang SC",sans-serif';
+  const W=1080,F='"Noto Sans SC",Roboto,"PingFang SC",sans-serif';
   const song=view.mode=='song',item=view.item;
   const hex=song?'#e4007f':safeHex(item.hex),accent=accentOf(hex);
   const src=song?songSrc(item):memberSrc(item);
   const img=await loadImg(src);
+  const probe=document.createElement('canvas').getContext('2d');
+  const linesOf=(font,text,max)=>{probe.font=font+' '+F;return wrapLines(probe,String(text||''),max)};
+  const fw=song?640:600,fh=song?640:700,fx=(W-fw)/2,fy=356;
+  const kind=song?(item.member?'个人曲 · '+item.member:'团体曲'):((item.status||'')+(item.color?' · '+item.color:''));
+  const titleLines=linesOf('700 52px',song?item.title:item.name,W-220).slice(0,2);
+  const kana=item.kana||'';
+  const metaLines=song?linesOf('500 28px',[item.duration||'—',item.release||'—'].join(' · '),W-220).slice(0,2):[];
+  const catchLines=!song&&item.catch?linesOf('500 30px',item.catch,W-220).slice(0,2):[];
+  let y=fy+fh+(song?56:78);
+  y+=54+titleLines.length*62;
+  if(kana)y+=46;
+  y+=metaLines.length*40+catchLines.length*42;
+  const foot=y+28,H=foot+86;
+  const c=document.createElement('canvas');c.width=W;c.height=H;
+  const x=c.getContext('2d');x.imageSmoothingQuality='high';
   x.fillStyle='#fbf8f4';x.fillRect(0,0,W,H);
   const blob=(cx,cy,r,col)=>{const g=x.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,col);g.addColorStop(1,'rgba(251,248,244,0)');x.fillStyle=g;x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.fill()};
-  blob(120,80,340,'rgba(228,0,127,.18)');blob(980,200,300,'rgba(255,179,214,.55)');blob(860,1480,360,'rgba(228,0,127,.12)');
-  x.save();x.shadowColor='rgba(228,0,127,.18)';x.shadowBlur=40;x.shadowOffsetY=16;x.fillStyle='#fff';roundRect(x,56,56,W-112,H-112,48);x.fill();x.restore();
-  x.save();roundRect(x,56,56,W-112,H-112,48);x.clip();x.fillStyle=accent;x.fillRect(56,56,W-112,18);x.restore();
-  x.textAlign='center';x.textBaseline='middle';x.fillStyle='#8a8a8a';x.font='500 22px '+F;x.fillText('FAN DATABASE',W/2,128);
-  x.font='900 68px '+F;x.fillStyle='#2b2b2b';
-  const brand='iLiFE',bang='!';
-  const bw=x.measureText(brand).width;x.font='900 68px '+F;const bangW=x.measureText(bang).width;
-  const start=(W-bw-bangW)/2;x.textAlign='left';x.fillStyle='#2b2b2b';x.fillText(brand,start,196);x.fillStyle='#e4007f';x.fillText(bang,start+bw,196);x.textAlign='center';
-  x.fillStyle='#8a8a8a';x.font='500 30px '+F;x.fillText('应援资料库',W/2,252);
+  blob(120,70,320,'rgba(228,0,127,.18)');blob(980,180,280,'rgba(255,179,214,.5)');blob(180,H-40,260,'rgba(228,0,127,.1)');
+  x.save();x.shadowColor='rgba(228,0,127,.16)';x.shadowBlur=36;x.shadowOffsetY=14;x.fillStyle='#fff';roundRect(x,48,48,W-96,H-96,44);x.fill();x.restore();
+  x.save();roundRect(x,48,48,W-96,H-96,44);x.clip();x.fillStyle=accent;x.fillRect(48,48,W-96,16);x.restore();
+  x.textAlign='center';x.textBaseline='middle';x.fillStyle='#8a8a8a';x.font='500 22px '+F;x.fillText('FAN DATABASE',W/2,118);
+  x.font='900 64px '+F;const brand='iLiFE',bang='!',bw=x.measureText(brand).width,bangW=x.measureText(bang).width,start=(W-bw-bangW)/2;
+  x.textAlign='left';x.fillStyle='#2b2b2b';x.fillText(brand,start,184);x.fillStyle='#e4007f';x.fillText(bang,start+bw,184);x.textAlign='center';
+  x.fillStyle='#8a8a8a';x.font='500 28px '+F;x.fillText('应援资料库',W/2,236);
   const bits=[view.day.replace(/-/g,'.'),song?'抽歌':'抽推'];if(view.first)bits.push('今日首抽');
-  x.fillStyle=accent;x.font='700 28px '+F;x.fillText(bits.join('  ·  '),W/2,318);
-  const fw=song?680:600,fh=song?680:760,fx=(W-fw)/2,fy=372;
+  x.fillStyle=accent;x.font='700 26px '+F;x.fillText(bits.join('  ·  '),W/2,292);
   roundRect(x,fx,fy,fw,fh,28);x.save();x.clip();
   x.fillStyle=song?'#f6e7ee':'#fbf3f7';x.fillRect(fx,fy,fw,fh);
   if(!song){x.fillStyle=hex;x.globalAlpha=lightHex(hex)?0.16:0.22;x.fillRect(fx,fy,fw,fh);x.globalAlpha=1}
@@ -393,23 +403,17 @@ if(P=='draw'){
   }else{
    const g=x.createLinearGradient(fx,fy,fx+fw,fy+fh);g.addColorStop(0,'#ffd0e6');g.addColorStop(1,'#e4007f');x.fillStyle=g;x.fillRect(fx,fy,fw,fh);
    x.fillStyle='#fff';x.font='700 42px '+F;x.textAlign='center';
-   wrapLines(x,song?item.title:item.name,fw-80).slice(0,3).forEach((ln,i)=>x.fillText(ln,W/2,fy+fh/2-28+i*52));
+   linesOf('700 42px',song?item.title:item.name,fw-80).slice(0,3).forEach((ln,i)=>x.fillText(ln,W/2,fy+fh/2-28+i*52));
   }
   x.restore();
-  let y=fy+fh+56;
-  if(!song){
-   x.fillStyle=hex;roundRect(x,fx,fy+fh+18,fw,12,6);x.fill();
-   if(lightHex(hex)){x.strokeStyle='#e6dfd9';x.lineWidth=2;x.stroke()}
-   y=fy+fh+62;
-  }
-  x.textAlign='center';x.fillStyle='#e4007f';x.font='700 24px '+F;
-  x.fillText(song?(item.member?'个人曲 · '+item.member:'团体曲'):((item.status||'')+(item.color?' · '+item.color:'')),W/2,y);
-  y+=58;x.fillStyle='#2b2b2b';x.font='700 52px '+F;
-  wrapLines(x,song?item.title:item.name,W-220).slice(0,2).forEach(ln=>{x.fillText(ln,W/2,y);y+=62});
-  const kana=item.kana||'';if(kana){x.fillStyle='#8a8a8a';x.font='500 28px '+F;x.fillText(kana,W/2,y);y+=48}
-  if(song){x.fillStyle='#6f8b97';x.font='500 28px '+F;wrapLines(x,[item.duration,item.release].filter(Boolean).join(' · ')||'—',W-220).slice(0,2).forEach(ln=>{x.fillText(ln,W/2,y);y+=40})}
-  else if(item.catch){x.fillStyle='#2b2b2b';x.font='500 30px '+F;wrapLines(x,item.catch,W-220).slice(0,2).forEach(ln=>{x.fillText(ln,W/2,y);y+=42})}
-  x.fillStyle='#8a8a8a';x.font='500 22px '+F;x.fillText('非官方粉丝站',W/2,H-108);
+  y=fy+fh+56;
+  if(!song){x.fillStyle=hex;roundRect(x,fx,fy+fh+16,fw,12,6);x.fill();if(lightHex(hex)){x.strokeStyle='#e6dfd9';x.lineWidth=2;x.stroke()}y=fy+fh+70}
+  x.textAlign='center';x.fillStyle='#e4007f';x.font='700 24px '+F;x.fillText(kind,W/2,y);y+=54;
+  x.fillStyle='#2b2b2b';x.font='700 52px '+F;titleLines.forEach(ln=>{x.fillText(ln,W/2,y);y+=62});
+  if(kana){x.fillStyle='#8a8a8a';x.font='500 28px '+F;x.fillText(kana,W/2,y);y+=46}
+  if(song){x.fillStyle='#6f8b97';x.font='500 28px '+F;metaLines.forEach(ln=>{x.fillText(ln,W/2,y);y+=40})}
+  else if(catchLines.length){x.fillStyle='#2b2b2b';x.font='500 30px '+F;catchLines.forEach(ln=>{x.fillText(ln,W/2,y);y+=42})}
+  x.fillStyle='#b9a3ad';x.font='500 22px '+F;x.fillText('非官方粉丝站',W/2,foot);
   return c;
  };
  const downloadBlob=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2500)};
@@ -441,7 +445,7 @@ if(P=='draw'){
    card=`<article class="dcard"><div class=dface><p class=dface-k>DRAW</p><p class=dface-logo>iLiFE<b>!</b></p><p class=dface-t>${mode=='song'?'今日的一首歌':'今日的一位推'}</p><p class=dface-n>${list.length?`池子里有 ${list.length} ${mode=='song'?'首':'人'}`:'这个范围是空的'}</p></div></article>`;
   }else if(view.mode=='song'){
    const s=view.item;
-   card=`<article class="dcard${anim?' is-in':''}"><div class=sr aria-live=polite>抽到 ${esc(s.title)}</div>${view.first?'<span class=dbadge>今日首抽</span>':''}${media(songSrc(s),s.title,'songs.html?s='+s.id)}<div class=dbody><p class=dkind>${s.member?'个人曲 · '+esc(s.member):'团体曲'}</p><h2>${esc(s.title)}</h2>${s.kana?`<p class=dkana>${esc(s.kana)}</p>`:''}<p class=dmeta>${esc([s.duration,s.release].filter(Boolean).join(' · ')||'—')}</p></div></article>`;
+   card=`<article class="dcard${anim?' is-in':''}"><div class=sr aria-live=polite>抽到 ${esc(s.title)}</div>${view.first?'<span class=dbadge>今日首抽</span>':''}${media(songSrc(s),s.title,'songs.html?s='+s.id)}<div class=dbody><p class=dkind>${s.member?'个人曲 · '+esc(s.member):'团体曲'}</p><h2>${esc(s.title)}</h2>${s.kana?`<p class=dkana>${esc(s.kana)}</p>`:''}<p class=dmeta>${esc([s.duration||'—',s.release||'—'].join(' · '))}</p></div></article>`;
   }else{
    const mem=view.item,hex=safeHex(mem.hex);
    card=`<article class="dcard mem${anim?' is-in':''}"><div class=sr aria-live=polite>抽到 ${esc(mem.name)}</div>${view.first?'<span class=dbadge>今日首抽</span>':''}${media(memberSrc(mem),mem.name,'members.html?m='+encodeURIComponent(mem.name),`color-mix(in srgb, ${hex} 22%, #fbf3f7)`)}<div class=dbar style="background:${hex}${lightHex(hex)?';box-shadow:inset 0 0 0 1px #e6dfd9':''}"></div><div class=dbody><p class=dkind><span class=dot style="background:${hex}"></span>${esc(mem.status||'')}${mem.color?' · '+esc(mem.color):''}</p><h2>${esc(mem.name)}</h2>${mem.kana?`<p class=dkana>${esc(mem.kana)}</p>`:''}${mem.catch?`<p class=dcatch>${esc(mem.catch)}</p>`:''}</div></article>`;
