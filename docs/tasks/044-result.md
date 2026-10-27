@@ -12,7 +12,7 @@
 
 两边合计：范围内 267 场，本轮 45 场挂上图，新 `image_lives` 115 条（111 张图，TIF 的「两天 / 三天谢谢」帖挂到了每一天）。封面改为演后 `category=live` 的 38 场。原来同帖已经有一张舞台照当封面的，封面不动，只补其余静图。
 
-没有新的 R2 对象。`python3 db/export.py --check` 通过。导出版本 `a2703fd6`。
+没有新的 R2 对象。`python3 db/export.py --check` 通过。导出版本 `a2703fd6`。数据提交 `ec120bf`。
 
 没有成员标注的图，`images.date` 改成演出日并重算了 `image_eras`（42 张，其中 1 张换了时期）。已有 `image_members` 的沿用发帖日。
 

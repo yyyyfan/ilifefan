@@ -22,6 +22,6 @@
 - [x] 不合并、不部署
 
 ## 状态
-待验收（与 043 同一分支 `cursor/043-2025-2026-live-encore-photos-623a`，PR #6，不合并）。
+待验收（与 043 同一分支 `cursor/043-2025-2026-live-encore-photos-623a`，数据提交 `ec120bf`，PR #6，不合并）。
 
 场次、帖子和仍缺的原因见 `docs/tasks/044-result.md`。
