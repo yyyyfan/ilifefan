@@ -23,3 +23,5 @@ SCHEDULE / 日历去掉了「有公演的月份」药丸墙和类型筛选药丸
 - 手机点 10 月 13 日后的当天列表：`/opt/cursor/artifacts/calendar-after-mobile-390-agenda.png`
 
 核对过：点 27 日封面进入 `lives.html?l=23`（HEROINES HALLOWEEN 2026 DAY1（出演））；上月、今天、年月输入、点日期换列表都正常。390 宽没有横向溢出。未合并、未部署。
+
+PR：https://github.com/yyyyfan/ilifefan/pull/8（版本 `2f42128f`）
