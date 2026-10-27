@@ -156,7 +156,7 @@ if(P=='calendar'){const L=await J('lives');
    const shown=extra?ev.slice(0,1):ev;
    const chips=shown.map(l=>`<a class=cev href="lives.html?l=${l.id}" title="${esc(l.title)}"><span class=cth>${thumb(l)}</span><span class=ct>${ltag(l.type)}<b>${esc(l.title)}</b></span></a>`).join('');
    const more=extra?`<button type=button class=cmore data-d="${date}">+${extra}</button>`:'';
-   const minis=ev.slice(0,3).map(l=>pic(l)?`<span class=mi>${thumb(l)}</span>`:`<span class="mi dot ${dotCls(l.type)}"></span>`).join('');
+   const minis=ev.slice(0,3).map(l=>`<a class="mi${pic(l)?'':' dot '+dotCls(l.type)}" href="lives.html?l=${l.id}" title="${esc(l.title)}" aria-label="${esc(l.title)}">${pic(l)?thumb(l):''}</a>`).join('');
    const cnt=ev.length>3?`<span class=ccnt>+${ev.length-3}</span>`:(ev.length>1?`<span class=ccnt>${ev.length}</span>`:'');
    return `<div class="${cls}" data-d="${date}" role=gridcell tabindex=0 aria-selected="${date==d}" aria-label="${mo}月${day}日${ev.length?`，${ev.length}场`:''}"><span class=dn>${day}</span><div class=cevs>${chips}${more}</div><div class=cdots>${minis}${cnt}</div></div>`;
   };
@@ -169,7 +169,12 @@ if(P=='calendar'){const L=await J('lives');
   m.innerHTML=`${head('SCHEDULE','日历')}<div class=calbar><div class=calnavs><a class="pill nav" href="${urlFor(prev.y,prev.mo,'')}" aria-label=上个月>‹</a><label class=ym><span aria-hidden=true>${y}年${mo}月</span><i aria-hidden=true>▾</i><input type=month value="${ym}" min="${minM}" max="${maxM}" aria-label=选择年月></label><a class="pill nav" href="${urlFor(next.y,next.mo,'')}" aria-label=下个月>›</a><a class="pill off todayb" href="${urlFor(+today.slice(0,4),+today.slice(5,7),today)}">今天</a></div><span class=calmeta>本月 ${monthN} 场</span></div><div class=cal role=grid>${grid}</div><section class=agenda aria-live=polite><h2>${mo}月${dd}日 · ${sel.length} 场</h2>${rows}</section>`;
   const go=href=>{history.pushState(null,'',href);render()};
   m.querySelectorAll('a.nav,a.todayb').forEach(a=>a.onclick=e=>{if(e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();go(new URL(a.getAttribute('href'),location.href).search||'?')});
-  m.querySelector('input[type=month]').onchange=e=>{const ym2=parseYM(e.target.value);if(!ym2)return;go(urlFor(ym2.y,ym2.mo,''))};
+  const monthIn=m.querySelector('input[type=month]');
+  monthIn.onchange=e=>{const ym2=parseYM(e.target.value);if(!ym2)return;go(urlFor(ym2.y,ym2.mo,''))};
+  m.querySelector('.ym').addEventListener('click',e=>{
+    if(typeof monthIn.showPicker!='function')return;
+    try{monthIn.showPicker();e.preventDefault()}catch(err){}
+  });
   const pick=date=>{if(date!=d){history.replaceState(null,'',urlFor(y,mo,date));render()}if(innerWidth<=760){const ag=m.querySelector('.agenda');if(ag)ag.scrollIntoView({block:'start'})}};
   m.querySelectorAll('.day[data-d]').forEach(el=>{el.onclick=e=>{if(e.target.closest('a')||e.target.closest('.cmore'))return;pick(el.dataset.d)};el.onkeydown=e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();pick(el.dataset.d)}}});
   m.querySelectorAll('.cmore').forEach(b=>b.onclick=e=>{e.stopPropagation();pick(b.dataset.d);const ag=m.querySelector('.agenda');if(ag)ag.scrollIntoView({block:'nearest'})});

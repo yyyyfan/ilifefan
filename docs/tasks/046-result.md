@@ -12,7 +12,7 @@ SCHEDULE / 日历去掉了「有公演的月份」药丸墙和类型筛选药丸
 
 - 公演 872 场。与 LIVE 卡片同源、能出封面的 708 场；没有图的 164 场走占位。
 - 2026-10 共 9 场，9 场都有封面。全库同一天最多 2 场（25 天），两场并排时格子高度仍是 112px。
-- `python3 db/export.py --check` 通过。版本 `2f42128f`（改前 `584ca657`）。数据 JSON 没有改。
+- `python3 db/export.py --check` 通过。版本 `fe9b63df`（上一版 `2f42128f`，改前 `584ca657`）。数据 JSON 没有改。
 
 ## 截图
 
@@ -24,4 +24,13 @@ SCHEDULE / 日历去掉了「有公演的月份」药丸墙和类型筛选药丸
 
 核对过：点 27 日封面进入 `lives.html?l=23`（HEROINES HALLOWEEN 2026 DAY1（出演））；上月、今天、年月输入、点日期换列表都正常。390 宽没有横向溢出。未合并、未部署。
 
-PR：https://github.com/yyyyfan/ilifefan/pull/8（版本 `2f42128f`）
+## 点击修复
+
+年月药丸整块点击会调用 `input.showPicker()`（失败时仍把点击交给铺满药丸的原生指示条）。手机上的小封面改成 `<a href="lives.html?l=<id>">`，点空白处或日期数字仍只选中当天。桌面公演条和当天列表链接不变。
+
+核对：桌面和 390 宽点「2026年10月」正中，`showPicker()` 成功且月份面板保持打开；选月后网格跟着变。390 宽点 10 月 27 日小封面进入 `lives.html?l=23`。点日期数字只改 `?d=`，不离开日历。12 月 31 日两张小封面分别指向两场。
+
+- 月份面板：`/opt/cursor/artifacts/calendar-month-picker-desktop.png`、`/opt/cursor/artifacts/calendar-month-picker-mobile.png`
+- 手机小封面进详情：`/opt/cursor/artifacts/calendar-mobile-thumb-live.png`
+
+PR：https://github.com/yyyyfan/ilifefan/pull/8（版本 `fe9b63df`）
