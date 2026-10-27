@@ -77,6 +77,24 @@ CREATE TABLE venues (
   UNIQUE (name, pref)
 );
 
+-- 场地足迹图锚点（任务 047）。pref 与 venues.pref 一致。
+-- kind=pref 的 lat/lng 是都道府县厅所在城市的英文维基主坐标，只用来把圆点放上日本轮廓，不是会场地址。
+-- kind=overseas / unknown 不上图（海外、线上、未确认）。
+CREATE TABLE region_geo (
+  pref       TEXT PRIMARY KEY,
+  ord        INTEGER NOT NULL UNIQUE,
+  name_ja    TEXT,
+  lat        REAL,
+  lng        REAL,
+  kind       TEXT NOT NULL CHECK (kind IN ('pref','overseas','unknown')),
+  source_url TEXT,
+  note       TEXT NOT NULL,
+  CHECK (
+    (kind='pref' AND lat IS NOT NULL AND lng IS NOT NULL AND name_ja IS NOT NULL)
+    OR (kind IN ('overseas','unknown') AND lat IS NULL AND lng IS NULL)
+  )
+);
+
 CREATE TABLE lives (
   id             INTEGER PRIMARY KEY,
   date           TEXT NOT NULL,

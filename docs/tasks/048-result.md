@@ -16,7 +16,7 @@
 
 ## 版本
 
-- `python3 db/export.py --check` 通过。版本 `4167adc3`（上一版 `d8243de4`）。曲目、成员、图片 JSON 没有改内容，只更新了 `data/version.json` 和各页 `?v=`。
+- `python3 db/export.py --check` 通过。合入 main 后版本 `87167ce6`（上一版 `4167adc3`）。曲目、成员、图片 JSON 没有改内容，只更新了 `data/version.json` 和各页 `?v=`。
 - 分享图要把 `img.ilifefan.dpdns.org` 画进 canvas。R2 桶 `ilife-images` 已有只读 CORS（`GET`/`HEAD`，`Origin: *`）。图片域名的响应头规则让缓存命中时也带 `Access-Control-Allow-Origin: *`。没有新上传文件。
 
 ## 怎么试

@@ -1,0 +1,184 @@
+[
+ {
+  "pref": "东京",
+  "name_ja": "東京都",
+  "lat": 35.68972,
+  "lng": 139.69222,
+  "kind": "pref"
+ },
+ {
+  "pref": "神奈川",
+  "name_ja": "神奈川県",
+  "lat": 35.44417,
+  "lng": 139.63806,
+  "kind": "pref"
+ },
+ {
+  "pref": "爱知",
+  "name_ja": "愛知県",
+  "lat": 35.18333,
+  "lng": 136.9,
+  "kind": "pref"
+ },
+ {
+  "pref": "大阪",
+  "name_ja": "大阪府",
+  "lat": 34.69389,
+  "lng": 135.50222,
+  "kind": "pref"
+ },
+ {
+  "pref": "千叶",
+  "name_ja": "千葉県",
+  "lat": 35.60728,
+  "lng": 140.10636,
+  "kind": "pref"
+ },
+ {
+  "pref": "埼玉",
+  "name_ja": "埼玉県",
+  "lat": 35.86139,
+  "lng": 139.64556,
+  "kind": "pref"
+ },
+ {
+  "pref": "福冈",
+  "name_ja": "福岡県",
+  "lat": 33.59,
+  "lng": 130.40167,
+  "kind": "pref"
+ },
+ {
+  "pref": "北海道",
+  "name_ja": "北海道",
+  "lat": 43.06194,
+  "lng": 141.35444,
+  "kind": "pref"
+ },
+ {
+  "pref": "宫城",
+  "name_ja": "宮城県",
+  "lat": 38.26822,
+  "lng": 140.86942,
+  "kind": "pref"
+ },
+ {
+  "pref": "石川",
+  "name_ja": "石川県",
+  "lat": 36.56106,
+  "lng": 136.65642,
+  "kind": "pref"
+ },
+ {
+  "pref": "广岛",
+  "name_ja": "広島県",
+  "lat": 34.39139,
+  "lng": 132.45194,
+  "kind": "pref"
+ },
+ {
+  "pref": "岐阜",
+  "name_ja": "岐阜県",
+  "lat": 35.42322,
+  "lng": 136.76078,
+  "kind": "pref"
+ },
+ {
+  "pref": "兵库",
+  "name_ja": "兵庫県",
+  "lat": 34.69,
+  "lng": 135.19556,
+  "kind": "pref"
+ },
+ {
+  "pref": "山梨",
+  "name_ja": "山梨県",
+  "lat": 35.66214,
+  "lng": 138.56822,
+  "kind": "pref"
+ },
+ {
+  "pref": "冲绳",
+  "name_ja": "沖縄県",
+  "lat": 26.21222,
+  "lng": 127.67917,
+  "kind": "pref"
+ },
+ {
+  "pref": "群马",
+  "name_ja": "群馬県",
+  "lat": 36.3895,
+  "lng": 139.06342,
+  "kind": "pref"
+ },
+ {
+  "pref": "香川",
+  "name_ja": "香川県",
+  "lat": 34.35,
+  "lng": 134.05,
+  "kind": "pref"
+ },
+ {
+  "pref": "长野",
+  "name_ja": "長野県",
+  "lat": 36.64861,
+  "lng": 138.19472,
+  "kind": "pref"
+ },
+ {
+  "pref": "茨城",
+  "name_ja": "茨城県",
+  "lat": 36.36583,
+  "lng": 140.47125,
+  "kind": "pref"
+ },
+ {
+  "pref": "福岛",
+  "name_ja": "福島県",
+  "lat": 37.76081,
+  "lng": 140.47472,
+  "kind": "pref"
+ },
+ {
+  "pref": "滋贺",
+  "name_ja": "滋賀県",
+  "lat": 35.01667,
+  "lng": 135.85,
+  "kind": "pref"
+ },
+ {
+  "pref": "富山",
+  "name_ja": "富山県",
+  "lat": 36.69592,
+  "lng": 137.21369,
+  "kind": "pref"
+ },
+ {
+  "pref": "三重",
+  "name_ja": "三重県",
+  "lat": 34.73306,
+  "lng": 136.51333,
+  "kind": "pref"
+ },
+ {
+  "pref": "台湾",
+  "name_ja": "台湾",
+  "lat": null,
+  "lng": null,
+  "kind": "overseas"
+ },
+ {
+  "pref": "上海",
+  "name_ja": "上海",
+  "lat": null,
+  "lng": null,
+  "kind": "overseas"
+ },
+ {
+  "pref": "—",
+  "name_ja": null,
+  "lat": null,
+  "lng": null,
+  "kind": "unknown"
+ }
+]
