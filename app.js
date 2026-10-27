@@ -285,12 +285,16 @@ if(P=='draw'){
   ['song','member'].forEach(k=>{
    if(raw.first&&dayOk(raw.first[k]))base.first[k]=raw.first[k];
    const arr=raw.history&&Array.isArray(raw.history[k])?raw.history[k]:[];
-   base.history[k]=arr.filter(x=>x&&Number.isFinite(Number(x.id))&&dayOk(x.day)).slice(0,20).map(x=>({id:Number(x.id),day:x.day,at:typeof x.at=='string'?x.at:'',first:!!x.first}));
+   base.history[k]=arr.filter(x=>x&&Number.isFinite(Number(x.id))&&dayOk(x.day)).slice(0,20).map(x=>{
+    const o={id:Number(x.id),day:x.day,at:typeof x.at=='string'?x.at:'',first:!!x.first};
+    const fortune=packFortune(x.fortune);if(fortune)o.fortune=fortune;
+    return o;
+   });
   });
   return base;
  };
  const load=()=>{try{return normalize(JSON.parse(localStorage.getItem(KEY)||''))}catch(e){return empty()}};
- let st=load(),view=null,busy=false,enterAnim=false,shaking=false,toastT=0;
+ let st,view=null,busy=false,enterAnim=false,shaking=false,toastT=0;
  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){toast('这个浏览器无法保存抽签记录')}};
  const toast=msg=>{let t=$('#dtoast');if(!t){document.body.insertAdjacentHTML('beforeend','<div id=dtoast role=status></div>');t=$('#dtoast')}t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2400)};
  if(!$('#dpetals'))document.body.insertAdjacentHTML('beforeend','<div id=dpetals aria-hidden=true></div>');
@@ -303,6 +307,45 @@ if(P=='draw'){
   let x;do{crypto.getRandomValues(buf);x=buf[0]}while(x>=limit);
   return x%n;
  };
+ /* 今日运势词库，改这里即可 */
+ const PASTELS=[
+  {name:'樱花粉',hex:'#ffb7d5'},{name:'草莓粉',hex:'#e85a9b'},{name:'蜜桃',hex:'#ffc2a8'},
+  {name:'奶油黄',hex:'#ffe08a'},{name:'香芋紫',hex:'#d4b4e8'},{name:'薄荷绿',hex:'#b7e4c7'},
+  {name:'珊瑚',hex:'#ff8fab'},{name:'杏子',hex:'#ffc9a3'},{name:'葡萄',hex:'#c9a0dc'},
+  {name:'玫瑰',hex:'#e4007f'},{name:'奶白',hex:'#fff1f6'},{name:'丁香',hex:'#e6c6e6'}
+ ];
+ const LUCK_ITEMS=['应援手灯','歌名便签','一张拍立得','今日发圈','口袋票根','草莓软糖','成员色发带','充满电的耳机','袖口小徽章','应援毛巾','歌词书签','闪亮指甲贴'];
+ const LUCK_ACTS=['把副歌再听一遍','把签发给同担','跟着节拍点头','写下喜欢的一句','给今天的推比心','单曲循环到会唱','把应援色穿上','放进今日歌单','看一眼公式照','把签名着声唱出来','把灯牌举高一点','和同担分享这张签'];
+ const LUCK_MOTTOS=['今天也把副歌唱亮','小幸运落在节拍上','把喜欢大声说出来','今天的推就在眼前','一首歌的时间刚刚好','应援色会照亮今天','走到灯下就是主角','把心跳交给这首歌','今天也要闪闪发光','同担的消息会带来好运','再听一遍运气就到','先对自己笑一个'];
+ const memberLucky=mem=>{
+  if(!/^#[0-9a-fA-F]{6}$/.test(mem&&mem.hex||''))return null;
+  const raw=String(mem.color||'');
+  let name='';
+  if(/黄/.test(raw)&&/緑|绿/.test(raw))name='黄绿';
+  else if(/桃/.test(raw))name='桃';
+  else if(/水色/.test(raw))name='水色';
+  else if(/粉|ピンク/.test(raw))name='粉';
+  else if(/橙|オレンジ/.test(raw))name='橙';
+  else if(/紫/.test(raw))name='紫';
+  else if(/緑|绿/.test(raw))name='绿';
+  else if(/黄/.test(raw))name='黄';
+  else if(/青/.test(raw))name='青';
+  else if(/赤|红/.test(raw))name='赤';
+  else if(/白/.test(raw))name='白';
+  return name?{hex:mem.hex,name}:null;
+ };
+ const rollFortune=(mode,item)=>{
+  const color=mode=='member'&&memberLucky(item)||PASTELS[randIndex(PASTELS.length)];
+  return {color:color.hex,colorName:color.name,item:LUCK_ITEMS[randIndex(LUCK_ITEMS.length)],action:LUCK_ACTS[randIndex(LUCK_ACTS.length)],motto:LUCK_MOTTOS[randIndex(LUCK_MOTTOS.length)]};
+ };
+ const packFortune=f=>{
+  if(!f||typeof f!='object')return null;
+  const color=/^#[0-9a-fA-F]{6}$/.test(f.color||'')?f.color:'';
+  const cut=(s,n)=>typeof s==='string'?s.trim().slice(0,n):'';
+  const colorName=cut(f.colorName,16),item=cut(f.item,40),action=cut(f.action,40),motto=cut(f.motto,48);
+  return color&&colorName&&item&&action&&motto?{color,colorName,item,action,motto}:null;
+ };
+ st=load();
  const isSq=im=>im&&im.w&&im.h&&Math.abs(im.w/im.h-1)<0.08;
  const songSrc=s=>{
   const v=(s.videos||[])[0],cov=s.cover;
@@ -346,9 +389,12 @@ if(P=='draw'){
   const label=String(view.mode=='song'?view.item.title:view.item.name).replace(/[\\/:*?"<>|\s]+/g,'');
   return `ilifefan-${kind}-${label}-${view.day}.png`;
  };
- const caption=()=>view.mode=='song'
-  ?`iLiFE! 应援资料库\n${view.day} 抽歌\n${view.item.title}${view.item.kana?'（'+view.item.kana+'）':''}`
-  :`iLiFE! 应援资料库\n${view.day} 抽推\n${view.item.name}${view.item.kana?'（'+view.item.kana+'）':''}`;
+ const caption=()=>{
+  const who=view.mode=='song'
+   ?`${view.day} 抽歌\n${view.item.title}${view.item.kana?'（'+view.item.kana+'）':''}`
+   :`${view.day} 抽推\n${view.item.name}${view.item.kana?'（'+view.item.kana+'）':''}`;
+  return `iLiFE! 应援资料库\n${who}${view.fortune?'\n'+view.fortune.motto:''}`;
+ };
  const loadImg=src=>new Promise(res=>{
   if(!src)return res(null);
   const im=new Image();im.crossOrigin='anonymous';
@@ -392,7 +438,7 @@ if(P=='draw'){
   x.fillStyle='#2b2b2b';x.font='500 22px '+F;x.fillText(dayLabel(view.day),W/2,142);
   x.fillStyle='#e4007f';x.font='700 16px '+F;x.letterSpacing='3px';x.fillText("TODAY'S DRAW",W/2,176);x.letterSpacing='0px';
   x.fillStyle='#8a8a8a';x.font='500 20px '+F;x.fillText('今日的签',W/2,206);
-  const photoW=song?500:420,photoH=song?500:560,pad=22,capH=96;
+  const photoW=song?480:400,photoH=song?460:480,pad=22,capH=88;
   const frameW=photoW+pad*2,frameH=pad+photoH+capH,frameX=(W-frameW)/2,frameY=236;
   x.save();
   x.translate(W/2,frameY+frameH/2);x.rotate(-1.5*Math.PI/180);x.translate(-W/2,-(frameY+frameH/2));
@@ -446,6 +492,34 @@ if(P=='draw'){
   };
   if(song){row('时长',item.duration||'—');row('作品',item.release||'—')}
   else{row('状态',item.status||'—');if(item.catch)row('口号',item.catch)}
+  const fort=view.fortune;
+  if(fort){
+   y+=10;x.textAlign='center';x.textBaseline='middle';x.fillStyle='#e4007f';x.font='700 16px '+F;x.letterSpacing='4px';x.fillText('今日运势',W/2,y);x.letterSpacing='0px';
+   y+=34;x.font='700 22px '+F;
+   const qLines=linesOf('700 22px','「'+fort.motto+'」',W-240).slice(0,2);
+   const qh=qLines.length*30+36;
+   x.fillStyle='#fff6fb';roundRect(x,86,y-24,W-172,qh,18);x.fill();
+   x.fillStyle='#e4007f';x.font='700 14px '+F;x.letterSpacing='3px';x.fillText('签语',W/2,y-2);x.letterSpacing='0px';
+   x.fillStyle='#2b2b2b';x.font='700 22px '+F;qLines.forEach((ln,i)=>x.fillText(ln,W/2,y+22+i*30));
+   y+=qh+20;
+   const luckRow=(label,value,swatch)=>{
+    x.fillStyle='#fff';roundRect(x,86,y-22,W-172,48,16);x.fill();
+    x.strokeStyle='#ffe4f0';x.lineWidth=2;x.stroke();
+    x.textAlign='left';x.fillStyle='#8a8a8a';x.font='500 18px '+F;x.fillText(label,112,y);
+    x.font='700 20px '+F;x.fillStyle='#2b2b2b';x.textAlign='right';
+    const vw=x.measureText(value).width;
+    if(swatch){
+     const cx=W-112-vw-18;
+     x.beginPath();x.arc(cx,y,9,0,Math.PI*2);x.fillStyle=swatch;x.fill();
+     if(lightHex(swatch)){x.strokeStyle='#e6dfd9';x.lineWidth=1.5;x.stroke()}
+     x.fillStyle='#2b2b2b';
+    }
+    x.fillText(value,W-112,y);y+=62;
+   };
+   luckRow('幸运色',fort.colorName,fort.color);
+   luckRow('幸运物品',fort.item);
+   luckRow('今日行动',fort.action);
+  }
   x.textAlign='center';x.textBaseline='middle';x.fillStyle='#2b2b2b';x.font='900 32px Roboto,sans-serif';
   const brand='iLiFE',bang='!',tail=' 应援资料库';
   const bw=x.measureText(brand).width,jw=x.measureText(bang).width;
@@ -488,15 +562,16 @@ if(P=='draw'){
    const inner=src?`<img src="${esc(src)}" alt="${esc(alt)}">`:`<span class=songph><b>${esc(alt)}</b><small>无官方图片</small></span>`;
    return `<a class="dframe${mem?' mem':''}" href="${href}">${inner}</a>`;
   };
+  const luckBlock=f=>f?`<section class=dluck><p class=dmicro>今日运势</p><div class=dluck-q><span>签语</span><b>「${esc(f.motto)}」</b></div><div class=dluck-rows><p><span>幸运色</span><b><i class="dswatch${lightHex(f.color)?' light':''}" style="background:${f.color}"></i>${esc(f.colorName)}</b></p><p><span>幸运物品</span><b>${esc(f.item)}</b></p><p><span>今日行动</span><b>${esc(f.action)}</b></p></div></section>`:'';
   let stage='';
   if(shaking){
    stage=`${slip(true)}<p class=dshake-t>${mode=='song'?'正在抽歌…':'正在抽推…'}</p><p class=dshake-s>稍等一下</p><div class=dcharge aria-hidden=true><i></i></div><button type=button id=drawGo class=go disabled hidden>抽取</button>`;
   }else if(view&&view.mode=='song'){
    const s=view.item,href='songs.html?s='+s.id;
-   stage=`<article class="dsheet${anim?' is-in':''}"><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S DRAW</p><p class=dsubk>今日的签</p><div class=dpolaroid>${frame(songSrc(s),s.title,href,false)}<div class="dseal${anim?' is-pop':''}">${view.first?'今日首抽':'抽歌'}</div><p class=dcap><b>${esc(s.title)}</b>${s.kana?`<span>${esc(s.kana)}</span>`:''}</p></div><div class="drows dmeta"><p><span>种类</span><b class=dkind>${s.member?'个人曲 · '+esc(s.member):'团体曲'}</b></p><p><span>时长</span><b>${esc(s.duration||'—')}</b></p><p><span>作品</span><b>${esc(s.release||'—')}</b></p></div><div class=dsharebox><p class=dask>把今天的签存下来</p><button type=button class="go dcta" id=drawSave>保存卡片</button></div><div class=dacts><button type=button class=off id=drawGo ${busy?'disabled':''}>再抽一次</button><a class="pill off" href="${href}">查看歌曲</a></div><div class=sr aria-live=polite>抽到 ${esc(s.title)}</div></article>`;
+   stage=`<article class="dsheet${anim?' is-in':''}"><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S DRAW</p><p class=dsubk>今日的签</p><div class=dpolaroid>${frame(songSrc(s),s.title,href,false)}<div class="dseal${anim?' is-pop':''}">${view.first?'今日首抽':'抽歌'}</div><p class=dcap><b>${esc(s.title)}</b>${s.kana?`<span>${esc(s.kana)}</span>`:''}</p></div><div class="drows dmeta"><p><span>种类</span><b class=dkind>${s.member?'个人曲 · '+esc(s.member):'团体曲'}</b></p><p><span>时长</span><b>${esc(s.duration||'—')}</b></p><p><span>作品</span><b>${esc(s.release||'—')}</b></p></div>${luckBlock(view.fortune)}<div class=dsharebox><p class=dask>把今天的签存下来</p><button type=button class="go dcta" id=drawSave>保存卡片</button></div><div class=dacts><button type=button class=off id=drawGo ${busy?'disabled':''}>再抽一次</button><a class="pill off" href="${href}">查看歌曲</a></div><div class=sr aria-live=polite>抽到 ${esc(s.title)}</div></article>`;
   }else if(view){
    const mem=view.item,hex=safeHex(mem.hex),href='members.html?m='+encodeURIComponent(mem.name);
-   stage=`<article class="dsheet mem${anim?' is-in':''}"><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S DRAW</p><p class=dsubk>今日的签</p><div class="dpolaroid mem">${frame(memberSrc(mem),mem.name,href,true)}<div class="dseal${anim?' is-pop':''}" style="border-color:${accentOf(hex)};color:${accentOf(hex)}">${view.first?'今日首抽':'抽推'}</div><p class=dcap><b>${esc(mem.name)}</b>${mem.kana?`<span>${esc(mem.kana)}</span>`:''}</p></div><div class="dbar${lightHex(hex)?' light':''}" style="background:${hex}"></div><div class=drows><p><span>状态</span><b class=dkind>${esc(mem.status||'')}${mem.color?' · '+esc(mem.color):''}</b></p>${mem.catch?`<p><span>口号</span><b>${esc(mem.catch)}</b></p>`:''}</div><div class=dsharebox><p class=dask>把今天的签存下来</p><button type=button class="go dcta" id=drawSave>保存卡片</button></div><div class=dacts><button type=button class=off id=drawGo ${busy?'disabled':''}>再抽一次</button><a class="pill off" href="${href}">查看成员</a></div><div class=sr aria-live=polite>抽到 ${esc(mem.name)}</div></article>`;
+   stage=`<article class="dsheet mem${anim?' is-in':''}"><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S DRAW</p><p class=dsubk>今日的签</p><div class="dpolaroid mem">${frame(memberSrc(mem),mem.name,href,true)}<div class="dseal${anim?' is-pop':''}" style="border-color:${accentOf(hex)};color:${accentOf(hex)}">${view.first?'今日首抽':'抽推'}</div><p class=dcap><b>${esc(mem.name)}</b>${mem.kana?`<span>${esc(mem.kana)}</span>`:''}</p></div><div class="dbar${lightHex(hex)?' light':''}" style="background:${hex}"></div><div class=drows><p><span>状态</span><b class=dkind>${esc(mem.status||'')}${mem.color?' · '+esc(mem.color):''}</b></p>${mem.catch?`<p><span>口号</span><b>${esc(mem.catch)}</b></p>`:''}</div>${luckBlock(view.fortune)}<div class=dsharebox><p class=dask>把今天的签存下来</p><button type=button class="go dcta" id=drawSave>保存卡片</button></div><div class=dacts><button type=button class=off id=drawGo ${busy?'disabled':''}>再抽一次</button><a class="pill off" href="${href}">查看成员</a></div><div class=sr aria-live=polite>抽到 ${esc(mem.name)}</div></article>`;
   }
   const filters=mode=='song'
    ?`<p class=filters role=group aria-label=曲目范围>${[['all','全部',n.all],['group','团体曲',n.group],['solo','个人曲',n.solo]].map(([k,lb,c])=>`<button type=button class="${st.prefs.songFilter==k?'':'off'}" data-sf=${k} aria-pressed=${st.prefs.songFilter==k}>${lb} ${c}</button>`).join('')}</p><p class=dpool>${list.length?`从 ${list.length} 首里抽`:'这个范围里没有歌'}</p>`
@@ -522,7 +597,8 @@ if(P=='draw'){
    if(busy)return;
    const h=st.history[mode].find(x=>String(x.id)==b.dataset.hid&&x.at==b.dataset.hat);if(!h)return;
    const item=mode=='song'?songById(h.id):memberById(h.id);if(!item)return;
-   view={mode,item,first:!!h.first,day:h.day,at:h.at,hist:true};render();
+   let fortune=h.fortune;if(!fortune){fortune=rollFortune(mode,item);h.fortune=fortune;save()}
+   view={mode,item,first:!!h.first,day:h.day,at:h.at,hist:true,fortune};render();
   });
   const ex=$('#drawExport');if(ex)ex.onclick=()=>{
    const blob=new Blob([JSON.stringify({key:KEY,exportedAt:new Date().toISOString(),...st},null,2)],{type:'application/json'});
@@ -561,10 +637,11 @@ if(P=='draw'){
    const day=jstDay(),mode=st.prefs.mode,first=st.first[mode]!==day;
    if(first)st.first[mode]=day;
    const at=new Date().toISOString();
-   st.history[mode]=[{id:item.id,day,at,first},...st.history[mode]].slice(0,20);
+   const fortune=rollFortune(mode,item);
+   st.history[mode]=[{id:item.id,day,at,first,fortune},...st.history[mode]].slice(0,20);
    save();
    shaking=false;
-   view={mode,item,first,day,at,hist:false};
+   view={mode,item,first,day,at,hist:false,fortune};
    enterAnim=!reduce;
    render();
    if(!reduce){

@@ -300,6 +300,17 @@ body[data-page=draw] .dcol .filters{text-align:center;margin:0}
 .drows p{display:flex;justify-content:space-between;gap:12px;margin:0;padding:9px 2px;border-bottom:1px dashed rgba(228,0,127,.2);font-size:13px}
 .drows span{color:var(--sub);font-size:11px;letter-spacing:.14em;flex:none}
 .drows b{font-weight:700;text-align:right;overflow-wrap:anywhere}
+.dluck{margin:14px 2px 0}
+.dluck .dmicro{text-align:center;letter-spacing:.28em}
+.dluck-q{margin:0 0 10px;padding:12px 14px 14px;text-align:center;background:#fff6fb;border-radius:18px}
+.dluck-q span{display:block;margin-bottom:4px;color:var(--pink);font:700 11px/1 Roboto,"Noto Sans SC";letter-spacing:.22em}
+.dluck-q b{display:block;font:700 15px/1.6 "Noto Sans SC",Roboto;color:var(--ink);overflow-wrap:anywhere}
+.dluck-rows{display:flex;flex-direction:column;gap:8px}
+.dluck-rows p{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0;padding:10px 12px;background:#fff;border-radius:16px;box-shadow:inset 0 0 0 1px #ffe4f0}
+.dluck-rows span{color:var(--sub);font-size:12px;letter-spacing:.12em;flex:none}
+.dluck-rows b{display:flex;align-items:center;justify-content:flex-end;gap:8px;font-weight:700;font-size:13px;text-align:right;overflow-wrap:anywhere}
+.dswatch{width:16px;height:16px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px #0001}
+.dswatch.light{box-shadow:inset 0 0 0 1px #e6dfd9}
 .dsharebox{margin-top:16px;padding:14px 14px 16px;text-align:center;background:#fff6fb;border-radius:22px}
 .dask{margin:0 0 8px;font-size:13px;color:var(--ink)}
 .dcta{display:flex;width:min(100%,340px);margin:8px auto 0;justify-content:center;align-items:center;padding:15px 28px;border-radius:999px;font-size:16px;letter-spacing:.08em;box-shadow:0 12px 28px #e4007f33}
