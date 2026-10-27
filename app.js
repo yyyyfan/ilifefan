@@ -123,14 +123,67 @@ if(P=='lives'){const[L,M]=await Promise.all([J('lives'),J('members')]);const MM=
 if(P=='venues'){const L=await J('lives'),v=q.get('v'),g={};L.forEach(l=>{if(l.venue!='未确认')(g[l.venue]=g[l.venue]||[]).push(l)});
  m.innerHTML=v?`${head('VENUE',esc(v),'<a href=venues.html>场地</a> / '+esc(v))}<div class=box><dl class=info><dt>iLiFE! 举办次数</dt><dd>${(g[v]||[]).length}</dd><dt>地区</dt><dd>${esc((g[v]||[{}])[0].pref||'未确认')}</dd><dt>地图</dt><dd><a href="https://www.google.com/maps/search/${encodeURIComponent(v)}" target=_blank>在 Google 地图查看 ↗</a></dd></dl></div><h2>在此举办的公演</h2>${ltab(g[v]||[])}`
  :`${head('VENUES','场地')}<div class=box><table><tr><th>场地</th><th>地区</th><th>次数</th></tr>${Object.entries(g).sort((a,b)=>b[1].length-a[1].length).map(([k,a])=>`<tr><td>${vl(k)}</td><td>${esc(a[0].pref)}</td><td>${a.length}</td></tr>`).join('')}</table></div>`;return}
-if(P=='calendar'){const L=await J('lives');let d=new Date(q.get('m')||new Date().toISOString().slice(0,7)+'-01'),cur=q.get('t')||'全部';
- const TYPES=['全部','ワンマン','主催','対バン','フェス','リリイベ','生誕祭','配信','その他'].filter(t=>t=='全部'||L.some(l=>l.type==t));
- const y=d.getFullYear(),mo=d.getMonth(),f=new Date(y,mo,1).getDay(),n=new Date(y,mo+1,0).getDate(),pad=x=>String(x).padStart(2,'0'),ym=(a,b)=>{const t=new Date(a,b,1);return t.getFullYear()+'-'+pad(t.getMonth()+1)};
- const tq=t=>t=='全部'?'':`&t=${encodeURIComponent(t)}`;
- const FL=cur=='全部'?L:L.filter(l=>l.type==cur);
- let c='日一二三四五六'.split('').map(x=>`<div class=wd>${x}</div>`).join('')+'<div></div>'.repeat(f);
- for(let i=1;i<=n;i++){const k=`${y}-${pad(mo+1)}-${pad(i)}`,e=FL.filter(l=>l.date==k);c+=`<div class="${e.length?'ev':''}">${i}${e.map(l=>`<a href="venues.html?v=${encodeURIComponent(l.venue)}">${ltag(l.type)} ${esc(l.title)}</a><small>${esc(l.venue)}${l.start_time?' · '+esc(l.start_time):''}</small>`).join('')}</div>`}
- m.innerHTML=`${head('SCHEDULE','日历 · '+y+'年'+(mo+1)+'月')}<p><a class=pill href="?m=${ym(y,mo-1)}-01${tq(cur)}">‹ 上月</a><a class=pill href="?m=${ym(y,mo+1)}-01${tq(cur)}">下月 ›</a></p><p class=filters><span class=lb>类型筛选</span>${TYPES.map(t=>`<a class="pill ${t==cur?'':'off'}" href="?m=${y}-${pad(mo+1)}-01${tq(t)}">${t} (${t=='全部'?L.length:L.filter(l=>l.type==t).length})</a>`).join('')}</p><p class=filters><span class=lb>有公演的月份</span>${[...new Set(FL.map(l=>l.date.slice(0,7)))].map(x=>`<a class="pill ${x==ym(y,mo)?'':'off'}" href="?m=${x}-01${tq(cur)}">${x}</a>`).join('')}</p><div class=cal>${c}</div>`;return}
+if(P=='calendar'){const L=await J('lives');
+ const pad=n=>String(n).padStart(2,'0');
+ const jstToday=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const today=jstToday();
+ const by={};L.forEach(l=>{(by[l.date]=by[l.date]||[]).push(l)});
+ Object.values(by).forEach(a=>a.sort((x,y)=>String(x.start_time||x.open_time||'99:99').localeCompare(String(y.start_time||y.open_time||'99:99'))||x.id-y.id));
+ const months=[...new Set(L.map(l=>l.date.slice(0,7)))].sort();
+ const minM=months[0]||today.slice(0,7),maxM=(months[months.length-1]||minM)>today.slice(0,7)?months[months.length-1]:today.slice(0,7);
+ const parseYM=s=>{const m=String(s||'').match(/^(\d{4})-(\d{2})/);if(!m)return null;const y=+m[1],mo=+m[2];return mo>=1&&mo<=12?{y,mo}:null};
+ const ymOf=(y,mo)=>y+'-'+pad(mo);
+ const shift=(y,mo,d)=>{const t=new Date(y,mo-1+d,1);return {y:t.getFullYear(),mo:t.getMonth()+1}};
+ const dimOf=(y,mo)=>new Date(y,mo,0).getDate();
+ const iso=(y,mo,day)=>ymOf(y,mo)+'-'+pad(day);
+ const pic=l=>l.cover||(l.images&&l.images[0])||null;
+ const thumb=l=>{const i=pic(l);return i?`<img loading=lazy decoding=async src="${i.local||i.url}" alt="">`:`<span class=cph>🎤</span>`};
+ const dotCls=t=>t=='ワンマン'?'oneman':t=='主催'?'sponsor':t=='生誕祭'?'bday':t=='フェス'?'fes':t=='リリイベ'?'release':'';
+ const when=l=>{const t=l.open_time&&l.start_time?`${l.open_time} / ${l.start_time}`:(l.start_time||l.open_time||'');return [l.venue,t].filter(Boolean).join(' · ')};
+ const defaultDay=(y,mo)=>{const ym=ymOf(y,mo);if(today.slice(0,7)==ym)return today;const hit=L.find(l=>l.date.slice(0,7)==ym);return hit?hit.date:iso(y,mo,1)};
+ const urlFor=(y,mo,d)=>{const p=new URLSearchParams();p.set('m',ymOf(y,mo));if(d)p.set('d',d);return '?'+p.toString()};
+ const read=()=>{const qq=new URLSearchParams(location.search);const base=parseYM(qq.get('m'))||parseYM(today);let d=qq.get('d')||'';const ym=ymOf(base.y,base.mo);if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||d.slice(0,7)!=ym)d=defaultDay(base.y,base.mo);const dd=+d.slice(8);if(dd<1||dd>dimOf(base.y,base.mo))d=defaultDay(base.y,base.mo);return {y:base.y,mo:base.mo,d}};
+ const CHIP=2;
+ const render=()=>{
+  const {y,mo,d}=read(),ym=ymOf(y,mo),dim=dimOf(y,mo),lead=new Date(y,mo-1,1).getDay();
+  const prev=shift(y,mo,-1),next=shift(y,mo,1),pdim=dimOf(prev.y,prev.mo);
+  document.title=`${y}年${mo}月 · SCHEDULE | iLiFE! 应援资料库`;
+  const cell=(out,day,date)=>{
+   const ev=out?[]:(by[date]||[]);
+   const cls=['day',out?'out':'',!out&&ev.length?'ev':'',date==today?'is-today':'',!out&&date==d?'sel':''].filter(Boolean).join(' ');
+   if(out)return `<div class="${cls}"><span class=dn>${day}</span></div>`;
+   const extra=ev.length>CHIP?ev.length-1:0;
+   const shown=extra?ev.slice(0,1):ev;
+   const chips=shown.map(l=>`<a class=cev href="lives.html?l=${l.id}" title="${esc(l.title)}"><span class=cth>${thumb(l)}</span><span class=ct>${ltag(l.type)}<b>${esc(l.title)}</b></span></a>`).join('');
+   const more=extra?`<button type=button class=cmore data-d="${date}">+${extra}</button>`:'';
+   const minis=ev.slice(0,3).map(l=>`<a class="mi${pic(l)?'':' dot '+dotCls(l.type)}" href="lives.html?l=${l.id}" title="${esc(l.title)}" aria-label="${esc(l.title)}">${pic(l)?thumb(l):''}</a>`).join('');
+   const cnt=ev.length>3?`<span class=ccnt>+${ev.length-3}</span>`:(ev.length>1?`<span class=ccnt>${ev.length}</span>`:'');
+   return `<div class="${cls}" data-d="${date}" role=gridcell tabindex=0 aria-selected="${date==d}" aria-label="${mo}月${day}日${ev.length?`，${ev.length}场`:''}"><span class=dn>${day}</span><div class=cevs>${chips}${more}</div><div class=cdots>${minis}${cnt}</div></div>`;
+  };
+  let grid='日一二三四五六'.split('').map((x,i)=>`<div class="wd${i==0?' sun':''}" role=columnheader>${x}</div>`).join('');
+  for(let i=0;i<lead;i++){const day=pdim-lead+1+i;grid+=cell(true,day,iso(prev.y,prev.mo,day))}
+  for(let day=1;day<=dim;day++)grid+=cell(false,day,iso(y,mo,day));
+  let trail=1;while((lead+dim+trail-1)%7){grid+=cell(true,trail,iso(next.y,next.mo,trail));trail++}
+  const monthN=L.filter(l=>l.date.slice(0,7)==ym).length,sel=by[d]||[],dd=+d.slice(8);
+  const clampYM=(yy,mm)=>{let t=ymOf(yy,mm);if(t<minM)t=minM;if(t>maxM)t=maxM;return parseYM(t)};
+  const prevYear=clampYM(y-1,mo),nextYear=clampYM(y+1,mo);
+  const ybtn=(target,label,aria)=>{const same=ymOf(target.y,target.mo)==ym;return same?`<span class="pill off ynav dis" aria-disabled=true>${label}</span>`:`<a class="pill off ynav" href="${urlFor(target.y,target.mo,'')}" aria-label="${aria}">${label}</a>`};
+  const rows=sel.length?sel.map(l=>`<a class=arow href="lives.html?l=${l.id}"><span class=ath>${thumb(l)}</span><span class=at><span class=aline>${ltag(l.type)}<b>${esc(l.title)}</b></span><small>${esc(when(l)||'时间未确认')}</small></span></a>`).join(''):'<p class=none>这天没有公演。</p>';
+  m.innerHTML=`${head('SCHEDULE','日历')}<div class=calbar><div class=calnavs>${ybtn(prevYear,'« 上一年','上一年')}<a class="pill nav" href="${urlFor(prev.y,prev.mo,'')}" aria-label=上个月>‹</a><label class=ym><span aria-hidden=true>${y}年${mo}月</span><i aria-hidden=true>▾</i><input type=month value="${ym}" min="${minM}" max="${maxM}" aria-label=选择年月></label><a class="pill nav" href="${urlFor(next.y,next.mo,'')}" aria-label=下个月>›</a>${ybtn(nextYear,'下一年 »','下一年')}<a class="pill off todayb" href="${urlFor(+today.slice(0,4),+today.slice(5,7),today)}">今天</a></div><span class=calmeta>本月 ${monthN} 场</span></div><div class=cal role=grid>${grid}</div><section class=agenda aria-live=polite><h2>${mo}月${dd}日 · ${sel.length} 场</h2>${rows}</section>`;
+  const go=href=>{history.pushState(null,'',href);render()};
+  m.querySelectorAll('a.nav,a.ynav,a.todayb').forEach(a=>a.onclick=e=>{if(e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();go(new URL(a.getAttribute('href'),location.href).search||'?')});
+  const monthIn=m.querySelector('input[type=month]');
+  monthIn.onchange=e=>{const ym2=parseYM(e.target.value);if(!ym2)return;go(urlFor(ym2.y,ym2.mo,''))};
+  m.querySelector('.ym').addEventListener('click',e=>{
+    if(typeof monthIn.showPicker!='function')return;
+    try{monthIn.showPicker();e.preventDefault()}catch(err){}
+  });
+  const pick=date=>{if(date!=d){history.replaceState(null,'',urlFor(y,mo,date));render()}if(innerWidth<=760){const ag=m.querySelector('.agenda');if(ag)ag.scrollIntoView({block:'start'})}};
+  m.querySelectorAll('.day[data-d]').forEach(el=>{el.onclick=e=>{if(e.target.closest('a')||e.target.closest('.cmore'))return;pick(el.dataset.d)};el.onkeydown=e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();pick(el.dataset.d)}}});
+  m.querySelectorAll('.cmore').forEach(b=>b.onclick=e=>{e.stopPropagation();pick(b.dataset.d);const ag=m.querySelector('.agenda');if(ag)ag.scrollIntoView({block:'nearest'})});
+  imgDone(m);
+ };
+ window.addEventListener('popstate',render);render();return}
 if(P=='gallery'){const I=await J('images'),C={all:'全部',official:'公式图',costume:'打歌服/衣装',live:'演出照',member:'个人(生诞)',other:'其他'};let cur=q.get('c')||'all',yr=q.get('y')||'all',lim=120;
  const Y=['all',...[...new Set(I.map(i=>i.date.slice(0,4)))].sort()];
  const r=()=>{const F=I.filter(i=>(cur=='all'||i.category==cur)&&(yr=='all'||i.date.startsWith(yr))).reverse();
