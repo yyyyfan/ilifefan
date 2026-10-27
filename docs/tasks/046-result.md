@@ -12,7 +12,7 @@ SCHEDULE / 日历去掉了「有公演的月份」药丸墙和类型筛选药丸
 
 - 公演 872 场。与 LIVE 卡片同源、能出封面的 708 场；没有图的 164 场走占位。
 - 2026-10 共 9 场，9 场都有封面。全库同一天最多 2 场（25 天），两场并排时格子高度仍是 112px。
-- `python3 db/export.py --check` 通过。版本 `fe9b63df`（上一版 `2f42128f`，改前 `584ca657`）。数据 JSON 没有改。
+- `python3 db/export.py --check` 通过。版本 `e95a0445`（上一版 `fe9b63df`）。数据 JSON 没有改。
 
 ## 截图
 
@@ -33,4 +33,13 @@ SCHEDULE / 日历去掉了「有公演的月份」药丸墙和类型筛选药丸
 - 月份面板：`/opt/cursor/artifacts/calendar-month-picker-desktop.png`、`/opt/cursor/artifacts/calendar-month-picker-mobile.png`
 - 手机小封面进详情：`/opt/cursor/artifacts/calendar-mobile-thumb-live.png`
 
-PR：https://github.com/yyyyfan/ilifefan/pull/8（版本 `fe9b63df`）
+## 年份快捷
+
+月份条旁边加了「« 上一年」「下一年 »」。跳到同一月的上一年或下一年，超出收录范围就停在最早或最晚有数据的月份（2020-06 … 2027-04）。已经在两端时，对应按钮变灰、不能再点。‹ ›、「今天」和年月选择器仍在，没有月份药丸墙。
+
+核对：2026-10 的上一年是 2025-10，下一年收到 2027-04。2020-08 的上一年收到 2020-06。390 宽按钮换行，没有横向溢出。
+
+- 桌面：`/opt/cursor/artifacts/calendar-year-desktop-1280.png`
+- 手机：`/opt/cursor/artifacts/calendar-year-mobile-390.png`
+
+PR：https://github.com/yyyyfan/ilifefan/pull/8（版本 `e95a0445`）
