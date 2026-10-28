@@ -36,24 +36,68 @@ const NAV=[
  ['gallery','gallery','PHOTO',{zh:'图库',ja:'写真',en:'Gallery'}]
 ];
 
+const LANG_OPTS=[
+ {code:'zh',name:'简体中文',short:'中文',flag:'🇨🇳'},
+ {code:'ja',name:'日本語',short:'日本語',flag:'🇯🇵'},
+ {code:'en',name:'English',short:'English',flag:'🇺🇸'}
+];
+const getLangOpt=code=>LANG_OPTS.find(o=>o.code===code)||LANG_OPTS[0];
+
 const updateHeaderNav=()=>{
- const l=currentLang;
+ const l=currentLang,cur=getLangOpt(l);
  document.querySelectorAll('nav a').forEach((a,i)=>{
   const item=NAV[i];if(!item)return;
   const span=a.querySelector('span');if(span)span.textContent=item[3][l]||item[3].zh;
  });
- document.querySelectorAll('.lang-btn').forEach(b=>{
+ const curSpan=document.querySelector('#langDd .lang-dd-cur');
+ if(curSpan)curSpan.textContent=cur.short;
+ document.querySelectorAll('.lang-dd-item').forEach(b=>{
   b.classList.toggle('on',b.dataset.lang===l);
  });
 };
 
-$('header').innerHTML=`<div class=hd><a class=logo href="index.html">iLiFE<b>!</b><small>FAN DATABASE · 应援资料库</small></a><div class="lang-switch" role="group" aria-label="Language"><button type="button" class="lang-btn${currentLang==='zh'?' on':''}" data-lang="zh">中</button><button type="button" class="lang-btn${currentLang==='ja'?' on':''}" data-lang="ja">日</button><button type="button" class="lang-btn${currentLang==='en'?' on':''}" data-lang="en">EN</button></div><button id=burger aria-label=menu>☰</button><nav>${NAV.map(([f,p,e,c])=>`<a href="${f}.html" class="${p==P?'on':''}">${e}<span>${c[currentLang]||c.zh}</span></a>`).join('')}</nav></div>`;
+const renderLangDd=()=>{
+ const cur=getLangOpt(currentLang);
+ return `<div class="lang-dd" id="langDd"><button type="button" class="lang-dd-btn" id="langDdBtn" aria-haspopup="true" aria-expanded="false" title="Language / 语言切换"><span class="lang-dd-globe">🌐</span><span class="lang-dd-cur">${cur.short}</span><span class="lang-dd-arrow">▾</span></button><div class="lang-dd-menu" role="menu">${LANG_OPTS.map(o=>`<button type="button" class="lang-dd-item${currentLang===o.code?' on':''}" data-lang="${o.code}" role="menuitem"><span class="lang-dd-flag">${o.flag}</span><span class="lang-dd-name">${o.name}</span><span class="lang-dd-check">✓</span></button>`).join('')}</div></div>`;
+};
+
+$('header').innerHTML=`<div class=hd><a class=logo href="index.html">iLiFE<b>!</b><small>FAN DATABASE · 应援资料库</small></a><nav>${NAV.map(([f,p,e,c])=>`<a href="${f}.html" class="${p==P?'on':''}">${e}<span>${c[currentLang]||c.zh}</span></a>`).join('')}</nav>${renderLangDd()}<button id=burger aria-label=menu>☰</button></div>`;
 $('#burger').onclick=()=>$('nav').classList.toggle('open');
+
 document.addEventListener('click',e=>{
- const b=e.target.closest('.lang-btn');
- if(b&&b.dataset.lang)setLang(b.dataset.lang);
- const opt=e.target.closest('.lang-opt');
- if(opt&&opt.dataset.setlang)setLang(opt.dataset.setlang);
+ const dd=document.getElementById('langDd');
+ const btn=e.target.closest('#langDdBtn');
+ if(btn&&dd){
+  const isOpen=dd.classList.toggle('open');
+  btn.setAttribute('aria-expanded',String(isOpen));
+  return;
+ }
+ const item=e.target.closest('.lang-dd-item');
+ if(item&&item.dataset.lang){
+  setLang(item.dataset.lang);
+  if(dd){
+   dd.classList.remove('open');
+   const b=document.getElementById('langDdBtn');
+   if(b)b.setAttribute('aria-expanded','false');
+  }
+  return;
+ }
+ if(dd&&!e.target.closest('#langDd')){
+  dd.classList.remove('open');
+  const b=document.getElementById('langDdBtn');
+  if(b)b.setAttribute('aria-expanded','false');
+ }
+});
+
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){
+  const dd=document.getElementById('langDd');
+  if(dd&&dd.classList.contains('open')){
+   dd.classList.remove('open');
+   const b=document.getElementById('langDdBtn');
+   if(b)b.setAttribute('aria-expanded','false');
+  }
+ }
 });
 
 window.setLang=(lang)=>{
@@ -1367,14 +1411,7 @@ if(P=='draw'){
   const drawnToday=hasDrawnToday(mode);
 
   const hero=`<div class="hero">
-   <div class="hero-top-row">
-    <p class="hero-eyebrow">${t.eyebrow}</p>
-    <div class="lang-pill" role="group" aria-label="Language">
-     <button type="button" class="lang-opt${l==='zh'?' on':''}" data-setlang="zh">中文</button>
-     <button type="button" class="lang-opt${l==='ja'?' on':''}" data-setlang="ja">日本語</button>
-     <button type="button" class="lang-opt${l==='en'?' on':''}" data-setlang="en">English</button>
-    </div>
-   </div>
+   <p class="hero-eyebrow">${t.eyebrow}</p>
    <h1 class="hero-title">
     <span class="jp">${mode=='member'?t.heroTitleMemJp:t.heroTitleSongJp}</span>
     <span class="cn">${mode=='member'?t.heroTitleMemSub:t.heroTitleSongSub}</span>

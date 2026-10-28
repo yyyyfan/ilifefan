@@ -7,10 +7,23 @@ header{position:sticky;top:0;z-index:50;background:rgba(251,248,244,.92);backdro
 .logo{font:900 26px/1 Roboto;letter-spacing:-.5px}.logo b{color:var(--pink)}.logo small{display:block;font:500 10px Roboto;letter-spacing:2px;color:var(--sub);margin-top:4px}
 nav{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap}nav a{font:700 12px Roboto;letter-spacing:.8px;text-transform:uppercase}nav a span{display:block;font:400 10px "Noto Sans SC";color:var(--sub);letter-spacing:0;text-transform:none;text-align:center}
 nav a.on{color:var(--pink)}#burger{display:none;margin-left:auto;background:none;border:0;font-size:24px;color:var(--ink)}
-.lang-switch{display:inline-flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px;gap:2px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-left:auto}
-.lang-btn{display:inline-flex;align-items:center;justify-content:center;border:0;background:none;color:var(--sub);font:700 11px Roboto,"Zen Maru Gothic",sans-serif;padding:3px 9px;border-radius:999px;cursor:pointer;line-height:1;margin:0;transition:all .18s ease}
-.lang-btn:hover{color:var(--ink);background:#fff0f6}
-.lang-btn.on{background:var(--pink);color:#fff;box-shadow:0 1px 4px rgba(228,0,127,.24)}
+.lang-dd{position:relative;flex:none;display:inline-block;user-select:none;margin-left:8px}
+.lang-dd-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #ffd6e8;border-radius:999px;padding:5px 12px;font:700 12px Roboto,"Zen Maru Gothic",sans-serif;color:var(--ink);cursor:pointer;line-height:1;margin:0;box-shadow:0 1px 4px rgba(228,0,127,.08);transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.lang-dd-btn:hover,.lang-dd.open .lang-dd-btn{border-color:var(--pink);color:var(--pink);background:#fff0f6;box-shadow:0 2px 8px rgba(228,0,127,.16)}
+.lang-dd-globe{font-size:13px;line-height:1}
+.lang-dd-cur{letter-spacing:.02em}
+.lang-dd-arrow{font-size:10px;color:var(--sub);transition:transform .2s ease;display:inline-block}
+.lang-dd.open .lang-dd-arrow{transform:rotate(180deg);color:var(--pink)}
+.lang-dd-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:140px;background:#fff;border:1px solid #ffd6e8;border-radius:14px;padding:5px;box-shadow:0 8px 24px rgba(228,0,127,.14),0 2px 6px rgba(0,0,0,.04);z-index:100;display:none;flex-direction:column;gap:2px}
+.lang-dd.open .lang-dd-menu{display:flex;animation:ddSlideIn .18s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes ddSlideIn{from{opacity:0;transform:translateY(-4px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.lang-dd-item{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:0;background:none;border-radius:9px;color:var(--ink);font:500 12.5px Roboto,"Zen Maru Gothic",sans-serif;cursor:pointer;margin:0;text-align:left;line-height:1.2;transition:all .15s ease}
+.lang-dd-item:hover{background:#fff0f6;color:var(--pink)}
+.lang-dd-item.on{background:#ffe6f2;color:var(--pink);font-weight:700}
+.lang-dd-flag{font-size:14px;line-height:1}
+.lang-dd-name{flex:1}
+.lang-dd-check{font-size:11px;color:var(--pink);opacity:0;font-weight:900}
+.lang-dd-item.on .lang-dd-check{opacity:1}
 .pill,button{display:inline-block;border:0;border-radius:999px;background:var(--pink);color:#fff;padding:7px 18px;font:700 12px Roboto,"Noto Sans SC";cursor:pointer;margin:3px}
 .pill.off,button.off{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
 main{max-width:1240px;margin:auto;padding:24px 24px 60px}
@@ -45,7 +58,7 @@ dl.info{display:grid;grid-template-columns:140px 1fr;margin:0}dl.info dt,dl.info
 .eranav{display:flex;gap:6px;flex-wrap:wrap}.era{border-left:4px solid var(--pink);padding-left:16px;margin-top:50px}.lineup a{display:inline-block;margin:3px 10px 3px 0;font-size:13px}
 #lb{position:fixed;inset:0;background:rgba(20,16,18,.92);display:none;z-index:99;align-items:center;justify-content:center;flex-direction:column}#lb.on{display:flex}#lb img{max-width:92vw;max-height:82vh}#lb p{color:#ddd;font-size:13px;margin:10px}#lb p a{color:#ff8cc6}#lb .x{position:absolute;top:14px;right:22px;font-size:30px;color:#fff;cursor:pointer}#lb .pv,#lb .nx{position:absolute;top:50%;font-size:44px;color:#fff;cursor:pointer;padding:20px;user-select:none}#lb .pv{left:6px}#lb .nx{right:6px}
 footer{background:#2a2624;color:#bbb;font-size:12px;padding:36px 24px;text-align:center}footer b{color:#fff;font:900 18px Roboto;display:block;margin-bottom:8px}
-@media(max-width:760px){#burger{display:block;margin-left:8px}.lang-switch{margin-left:auto}nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);flex-direction:column;padding:12px 24px;border-bottom:1px solid var(--line)}nav.open{display:flex}nav a span{display:inline;margin-left:8px}
+@media(max-width:760px){.hd{padding:10px 16px;gap:8px}#burger{display:block;margin:0;padding:4px 6px;background:none;color:var(--ink);font-size:22px;line-height:1}.lang-dd{margin-left:auto}nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);flex-direction:column;padding:12px 24px;border-bottom:1px solid var(--line)}nav.open{display:flex}nav a span{display:inline;margin-left:8px}
 .mgrid{grid-template-columns:repeat(2,1fr);gap:24px 14px}.stats{grid-template-columns:repeat(2,1fr)}.gal{grid-template-columns:repeat(2,1fr);gap:8px}h1.ttl{font-size:36px;letter-spacing:3px}dl.info{grid-template-columns:100px 1fr}main{padding:16px}.hero{margin:-16px -16px 0}}
 
 .tlwrap{overflow-x:auto;background:#fff;border:1px solid var(--line);-webkit-overflow-scrolling:touch}.tl{min-width:1100px;position:relative}
@@ -370,14 +383,6 @@ body[data-page=draw] button:focus-visible,body[data-page=draw] a:focus-visible{o
   text-align: center;
   padding: 16px 0 24px;
 }
-.hero-top-row{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
 .hero-eyebrow{
   display: inline-flex;
   align-items: center;
@@ -389,44 +394,10 @@ body[data-page=draw] button:focus-visible,body[data-page=draw] a:focus-visible{o
   border: 1px solid #ffd6e8;
   padding: 6px 16px;
   border-radius: 999px;
+  margin-bottom: 16px;
   backdrop-filter: blur(6px);
   font-weight: 700;
   box-shadow: 0 2px 10px rgba(228,0,127,.07);
-}
-.lang-pill{
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, .94);
-  border: 1.5px solid #ffd6e8;
-  border-radius: 999px;
-  padding: 3px;
-  gap: 3px;
-  box-shadow: 0 2px 10px rgba(228, 0, 127, .07);
-  backdrop-filter: blur(6px);
-}
-.lang-opt{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  background: none;
-  color: #8a8a8a;
-  font: 700 11.5px Roboto, 'Zen Maru Gothic', sans-serif;
-  padding: 5px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  line-height: 1;
-  margin: 0;
-  transition: all .2s cubic-bezier(.34, 1.56, .64, 1);
-}
-.lang-opt:hover{
-  color: var(--pink);
-  background: #fff6fb;
-}
-.lang-opt.on{
-  background: linear-gradient(135deg, #ff4d9e, #e4007f);
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(228, 0, 127, .28);
 }
 .hero-title{
   display: flex;
