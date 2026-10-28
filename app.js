@@ -950,7 +950,7 @@ if(P=='draw'){
  };
  const load=()=>{try{return normalize(JSON.parse(localStorage.getItem(KEY)||''))}catch(e){return empty()}};
  let st,view=null,busy=false,enterAnim=false,shaking=false,toastT=0;
- const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){toast('这个浏览器无法保存抽签记录')}};
+ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){const l=currentLang;toast(l==='ja'?'このブラウザでは履歴を保存できません':l==='en'?'Could not save draw history':'这个浏览器无法保存抽签记录')}};
  const toast=msg=>{let t=$('#dtoast');if(!t){document.body.insertAdjacentHTML('beforeend','<div id=dtoast role=status></div>');t=$('#dtoast')}t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2400)};
  if(!$('#dpetals'))document.body.insertAdjacentHTML('beforeend','<div id=dpetals aria-hidden=true></div>');
  const safeHex=h=>/^#[0-9a-fA-F]{6}$/.test(h||'')?h:'#e4007f';
@@ -1212,7 +1212,7 @@ if(P=='draw'){
  const sealSvg=(kichi,first,col,l=currentLang)=>{
   const meta=getKMeta(kichi);
   const sealCol=col||meta.deep;
-  const subText=first?(l==='en'?'✦ TODAY ONLY ✦':'✦ 今日限定 ✦'):(l==='en'?'PRESCRIPTION':'処方箋');
+  const subText=first?(l==='en'?'✦ TODAY ONLY ✦':'✦ 今日限定 ✦'):(l==='en'?'PRESCRIPTION':l==='ja'?'処方箋':'处方笺');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" class="seal-svg"><circle cx="80" cy="80" r="72" fill="${meta.soft}" stroke="${sealCol}" stroke-width="3" stroke-dasharray="6 6"/><circle cx="80" cy="80" r="58" fill="#ffffff" opacity=".92"/><circle cx="80" cy="80" r="52" fill="none" stroke="${sealCol}" stroke-width="1.2" opacity=".4"/><text x="80" y="58" text-anchor="middle" font-size="28">${meta.emoji}</text><text x="80" y="94" text-anchor="middle" font-size="25" font-family="'Zen Maru Gothic',sans-serif" font-weight="900" fill="${sealCol}">${esc(kichi)}</text><text x="80" y="116" text-anchor="middle" font-size="9.5" font-family="'Zen Maru Gothic',sans-serif" font-weight="700" fill="${sealCol}" letter-spacing="1.5">${subText}</text></svg>`;
  };
  const PASTELS=[
@@ -1509,19 +1509,19 @@ if(P=='draw'){
     <span class="cn">${mode=='member'?t.heroTitleMemSub:t.heroTitleSongSub}</span>
    </h1>
    <p class="hero-desc">${t.heroDesc}</p>
-   <div class="dmode" role="tablist" aria-label="抽签模式">
+   <div class="dmode" role="tablist" aria-label="${l==='ja'?'おみくじモード':l==='en'?'Draw Mode':'抽签模式'}">
     <button type="button" role="tab" data-mode="member" aria-selected="${mode=='member'}"><i class="dico">🐰</i>${t.tabMember}${hasDrawnToday('member')?`<span class="dmode-tag done">${t.tagDone}</span>`:`<span class="dmode-tag">${t.tagPending}</span>`}</button>
     <button type="button" role="tab" data-mode="song" aria-selected="${mode=='song'}"><i class="dico">🎵</i>${t.tabSong}${hasDrawnToday('song')?`<span class="dmode-tag done">${t.tagDone}</span>`:`<span class="dmode-tag">${t.tagPending}</span>`}</button>
    </div>
    ${mode=='song'
-    ?`<div class="dfilter-bar" role="group" aria-label="曲目范围">${[['all',t.filterAll+' '+n.all],['group',t.filterGroup+' '+n.group],['solo',t.filterSolo+' '+n.solo]].map(([k,lb])=>`<button type="button" class="pill-btn${st.prefs.songFilter==k?' active':''}" data-sf="${k}">${lb}</button>`).join('')}</div>`
+    ?`<div class="dfilter-bar" role="group" aria-label="${l==='ja'?'曲目範囲':l==='en'?'Song Filter':'曲目范围'}">${[['all',t.filterAll+' '+n.all],['group',t.filterGroup+' '+n.group],['solo',t.filterSolo+' '+n.solo]].map(([k,lb])=>`<button type="button" class="pill-btn${st.prefs.songFilter==k?' active':''}" data-sf="${k}">${lb}</button>`).join('')}</div>`
     :`<div class="dfilter-bar"><button type="button" id="drawFormer" class="pill-btn${st.prefs.includeFormer?' active':''}">${st.prefs.includeFormer?`${t.filterFormer} (${n.allM})`:`${t.filterActive} (${n.active})`}</button></div>`
    }
    <div class="mascot-wrap" id="mascotHero" title="${t.mascotHeroTitle}">
     <div class="mascot-avatar-hero">
      <div class="mascot-ears"><span></span><span></span></div>
      <div class="mascot-img-wrap">
-      <img src="https://img.ilifefan.dpdns.org/img/FtqqCumaEAMoGDY.jpg" alt="アイラビット">
+      <img src="https://img.ilifefan.dpdns.org/img/FtqqCumaEAMoGDY.jpg" alt="${esc(t.mascotHeroBadge)}">
      </div>
      <div class="mascot-badge">${t.mascotHeroBadge}</div>
     </div>
