@@ -1426,7 +1426,7 @@ if(P=='draw'){
    x.beginPath();x.moveTo(110,y+h/2+14);x.lineTo(W-110,y+h/2+14);x.stroke();
    y+=h+28;
   };
-  row(song?(l==='en'?'Type':l==='ja'?'区分':'类型'):(l==='en'?'Role':l==='ja'?'担当':'担当'),song?(item.member?(l==='en'?'Solo · '+item.member:l==='ja'?'ソロ曲 ・ '+item.member:'个人曲 · '+item.member):(l==='en'?'Group Song':l==='ja'?'グループ曲':'团体曲')):(item.color?(l==='en'?'Color: '+trColor(item.color,l):l==='ja'?'担当色: '+trColor(item.color,l):'担当色: '+item.color):(l==='en'?'Member':l==='ja'?'メンバー':'成员')));
+  row(song?(l==='en'?'Type':l==='ja'?'区分':'类型'):(l==='en'?'Role':l==='ja'?'担当':'担当'),song?(item.member?(l==='en'?'Solo · '+item.member:l==='ja'?'ソロ曲 ・ '+item.member:'个人曲 · '+item.member):(l==='en'?'Group Song':l==='ja'?'グループ曲':'团体曲')):(item.color?(l==='en'?'Color: '+trColor(item.color,l):l==='ja'?'担当色: '+trColor(item.color,l):'担当色: '+trColor(item.color,l)):(l==='en'?'Member':l==='ja'?'メンバー':'成员')));
   if(song&&item.release)row(l==='en'?'Release':l==='ja'?'リリース':'发布时期',item.release);
   if(!song&&item.status)row(l==='en'?'Status':l==='ja'?'在籍状況':'在籍状态',trStatus(item.status,l));
   if(!song&&item.join)row(l==='en'?'Joined':l==='ja'?'加入日':'加入时间',item.join);
@@ -1548,7 +1548,7 @@ if(P=='draw'){
    const sub=isSong
     ?`${item.member?(l==='en'?'Solo · '+item.member:l==='ja'?'ソロ曲 ・ '+item.member:'个人曲 · '+item.member):(l==='en'?'Group Song':l==='ja'?'グループ曲':'团体曲')}${item.duration?' · '+item.duration:''}`
     :`${trStatus(item.status,l)}${item.color?' · '+trColor(item.color,l):''}${item.catch?' · '+item.catch:''}`;
-   const no=isSong?(item.release?(l==='en'?'Release: '+item.release:l==='ja'?'リリース: '+item.release:'作品: '+item.release):'iLiFE! SONG'):(item.color?(l==='en'?'Color: '+trColor(item.color,l):l==='ja'?'担当色: '+trColor(item.color,l):'担当色: '+item.color):(l==='en'?'iLiFE! MEMBER':l==='ja'?'iLiFE! メンバー':'iLiFE! 成员'));
+   const no=isSong?(item.release?(l==='en'?'Release: '+item.release:l==='ja'?'リリース: '+item.release:'作品: '+item.release):'iLiFE! SONG'):(item.color?(l==='en'?'Color: '+trColor(item.color,l):l==='ja'?'担当色: '+trColor(item.color,l):'担当色: '+trColor(item.color,l)):(l==='en'?'iLiFE! MEMBER':l==='ja'?'iLiFE! メンバー':'iLiFE! 成员'));
    const kichi=(view.fortune&&view.fortune.kichi)||'吉';
    const kMeta=getKMeta(kichi);
    const hex=!isSong?safeHex(item.hex):'#e4007f';
