@@ -962,37 +962,155 @@ if(P=='draw'){
   let x;do{crypto.getRandomValues(buf);x=buf[0]}while(x>=limit);
   return x%n;
  };
+ let lastInteractionPos={x:0,y:0,sx:0,sy:0,t:Date.now(),cnt:0};
+ const recordPos=e=>{
+  if(!e)return;
+  lastInteractionPos.cnt++;
+  if(e.clientX!==undefined)lastInteractionPos.x=e.clientX;
+  if(e.clientY!==undefined)lastInteractionPos.y=e.clientY;
+  if(e.screenX!==undefined)lastInteractionPos.sx=e.screenX;
+  if(e.screenY!==undefined)lastInteractionPos.sy=e.screenY;
+  lastInteractionPos.t=Date.now();
+ };
+ ['pointerdown','click','touchstart'].forEach(type=>{
+  document.addEventListener(type,recordPos,{passive:true,capture:true});
+ });
+
+ const createSpatioTemporalRng=evt=>{
+  const tMs=Date.now();
+  const tPerf=(typeof performance!=='undefined'&&performance.now)?performance.now():0;
+  const x=(evt&&evt.clientX)??lastInteractionPos.x??0;
+  const y=(evt&&evt.clientY)??lastInteractionPos.y??0;
+  const sx=(evt&&evt.screenX)??lastInteractionPos.sx??0;
+  const sy=(evt&&evt.screenY)??lastInteractionPos.sy??0;
+  const w=window.innerWidth||1024,h=window.innerHeight||768;
+  const sc=window.scrollY||0;
+  const tz=new Date().getTimezoneOffset();
+
+  const hw=new Uint32Array(4);
+  if(globalThis.crypto&&crypto.getRandomValues){
+   crypto.getRandomValues(hw);
+  }
+
+  let a=(tMs^hw[0])>>>0;
+  let b=((Math.round(tPerf*1000)^(x<<16|(y&0xffff)))^hw[1])>>>0;
+  let c=(((sx<<16|(sy&0xffff))^(w<<12|(h&0xfff)))^hw[2])>>>0;
+  let d=(((sc<<8)^tz^lastInteractionPos.cnt)^hw[3])>>>0;
+
+  const mix=v=>{
+   v=Math.imul(v^(v>>>16),0x85ebca6b);
+   v=Math.imul(v^(v>>>13),0xc2b2ae35);
+   return (v^(v>>>16))>>>0;
+  };
+
+  let s0=mix(a^b)||1;
+  let s1=mix(b^c)||2;
+  let s2=mix(c^d)||3;
+  let s3=mix(d^a)||4;
+
+  return ()=>{
+   const res=(s0+s3)>>>0;
+   const t=(s1<<9)>>>0;
+   s2^=s0;s3^=s1;s1^=s2;s0^=s3;s2^=t;
+   s3=(s3<<11|s3>>>21)>>>0;
+   return res/0x100000000;
+  };
+ };
+ const buildFortunes1000 = () => {
+ const LEVELS = [["大吉", 0, 250, [28, 28, 28, 28, 28, 28, 28, 28, 26]], ["中吉", 1, 250, [28, 28, 28, 28, 28, 28, 28, 28, 26]], ["小吉", 2, 200, [22, 22, 22, 22, 22, 22, 22, 22, 24]], ["吉", 3, 200, [22, 22, 22, 22, 22, 22, 22, 22, 24]], ["末吉", 4, 100, [11, 11, 11, 11, 11, 11, 11, 11, 12]]];
+ const PREFIXES = {"0": [["超绝大吉", "奇跡の大吉", "Miracle Super Blessing"], ["心跳满开", "胸の高鳴り", "Full Heartbeat"], ["奇迹相遇", "運命の巡り合い", "Destined Miracle"], ["绝好调", "絶好調", "Peak Vitality"], ["光芒万丈", "まばゆい光芒", "Radiant Spotlight"], ["天选降临", "天選の幸運", "Heaven's Chosen"], ["双倍好运", "倍増の幸運", "Double Fortune"], ["命中注定", "運命の引き寄せ", "Pure Destiny"], ["专属特等", "特別なお守り", "Special Blessing"], ["极上幸福", "至福のひととき", "Ultimate Bliss"]], "1": [["闪闪发光", "キラキラの予感", "Sparkling Glow"], ["好事接近", "幸福接近", "Joy Approaching"], ["节奏共鸣", "心地よいビート", "Rhythm Sync"], ["心动前奏", "胸躍るイントロ", "Heartbeat Prelude"], ["惊喜降临", "うれしいサプライズ", "Delightful Surprise"], ["元气满格", "元気チャージ", "Full Energy"], ["甜度加分", "甘さプラス", "Sweet Addition"], ["默契连结", "通じ合う心", "Secret Harmony"], ["步调轻快", "軽快なステップ", "Light Steps"], ["温柔守护", "やさしい見守り", "Gentle Guard"]], "2": [["微风轻拂", "そよ風ステップ", "Gentle Breeze"], ["温暖微光", "あたたかな微光", "Warm Soft Glow"], ["清脆节拍", "軽快なクラップ", "Cheerful Claps"], ["日常微甜", "日常の甘いひとコマ", "Everyday Sweetness"], ["心安从容", "穏やかな心地", "Peaceful Heart"], ["悠闲片刻", "ひとときの安らぎ", "Leisurely Moment"], ["草莓软糖", "ストロベリーの甘み", "Strawberry Drop"], ["细水微澜", "ささやかな幸せ", "Small Ripple of Joy"], ["暖阳初照", "柔らかな日差し", "Soft Sunshine"], ["轻巧前行", "マイペースな歩み", "Gentle Forward Step"]], "3": [["平稳安然", "平穏無事の守り", "Calm and Steady"], ["踏实前行", "確かな一歩", "Solid Footsteps"], ["温暖相伴", "寄り添う温もり", "Warm Companionship"], ["默默守护", "静かな見守り", "Quiet Devotion"], ["细水长流", "ゆるぎない愛", "Enduring Stream"], ["坚定热爱", "変わらぬ情熱", "Steadfast Passion"], ["安稳笃定", "芯のある強さ", "Grounded Certainty"], ["岁月静好", "穏やかな時間", "Tranquil Days"], ["静待花开", "花ひらく時を待つ", "Awaiting Blossom"], ["初心不改", "まっすぐな想い", "Unyielding Devotion"]], "4": [["蓄势待发", "チャージ日和", "Gathering Power"], ["蓄力生长", "次のジャンプへ", "Springboard Rest"], ["温和自愈", "心のリセット", "Gentle Healing"], ["整理思绪", "思い出の整理", "Organizing Memories"], ["静水流深", "静かな夜明け前", "Still Waters Awaiting Dawn"], ["雨后初晴", "雨上がりの虹", "Rainbow After Rain"], ["自我犒劳", "自分へのご褒美", "Self-Reward"], ["期待破晓", "光射す明日へ", "Awaiting Sunrise"], ["晚安好梦", "あたたかな夢", "Sweet Dreams"], ["渐入佳境", "運気上昇の助走", "Turning the Corner"]]};
+ const THEME_ROOTS = {"0": [["最前神席", "最前列神席", "Front Row God Seat"], ["花道中心", "花道真正面", "Runway Center Front"], ["整理一桁", "神引き良番１桁", "Single-Digit Queue"], ["银彩漫天", "舞い降りる銀テープ", "Raining Silver Ribbons"], ["会场特等", "アリーナ特等席", "Prime Arena Seat"], ["舞台正中", "ステージ真正面", "Stage Dead Center"], ["音压震撼", "全身を包む音圧", "Full Body Soundwave"], ["狂热核心", "熱狂のスタンディング", "Electric Standing Pit"], ["近距视线", "息遣い届く至近距離", "Ultra-Close Proximity"], ["闪耀焦点", "輝くスポットライト下", "Radiant Spotlight View"]], "1": [["视线直击", "視線直撃の奇跡", "Direct Eye Contact"], ["确定神指", "確実な指差しレス", "Confirmed Pointing Res"], ["比心返球", "満開のハート返球", "Heart Sign Return"], ["专属微笑", "私だけの特別な笑顔", "Exclusive Radiant Smile"], ["温柔点头", "頷いてくれた瞬間", "Gentle Nod of Recognition"], ["双手挥动", "両手のお手振り", "Two-Handed Cheerful Wave"], ["眼神交汇", "目が合って止まる時間", "Eyes Locking in Wonder"], ["眨眼暴击", "不意打ちのウインク", "Surprise Sweet Wink"], ["空中拥抱", "あたたかなエアハグ", "Warm Air Hug"], ["神级反馈", "奇跡の確定ファンサ", "Miraculous Fan Service"]], "2": [["全力应援", "全力コールの大合唱", "Full Power Cheer Call"], ["掉落副歌", "心震える落ちサビ", "Emotional Climax Drop"], ["节拍共振", "フロア一体のクラップ", "Full Floor Synced Clap"], ["热气沸腾", "熱気あふれるフロア", "Boiling Floor Energy"], ["声贯全馆", "響き渡るコール", "Hall-Shaking Vocals"], ["奇迹和弦", "息の合った掛け声", "Harmonious Cheer Chants"], ["热狂高潮", "クライマックスの熱狂", "Climax Euphoria"], ["跳跃合流", "フロア揺れる大ジャンプ", "Full Floor Jump Wave"], ["呼应连发", "完璧なコール＆レス", "Flawless Call & Res"], ["燃尽热忱", "完全燃焼の情熱", "Passionate All-Out Chant"]], "3": [["拍立得神抽", "宝物の２ショットチェキ", "Treasured 2-Shot Cheki"], ["同款动作", "自然とお揃いのポーズ", "Natural Matching Poses"], ["签名满载", "サインに込められた愛", "Signed with Full Affection"], ["对视甜度", "レンズ越しの甘い笑顔", "Sweet Smile Through Lens"], ["温柔问候", "「いつもありがとう」の声", "Warm 'Thank You Always'"], ["相谈甚欢", "会話が弾む幸せな時間", "Lively Heartwarming Chat"], ["永久定格", "一生残る大切な１枚", "Precious Eternal Keepsake"], ["心动留影", "ドキドキの記念写真", "Heart-Throbbing Photo"], ["手写寄语", "チェキ裏のあたたかな文字", "Warm Handwritten Note"], ["专属笑容", "私だけに咲いた笑顔", "A Smile Bloomed for Me"]], "4": [["担当色光芒", "担当カラーのまばゆい光", "Oshi Color Radiance"], ["手灯光海", "一面に広がる光の海", "Ocean of Glowing Lights"], ["应援穿搭", "推し色に染まるコーディネート", "Oshi-Themed Style Outfit"], ["自引生写真", "自引きした最高の生写真", "Self-Pulled Best Photo"], ["痛包点缀", "キラキラ光る痛バッグ", "Sparkling Ita-Bag Charms"], ["公式手扇", "掲げた公式うちわ", "Raised Official Uchiwa"], ["徽章闪耀", "胸元に輝く推し缶バッジ", "Shining Pin Badge on Chest"], ["新调灯棒", "新調したピカピカのペンラ", "Brand-New Bright Lightstick"], ["幸运推色", "今日を照らすラッキーカラー", "Today's Lucky Oshi Hue"], ["光之轨迹", "暗闇を彩る光の軌跡", "Trail of Light in Darkness"]], "5": [["神曲降临", "奇跡の神曲プレイリスト", "Masterpiece On Playlist"], ["心动前奏", "鳥肌が立つ神イントロ", "Goosebump Opening Intro"], ["单曲循环", "無限ループのフェイバリット", "Infinite Looping Tune"], ["绝美独唱", "耳元で響くエモいソロ", "Emotional Ear-Melting Solo"], ["副歌大赏", "心に突き刺さる最高のサビ", "Heart-Piercing Chorus Hook"], ["歌词共鸣", "胸を打つあたたかな歌詞", "Deeply Touching Lyrics"], ["疾走旋律", "駆け抜けるポップチューン", "Dashing Pop Energy Melody"], ["舒缓抒情", "心を包み込む優しいバラード", "Soothing Gentle Ballad"], ["重音律动", "心臓に響くパワフルビート", "Heart-Pounding Powerful Beat"], ["治愈之歌", "今日を救ってくれる名曲", "The Song That Saves Today"]], "6": [["同担连番", "最高の連番仲間との絆", "Best Cheer Buddy Bond"], ["会场击掌", "歓喜を分かち合うハイタッチ", "Joyous High-Five at Venue"], ["周边交换", "奇跡のトレード大成功", "Miraculous Merch Trade Win"], ["会心相视", "顔を見合わせて笑い合う瞬間", "Looking Over and Smiling"], ["推话长谈", "夜空の下で語り明かす推し事", "Talking Passion Under Night Sky"], ["同路远征", "道中も楽しい遠征の仲間", "Joyful Travel Buddies"], ["共鸣回响", "同じ熱量で語れる幸せ", "Blessing of Shared Passion"], ["善意偶遇", "現場で出会った優しいオタ友", "Kind Fellow Fan Encounter"], ["同色阵营", "推し色で結ばれた絆", "Bond Forged by Shared Color"], ["声援齐聚", "心ひとつに届けるエール", "Voices United in One Accord"]], "7": [["清晨元气", "朝一番の神更新で充電完了", "Morning Refresh Full Charge"], ["通勤旋律", "イヤホン越しの最高の応援歌", "Cheer Song in Earphones"], ["自拍暴击", "タイムラインに降る天使の自撮り", "Angel Selfie on Timeline"], ["晚间治愈", "一日の疲れを溶かす歌声", "Voice Melting Day's Fatigue"], ["专属甜点", "頑張った自分への甘いご褒美", "Sweet Self-Reward Treat"], ["元气重置", "ぐっすり眠ってフルパワー", "Deep Sleep Reset to Full"], ["桌前谷美", "デスクで見守ってくれる推し", "Oshi Merch Guarding Desk"], ["微暖茶歇", "ほっと一息のティータイム", "Warm Relaxing Tea Break"], ["明媚好梦", "夢の中で会える幸せな夜", "Sweet Dream Meeting Tonight"], ["今日晴空", "推しがいるから毎日が晴天", "Every Day Sunny With Oshi"]], "8": [["舞台之约", "約束された未来のステージへ", "Toward the Promised Stage"], ["永恒誓约", "ずっと推し続ける大切な誓い", "Sacred Vow of Lifelong Cheer"], ["辉煌明日", "キラキラと輝く明日への光", "Radiant Light Toward Tomorrow"], ["梦想起跑", "大きな夢に向かって踏み出す", "Taking Leap Toward Big Dreams"], ["共同成长", "一緒に歩むかけがえのない青春", "Precious Youth Walked Together"], ["武道之愿", "日本武道館へと続く光の道", "Luminous Road to Budokan"], ["奇迹序章", "これから始まる新しい物語", "New Story Beginning Right Now"], ["星光相随", "どんな夜空も照らす星の導き", "Star Guiding Through Dark Sky"], ["未来绽放", "いつか大輪の花を咲かせる日", "Day When Great Blossoms Bloom"], ["一生宝物", "心に刻まれた永遠の思い出", "Eternal Memory in Heart"]]};
+ const SUFFIXES = {"0": [["全开", "全開", "Fully Unleashed"], ["降临", "降臨", "Descent"], ["大胜利", "大勝利", "Triumphant Victory"], ["奇迹", "奇跡の光", "Miraculous Sparkle"], ["满格", "満開", "Fully In Bloom"], ["必中", "神引き連発", "Instant Hit"]], "1": [["接近", "接近", "Approaching"], ["连结", "シンクロ", "In Sync"], ["调和", "心地よさ", "Harmony"], ["惊喜", "サプライズ", "Sweet Surprise"], ["微光", "輝き", "Radiant Gleam"], ["如意", "順調", "Smooth Sailing"]], "2": [["点滴", "ひとコマ", "Small Moment"], ["从容", "マイペース", "Own Pace"], ["微甜", "プチ幸運", "Tiny Sweetness"], ["轻盈", "軽やかさ", "Lightness"], ["安舒", "心地よさ", "Gentle Comfort"], ["初现", "芽生え", "First Budding"]], "3": [["常伴", "日常の守り", "Constant Guard"], ["笃定", "確かな歩み", "Firm Footing"], ["长久", "続く幸せ", "Enduring Happiness"], ["温润", "温もり", "Soft Warmth"], ["安宁", "平穏", "Tranquil Peace"], ["恒久", "変わらぬ絆", "Unwavering Bond"]], "4": [["蓄能", "チャージ", "Recharge Phase"], ["助跑", "助走期間", "Run-Up Step"], ["初晓", "夜明けの兆し", "Faint Sunrise"], ["舒缓", "ひと休み", "Short Breathing Space"], ["萌芽", "新しい芽", "Sprouting Spark"], ["可期", "期待の種", "Seeds of Hope"]]};
+ const SCENES = {"0": [["站在最前排的特等席", "最前列の特別なエリアに立ち", "Standing in the front row prime section"], ["花道延伸的最正面位置", "花道が目の前に広がる特等席で", "Right in front of the extended runway"], ["被整场动感音压温柔包裹", "会場全体の音圧に心地よく包まれ", "Enveloped by the venue's live acoustics"], ["开演前灯光骤暗的刹那", "開演の合図とともに照明が落ちた瞬間", "The instant house lights drop before showtime"], ["银色彩条漫天飞舞的现场", "銀テープがキラキラと舞い散る会場で", "As silver ribbons float dazzingly overhead"], ["安可声浪回荡的场馆正中", "アンコールの歓声が響くアリーナ中央で", "Amidst roaring encore chants at arena center"], ["在离舞台最近的黄金距离", "ステージに一番近い奇跡の距離感で", "At the prime distance closest to stage"], ["全场手灯随节拍起伏的瞬间", "ペンライトの光がリズムに合わせて揺れる中", "As sea of penlights sways in rhythm"], ["抬头就能看到清晰笑容的位置", "見上げれば推しの笑顔がすぐそこにある席で", "Looking up to her smile just inches away"], ["整个会场温度升到最高点的时刻", "会場のボルテージが最高潮に達した瞬間", "When venue excitement reaches its apex"]], "1": [["挥出手中最亮一束应援光的瞬间", "ペンライトをまっすぐに高く掲げた瞬間", "The moment you raise your lightstick high"], ["目光在空中不期而遇的几秒钟", "ふと視線が重なり合い時間が止まる時", "A few seconds when eyes lock across air"], ["在推视线扫过这片座席的时候", "推しが客席へ優しい視線を巡らせた時", "When she scans the crowd with a warm gaze"], ["当手灯切到专属代表色的刹那", "ペンライトを担当カラーに合わせた瞬間", "The instant lightstick switches to her hue"], ["把最真挚的心意比作心形的时候", "両手でそっとハートを作って送った時", "Sending a heartfelt hand-heart toward stage"], ["在副歌独唱高潮直面镜头的时刻", "落ちサビのソロパートで真っ直ぐ前を見た時", "During her solo chorus looking right ahead"], ["全场安静下来静静对视的一刻", "一瞬の静寂の中、目がバッチリ合った時", "Locking direct eye contact in a quiet moment"], ["轻轻挥手收到甜甜回应的瞬间", "小さく手を振った瞬間に笑顔が返ってきた時", "Getting a sweet smile back after a soft wave"], ["在人群中被一眼认出的奇迹里", "たくさんの人の中から見つけてくれた奇跡で", "In the miracle of being spotted in the crowd"], ["一个俏皮的wink降临在眼前的瞬间", "不意打ちのウインクが視界いっぱいに届いた瞬間", "When a playful wink lands straight in sight"]], "2": [["当开场第一句MIX响彻全场", "オープニングのMIXが会場いっぱいに響く時", "As opening MIX reverberates across the hall"], ["在最激动人心的掉落副歌段落", "胸を打つ落ちサビが静かに始まった時", "When the breathtaking chorus drop arrives"], ["全场同伴一同跃起落下的瞬间", "フロア中が一斉にリズムに合わせて跳ねる時", "When the whole floor jumps in unison"], ["呼唤推名字的声音融进声浪的时刻", "推しの名前を呼ぶ声がフロアと重なる瞬間", "As calling her name melts into crowd roar"], ["台下掌声与台上节奏严丝合缝时", "手拍子のクラップがビートと完璧に重なる時", "When claps sync tightly with the rhythm"], ["大家拼尽全力喊出最响亮的一句时", "喉が枯れるほどの全力コールを届けた時", "Shouting the loudest chant with all your heart"], ["在返场呼唤点燃最后热情的时刻", "アンコールの声がひとつにまとまり熱を帯びる時", "When encore calls unite into passionate fire"], ["节拍加快心跳也跟着共振的刹那", "曲のテンポとともに鼓動が高鳴っていく瞬間", "As tempo races and heartbeat resonates"], ["每一次挥动手臂都带着热爱的现场", "腕を振り上げるたびに熱い想いが溢れる現場で", "Every arm pump fueled with genuine love"], ["全馆同唱副歌让感动充盈四周时", "会場全体の大合唱が胸をあたたかく包む時", "When full-hall chorus warms every corner"]], "3": [["站在拍立得相机面前的倒数三秒", "チェキカメラの前に立ってカウントダウンの瞬間", "Three seconds before the cheki shutter clicks"], ["推笑着迎上来问候'你好呀'的时刻", "推しが「来てくれてありがとう！」と迎えてくれた時", "When she greets with 'Thank you for coming!'"], ["自然而然摆出心有灵犀同款姿势时", "打ち合わせなしで自然と同じポーズが決まった時", "Naturally striking the exact same sweet pose"], ["在签名板上认真写下专属话语时", "チェキの余白に丁寧なメッセージを書いてくれる時", "Writing a thoughtful message on photo border"], ["接过洗印好还带着微温照片的瞬间", "まだほんのり温かいチェキを手渡された瞬間", "Receiving the freshly printed warm photo"], ["互相分享今天最开心瞬间的话题里", "今日一番楽しかった出来事を笑顔で語り合う時", "Laughing over today's happiest memories"], ["四目相对认真倾听彼此声音的片刻", "目をじっと見つめて言葉に耳を傾けてくれた時", "Listening closely while looking eye to eye"], ["把拍立得放进随身保护套珍藏时", "お気に入りのスリーブに大切にチェキをしまう時", "Sliding the prized photo into protective sleeve"], ["看到照片里两个人笑得一样灿烂时", "現像された写真でお互い満開の笑顔だった時", "Seeing both of you smiling with pure joy"], ["挥手告别并约定下次再见的瞬间", "「また絶対会おうね」と手を振って別れる瞬間", "Waving goodbye with promise to meet again"]], "4": [["按下开关点亮纯粹应援色的时候", "スイッチを入れて担当カラーの光を灯した時", "Clicking switch to ignite her pure oshi color"], ["看着推的专属色彩铺满视线的时刻", "視界一面が推しの担当色に染まり輝く時", "Watching her representative hue fill your sight"], ["精心搭配的应援色小物件被注意时", "推し色を取り入れた今日のコーデに気付かれた時", "When coordinated oshi accessories are noticed"], ["拆开生写真盲袋刚好翻出推的那一刻", "生写真の封を開けたら推しが真っ先に出てきた時", "Unwrapping photo pack to find her on top"], ["给痛包细心别上每一枚闪亮徽章时", "痛バッグにキラキラの缶バッジを綺麗に並べた時", "Arranging sparkling badges neatly on ita-bag"], ["手中的应援扇在灯光下熠熠生辉时", "掲げたうちわの文字がライトに照らされ輝く時", "Uchiwa lettering glowing under concert light"], ["把应援毛巾披在肩头带来安心感时", "推しタオルを肩にかけて背筋がすっと伸びる時", "Draping official towel over shoulders in pride"], ["换上全新电池让光芒亮如白昼的瞬间", "新しい電池を入れてペンライトが眩しく輝く瞬間", "Fresh batteries making lightstick shine bright"], ["推色小挂件在口袋边轻轻摇曳的午后", "推し色のキーホルダーがバッグで揺れる午後に", "Oshi charm swaying gently by your bag"], ["看到舞台应援光汇聚成彩虹的壮观时", "会場のペンライトが綺麗な虹の海を作った時", "Seeing crowd lights merge into rainbow sea"]], "5": [["当前奏第一个音符悄然响起的瞬间", "イントロの最初の音がスピーカーから鳴り響いた瞬間", "The instant opening intro note chimes"], ["耳机里单曲循环到最击中灵魂的一句", "イヤホンで何度も聴いたお気に入りのフレーズで", "Looping headphones to the most moving line"], ["推清澈透亮的单独Solo直击心底时", "推しの澄み切ったソロパートが胸に響いた時", "Her crystal solo voice echoing deep in heart"], ["副歌前那一小段鼓点渐起的动人时刻", "サビに向かってビートが高まっていくワクワクの時", "Drums building excitingly toward chorus"], ["现场重低音伴随心跳一同共鸣的刹那", "重低音のベースが心臓のリズムと心地よく重なる時", "Heavy bass groove syncing with your pulse"], ["看到舞台编舞和歌词完美交融的时刻", "歌詞の世界観とダンスが完璧に溶け合った時", "Choreography fusing flawlessly with lyrics"], ["在回程电车上把今日歌单再听一遍时", "帰り道の電車で今日のセトリをもう一度再生した時", "Replaying today's setlist on train home"], ["旋律驱散了所有疲惫与烦恼的当下", "心地よいメロディが今日のモヤモヤを消し去る時", "Melodies wiping away all fatigue and fog"], ["情不自禁跟着哼唱出温柔副歌的午后", "気付けば口ずさんでいた優しいフレーズの午後に", "Humming sweet chorus softly in afternoon"], ["当最想听的那首歌作为压轴登场的时刻", "一番聴きたかった大好きな曲がラストに流れた時", "When the song you longed for arrives as finale"]], "6": [["与身边同担好友相视一笑默契击掌时", "連番の仲間と目が合って自然とハイタッチした時", "Looking over to cheer buddy and high-fiving"], ["在会场外顺利换到心仪推的小卡时", "会場の外でお目当てのグッズを無事に交換できた時", "Trading smoothly for coveted photocards"], ["听到同担真诚夸赞推的舞台表现时", "推しの素晴らしさを仲間と熱く共感し合えた時", "Sharing genuine awe over her stage moments"], ["演出散场后并肩走出场馆意犹未尽时", "終演後に余韻に浸りながら一緒に会場を出る時", "Walking out side by side soaked in afterglow"], ["在群聊里一起为推的最新动态喝彩时", "SNSのタイムラインで仲間と一緒にお祝いした時", "Cheering her latest updates in fan chat"], ["大家一起把手灯调成相同颜色挥动时", "みんなで色を揃えてペンライトを高く掲げた時", "Uniting all lightsticks in identical color"], ["陌生同好在现场伸出援手递来电池时", "困っていたら近くの同担さんが優しく助けてくれた時", "Kind fellow fan offering spare batteries"], ["在饮品店里把两只应援谷美摆在一起时", "カフェで推しのアクスタを並べて記念撮影した時", "Placing acrylic stands together at cafe table"], ["谈起初次喜欢上推的契机而感动的瞬间", "推しに出会った頃の思い出を語り合って胸が熱い時", "Touching on memories of first loving oshi"], ["互相道一句'下次现场再见'的温暖告别", "「また現場で会おうね！」と笑顔で手を振る瞬間に", "Parting warmly with 'See you at next show!'"]], "7": [["早晨醒来第一眼刷到推的新动态时", "朝起きて一番に推しの笑顔のツイートを見た時", "Waking up to see her radiant morning post"], ["走在阳光斑驳的路上听着欢快单曲时", "木漏れ日の道を歩きながら明るい曲を聴く時", "Walking sunny path to her upbeat song"], ["工作学习之余看一眼手机桌面公式照时", "忙しい合間にスマホの待ち受け写真を見て癒やされる時", "Glancing at her lockscreen photo amid work"], ["给辛劳一整天的自己泡一杯全糖奶茶时", "頑張った一日の終わりに甘いドリンクで一息つく時", "Treating tired self to a sweet bubble tea"], ["收拾整理满桌可爱的推色应援谷美时", "机の上のグッズたちを綺麗に並べ直して眺める時", "Arranging cute oshi merch tidily on desk"], ["洗完热水澡裹进松软被窝闭上眼听歌时", "お風呂上がりにふかふかのお布団で音楽に浸る時", "Wrapped in cozy duvet drifting into songs"], ["收到推充满活力的日常随笔推送的片刻", "日常のつぶやきが届いて心がほっとあたたまる時", "Receiving her sweet daily casual thoughts"], ["在抽屉角里摸到珍藏已久的应援门票时", "引き出しの奥の大切なチケット半券を見つけた時", "Finding cherished ticket stubs in drawer"], ["把喜欢的生写真放进随身卡夹随身携带时", "お気に入りの１枚をパスケースに入れて持ち歩く時", "Keeping favorite photo safe in daily cardholder"], ["对着穿衣镜整装待发给自己比个V的早晨", "鏡の前で推しグッズを身につけて笑顔を作る朝に", "Flashing peace sign in mirror ready for day"]], "8": [["望着舞台中央奋力起舞的闪耀身影时", "スポットライトの中で輝く推しの背中を見つめる時", "Watching her shining figure dancing center stage"], ["听到推在MC环节说出对未来的期许时", "MCで語られた真っ直ぐな夢の言葉を聞いた時", "Hearing her heartfelt hopes spoken during MC"], ["深知这份热爱会成为彼此前行底气的时刻", "応援する気持ちがお互いの力になっていると信じる時", "Knowing this devotion fuels each other's path"], ["想象着有朝一日登上梦想巨蛋的灿烂图景", "いつか立つ大きな夢の舞台を一緒に思い描く時", "Envisioning the grand dome stage together"], ["把每一次的应援当作通往光芒的铺垫时", "一回一回の現場が大切な宝物になっていく時", "Treating every live show as a precious step"], ["心中涌起'能喜欢上她真好'的由衷庆幸时", "「出会えて本当によかった」と心から思える瞬間に", "Heart brimming with 'So lucky to have met you'"], ["将小小的手灯汇入漫无边际星河的感动里", "一本の光が大きな星座のように輝く光景の中で", "Merging your lightstick into an infinite galaxy"], ["坚信真诚的汗水总会迎来最大掌声的瞬间", "ひたむきな努力が最高の実を結ぶと確信した時", "Believing honest sweat will harvest cheers"], ["与推相约在更大舞台再次相会的承诺中", "「もっと大きな場所へ行こう」と心の中で誓う時", "Promising to meet again at grander stages"], ["回望一路走来的点点滴滴皆为青春的时刻", "一緒に歩んできた奇跡の軌跡を振り返る瞬間に", "Looking back on youth's miraculous trail"]]};
+ const ACTIONS = {"0": [["挥动手灯被目光温柔捕获", "ペンライトを振ると推しが優しく見つめてくれた", "waving penlight captured her gentle gaze"], ["整个人的心跳都随鼓点欢腾", "心臓が高鳴るリズムと完全にシンクロした", "heartbeat completely synced with live drums"], ["在离舞台最近的地方尽情欢呼", "ステージのすぐそばで思いきり愛を叫んだ", "cheering joyously at the closest spot"], ["现场的热气融化了所有的疲惫", "会場の熱狂が日々の疲れを一瞬で吹き飛ばした", "heatwave of the room dissolved all fatigue"], ["银彩如雨落在手心化作最好的纪念", "舞い降りた銀テープが手の中にそっと収まった", "falling silver streamer landed softly in palm"]], "1": [["专属的回应让心跳猛然加速", "自分だけに向けられた笑顔に胸がキュンとした", "her exclusive response made heart skip beats"], ["四目相触的瞬间时间仿佛完全定格", "視線が重なった瞬間、時が止まったように感じた", "time stood completely still as eyes met"], ["甜甜的wink把所有烦恼一扫而空", "とびきり可愛いウインクに心奪われた", "sweet wink wiped out every lingering worry"], ["温柔的招手传递着满满的关怀", "大きく振ってくれた両手に温もりを感じた", "two-handed wave delivered endless warmth"], ["台上的笑容如春风般沁入心间", "ステージから届いた微笑みが心を満たしてくれた", "stage smile warmed heart like spring breeze"]], "2": [["最嘹亮的Call化作了全场最美和声", "全力のコールが会場の一体感をさらに高めた", "loudest cheer joined the room's melody"], ["整齐的掌声里有着不言而喻的默契", "揃った手拍子の中に熱い絆を確かに感じた", "synchronized claps held unspoken chemistry"], ["全心全意的呼喊换来了台上的绽放", "全力で届けた声援が最高の笑顔を引き出した", "wholehearted shout brought out her smile"], ["热血在副歌响起的瞬间彻底沸腾", "落ちサビの合唱で全身に鳥肌が駆け巡った", "passion boiled high as the chorus soared"], ["跳跃的步伐轻快得如同飞翔一般", "リズムに合わせて跳ねる足取りが軽やかだった", "bouncing steps felt as light as flying"]], "3": [["镜头前的微笑定格成永恒的珍藏", "レンズの前で並んだ笑顔が最高の宝物になった", "smiles before lens froze into keepsake"], ["合影里的相称动作让人会心一笑", "息ぴったりのお揃いポーズに思わず笑みがこぼれた", "matching poses brought warm knowing smiles"], ["亲切的交谈为今天画上最甜句号", "温かい言葉のキャッチボールに心が満たされた", "sweet conversation capped today perfectly"], ["手写的心意在卡片上闪闪发光", "チェキに添えられた手書き文字が輝いて見えた", "handwritten words gleamed on photo card"], ["握在手心的合影带来了无限力量", "手に持ったチェキを見つめるだけで勇気が湧いた", "holding the photo filled soul with courage"]], "4": [["明亮的担当色照亮了身边的世界", "担当カラーの光が周りを鮮やかに彩った", "bright oshi color illuminated world around"], ["推色小物的点缀让心情格外明朗", "身につけた推し色が最高のお守りになってくれた", "oshi-colored charm was the finest talisman"], ["自引的生写真如同神明眷顾一般", "推しの生写真を引き当てて飛び上がるほど喜んだ", "pulling her photo felt like heaven's favor"], ["光海中的一束是心中最纯粹的爱", "光の海の一粒としてまっすぐな愛を届けられた", "one beam in sea delivered purest devotion"], ["背包上的徽章记录着热爱的温度", "痛バッグに並ぶグッズが輝かしい思い出を語った", "badges on bag retold memories of passion"]], "5": [["耳边的歌声如蜜糖般抚平了躁动", "イヤホンから流れる歌声が心を穏やかに癒やした", "earphone melody smoothed out every unrest"], ["动人的单曲循环整整陪伴了一路", "お気に入りの１曲が帰り道を優しく照らしてくれた", "looping favorite tune accompanied road home"], ["前奏一响就找回了最初的那份心动", "イントロが鳴るだけで初心のときめきが蘇った", "opening note revived initial heartbeat"], ["击中心灵的歌词化作前行的勇气", "心に刺さるフレーズが明日への力に変わった", "heartfelt lyrics turned into bold courage"], ["旋律里的每一个转音都充满魔力", "一音一音のメロディに魔法のような魅力を感じた", "every melodic turn held enchanting magic"]], "6": [["相视一笑的默契带来了加倍快乐", "顔を見合わせて笑い合い、喜びが何倍にも膨らんだ", "shared smiles multiplied joy many times"], ["同担之间真诚的赞赏格外温暖人心", "推しを語り合う温かい言葉に心がじんわり満たされた", "fellow fans' praises warmed inner heart"], ["顺利的周边交换如奇迹般顺畅", "欲しかったグッズが手に入り最高の幸運を感じた", "smooth trading felt like miraculous blessing"], ["并肩作战的记忆成为宝贵的财富", "共に熱狂した思い出がかけがえのない絆になった", "cheering together became cherished treasure"], ["彼此互道珍重的话语充盈着力量", "「またね」の一言が次の現場への活力になった", "'See you next time' gave vital energy"]], "7": [["推的新动态让清晨洒满元气光芒", "朝のタイムラインに届いた笑顔が一日を明るくした", "morning post bathed day in cheerful light"], ["窗外的清风伴随着歌声温柔吹拂", "窓から差し込む風と音楽が心を解きほぐした", "breeze and music softly relaxed the spirit"], ["小巧的甜点和推的美照治愈疲倦", "お気に入りのスイーツと写真が疲れを癒やしてくれた", "dessert and photos melted away all fatigue"], ["整齐的书桌前有推的笑容静静陪伴", "綺麗にしたデスクで推しのアクスタが微笑んでいた", "oshi stand smiled quietly on tidy desk"], ["充足的睡眠给心灵做了一次深呼吸", "心地よい眠りが明日へのエネルギーをフル充電した", "sound sleep gave mind a deep recharge"]], "8": [["坚定的步伐正迈向更加广阔的未来", "大きなステージへ向かう背中に確かな希望を見た", "firm steps walked toward broader horizons"], ["心中的誓言在闪耀的光芒里更加笃定", "これからも応援し続ける決意が胸に深く刻まれた", "vow to cheer grew firmer in shining light"], ["所有的期待都将在明日如约盛放", "積み重ねた日々の願いが必ず実を結ぶと信じられた", "all hopes felt destined to bloom tomorrow"], ["相伴走过的每一步都闪耀着青春", "一緒に歩んできた時間が最高の宝物だと実感した", "each shared step shone with bright youth"], ["星光般的梦想指引着前行的每一程", "夜空に輝く星のように夢が未来を照らし続けた", "starlike dream guided every step forward"]]};
+ const FEELINGS = {"0": [["幸福感瞬间爆棚", "これ以上ない幸せに包まれる日", "engulfed in ultimate happiness"], ["幸运的奇迹在此刻彻底显现", "奇跡の運気が最高潮に達する日", "miracle fortune peaks right now"], ["胸口的小鹿乱撞完全停不下来", "胸のドキドキが止まらない最高の日", "racing heart simply cannot be calmed"], ["被无与伦比的光芒紧紧环抱", "まばゆい光に祝福される一日", "blessed by matchless radiance"], ["好运连发带来极致的心动体验", "幸運の連発に笑顔があふれる日", "wave of luck brings thrilling wonder"]], "1": [["小小的惊喜正在悄悄向你靠近", "うれしいサプライズがそっと届く日", "sweet surprises quietly drawing near"], ["整个人走路都带上了轻快的风", "足取りも軽く笑顔が自然と咲く日", "walking with joyful breeze in steps"], ["心中满溢着甜美而充实的暖意", "心があたたかな甘さに満たされる日", "heart filled with cozy sweet warmth"], ["生活正在顺着心意悄然变好", "物事が心地よく前進していく一日", "life turning smoother by the moment"], ["随身带着的好心情让晴空更蓝", "晴れやかな気分で前を向ける日", "cheery mood turns the sky extra blue"]], "2": [["微小的幸运如花蕾般悄然初绽", "ささやかな幸せがそっと芽生える日", "tiny joys blooming softly like buds"], ["心境在悠闲节奏中变得格外舒坦", "マイペースに心地よく過ごせる一日", "peaceful rhythm eases mind completely"], ["甜甜的滋味在日常中慢慢晕开", "日常の甘いひとコマに癒やされる日", "sweet tastes gently spreading in daily life"], ["每一个微小进步都值得被庆祝", "小さな一歩を大切にできる素敵な日", "every small step feels worth celebrating"], ["温暖的微光静静守护着你的步调", "やわらかな光が足元を照らしてくれる日", "soft glow gently watching over steps"]], "3": [["踏实的安心感是今天最好的底气", "揺るぎない安心感が心を支えてくれる日", "solid calm provides finest backbone"], ["长久的陪伴让平凡的日子闪闪发光", "変わらぬ想いが日常を彩ってくれる日", "enduring bond makes everyday sparkle"], ["默默积蓄的热爱化作了坚实力量", "静かな情熱が確かな力に変わる一日", "quiet devotion turns to sturdy strength"], ["平平淡淡的日常里有最真的美好", "平穏無事の中にかけがえのない喜びがある日", "true beauty rests in peaceful daily life"], ["笃定的心怀能战胜所有微小的风浪", "芯のある落ち着きで穏やかに進める日", "firm heart easily navigates minor winds"]], "4": [["将今天的休息化作明日起跳的助跑", "次のジャンプのための大切な充電日", "today's sweet rest powers tomorrow's leap"], ["雨过天晴之后必将迎来绚丽彩虹", "雨のあとには必ず綺麗な虹がかかる日", "rainbow surely follows after gentle rain"], ["给紧绷的神经一个温柔的深呼吸", "深呼吸して心をふんわり緩める一日", "deep breath brings gentle ease to spirit"], ["悄悄积蓄的光芒正在静候破晓时刻", "静かに力を蓄え、明日の光を待つ日", "quiet inner glow awaits dawn's arrival"], ["吃个小甜点犒劳认真努力的自己", "頑張った自分をスイーツで甘やかす日", "treat yourself to a well-earned dessert"]]};
+ const MOTTOS_BASE = {"0": [["目光对视的瞬间时间会暂停", "視線が重なった瞬間、世界がきらめいた", "The moment your eyes met, the world lit up"], ["台下挥动的手灯是热爱的证明", "ペンライトを振るその手が熱い想いの証拠", "The waving lightstick is the pure proof of love"], ["每一次现场奔赴都值得全力以赴", "現場へ向かう一歩一歩が最高の青春", "Every journey to the live stage is shining youth"], ["舞台上的光芒会温柔落在你肩上", "ステージの光は、いつもあなたを照らしている", "The stage spotlight falls softly on your shoulder"], ["站在离推最近的地方做最闪亮的主角", "一番近くで笑顔を見守れる、最高の特等席", "The finest prime seat to cherish her radiant smile"], ["音浪穿过身体留下的是永远的感动", "全身を震わせるライブの熱狂は一生の宝物", "Body-shaking live vibrations become eternal treasures"], ["无论走到第几排，爱意都会直达中央", "どこにいても、あなたのエールは届いている", "Wherever you stand, your cheers reach center stage"], ["银彩漫天那一刻所有的心愿都已成真", "銀テープが舞う瞬間、すべての願いが花ひらく", "As ribbons fall, all heartfelt wishes blossom"], ["站在灯光聚焦处，享受今天的心动奇迹", "スポットライトの下で、今日という奇跡を抱きしめよう", "Embrace today's miracle under the spotlight"], ["现场的热烈是生活最棒的解药", "ライブの熱気は、どんな疲れも吹き飛ばす特効薬", "Live concert fervor is the best cure for life"]], "1": [["推的每一次注视都在为你默默加油", "推しの優しい視線が、今日の最高のお守り", "Her gentle gaze is today's greatest talisman"], ["一个微笑就能融化一整天的疲惫", "とびきりの笑顔が、すべてのモヤモヤを溶かしていく", "A radiant smile melts away all day's fatigue"], ["被认真看见的心情就像阳光般温暖", "ちゃんと見つけてくれた喜びが、胸いっぱいに広がる", "The joy of being spotted fills heart like sunshine"], ["所有的热情都在今天得到了最甜回答", "まっすぐに届けた愛が、最高のお返事になって返ってくる", "Pure love sent out receives the sweetest reply"], ["镜头前的对视把这一刻变成了永恒", "目が合った瞬間のときめきは、心に永遠に残る", "The flutter of locked eyes stays in heart forever"], ["专属的wink是为你定制的魔法能量", "特別なウインクは、あなたに届いた魔法のエネルギー", "A sweet wink is tailored magic energy for you"], ["在人海中被认出，是世界上最棒的奇迹", "たくさんの人の中で推しと心が通う、最高の奇跡", "Hearts aligning across crowd is life's best miracle"], ["挥舞的手臂早已架起了心意相通的桥", "掲げた両手が、ステージと心をつなぐ架け桥になる", "Raised arms form a bridge connecting souls"], ["哪怕只有一秒的对视，也足够回味良久", "たった一秒のアイコンタクトが、一生の宝物になる", "Even a one-second glance turns into lifelong gold"], ["用最真诚的微笑回应台上的每一抹光", "最高の笑顔で、ステージからの愛を受け止めよう", "Catch every beam from stage with honest smiles"]], "2": [["把最响亮的Call送给闪闪发光的舞台", "最高の愛を込めて、ステージに全力コールを届けよう", "Send passionate cheers to the shining stage"], ["节拍共振的瞬间整座场馆都是一体的", "会場中がひとつになる瞬間、鳥肌が止まらない", "When the room unites, goosebumps never stop"], ["声嘶力竭的呼喊是青春最炽热的注脚", "声を限りに叫ぶコールが、最高の青春の証", "Cheering at the top of lungs is youth's blazing mark"], ["掉落副歌的大合唱总让人热泪盈眶", "大好きな落ちサビの合唱に、自然と涙があふれてくる", "The chorus drop sing-along brings tears of joy"], ["全场同频的跃动把烦恼彻底踩在脚下", "みんなで跳ねるフロアで、すべての悩みを吹き飛ばそう", "Bouncing with the floor kicks all worries away"], ["呼喊推的名字，心里就会升起无限勇气", "推しの名前を叫ぶたび、胸に勇気が湧き上がってくる", "Shouting her name fills the heart with bold courage"], ["台上台下的呼应是世界上最美的和弦", "コール＆レスポンスが織りなす、世界で一番美しいハーモニー", "Call and response creates the world's finest harmony"], ["汗水与声浪交织成了最纯粹的热爱", "流した汗と叫んだ声が、かけがえのない熱量になる", "Sweat and shouts weave together into purest devotion"], ["跟着节拍点头，今天的好运也会跟着跳", "ビートに合わせてステップを踏めば、幸運も弾み出す", "Step to the beat and good luck will bounce along"], ["在音乐里完全燃尽，才能迎来崭新的朝阳", "全力で燃焼したあとの心には、清々しい朝日が昇る", "Burning all out in music brings a fresh dawn"]], "3": [["每一张拍立得都封存着永恒的心动", "チェキに閉じ込めた、かけがえのない笑顔の記憶", "Every cheki locks in memories of eternal joy"], ["镜头前的笑脸是今天最甜的通行证", "レンズに向けた笑顔が、最高のハッピーを運んでくる", "Smiles before the lens bring greatest happiness"], ["两手拼出的心形是最具灵犀的默契", "お揃いのポーズで通じ合う、温かな絆を大切に", "Cherish the warm bond shared in matching poses"], ["珍藏在卡册里的不只是照片更是青春", "アルバムを開くたび、輝く思い出が胸を温める", "Opening photo album warms the heart with memories"], ["手写的小小心意在岁月里愈发香甜", "チェキの裏のメッセージは、ずっと色褪せない宝物", "Words on the photo back are unfading treasures"], ["相视而笑的瞬间连空气都是草莓味的", "笑い合ったひとときは、甘いスイーツのように心地よい", "Moments of shared laughter are sweet as candy"], ["感谢所有的相遇，让回忆充满色彩", "出会えた奇跡に感謝して、笑顔で明日へ進もう", "Grateful for the encounter, step to tomorrow smiling"], ["那张小小的相纸里盛着整个晴空", "手のひらサイズの写真に、まぶしい青空が広がっている", "A palm-sized print holds an entire sunny sky"], ["认真聆听话语的推就像身边的好朋友", "優しく寄り添ってくれた記憶が、日々の力になる", "Her gentle listening presence becomes daily strength"], ["把最喜欢的合影当作护身符随身携带", "お気に入りの１枚をお守りにして、今日も元気に前を向こう", "Carry favorite photo as a charm to face the day"]], "4": [["手灯切到担当色，好运自然随之而来", "ペンライトを担当色に灯せば、幸運が自然と寄り添う", "Light up your oshi color and luck arrives"], ["专属应援色会像明灯一样指引前路", "担当カラーの輝きが、あなたの進む道を優しく照らす", "Her oshi hue gently illuminates your path"], ["漫天光海里有一束光属于执着的你", "広大な光の海の中に、あなただけの確かな一筋がある", "In the ocean of lights stands your firm beam"], ["包上别着的小谷美在悄悄为你打气", "バッグにつけたグッズたちが、いつもそっと応援している", "Merch on your bag is quietly cheering you on"], ["推的应援色就是今天最棒的心情滤镜", "推しのイメージカラーは、世界をハッピーにする魔法", "Her image color is magic that brightens the world"], ["自引的喜悦胜过世间一切琐碎繁复", "大好きな１枚を手に入れた喜びが、胸いっぱいに広がる", "Joy of drawing her photo fills heart completely"], ["把喜欢穿在身上，走路都格外有底气", "推し色を身につけて、胸を張って軽やかに歩き出そう", "Wearing her color lets you walk with confidence"], ["新调的手灯镜片正映照着未来的梦想", "磨き上げたペンライトに、輝く未来が映り込んでいる", "Polished lightstick reflects the shining future"], ["无论黑暗有多深，手中的光永不熄灭", "どんな暗闇の中でも、愛を灯した光は消えることがない", "No matter how dark, light of devotion never fades"], ["那是属于你们之间最独特的色彩约定", "ふたりをつなぐ大切なカラーは、永遠の約束の印", "The color tying you together is a mark of promise"]], "5": [["前奏响起烦恼全都清空", "イントロが鳴った瞬間、すべてのモヤモヤが吹き飛ぶ", "Opening intro plays and worries vanish away"], ["单曲循环一整天都不觉得腻", "お気に入りの曲は、一日中リピートしても色褪せない", "Looping your favorite song never loses flavor"], ["在歌声里找到继续前行的温柔与勇气", "メロディの中に、前に進むための優しい勇気を見つけよう", "Find gentle courage to step forward in melody"], ["耳边的歌词总有一句刚好写中你的心", "歌詞の一言一言が、あなたの心にそっと寄り添ってくれる", "Every lyric softly keeps your heart company"], ["掉落副歌那一刻整个世界都在屏息倾听", "落ちサビの静寂の中で、推しの歌声が胸を直撃する", "In the chorus drop silence, her voice hits deep"], ["耳机里的旋律是今日最可靠的护身符", "イヤホン越しの歌声が、今日一番頼もしいお守りになる", "Voice in earphones is today's truest amulet"], ["只要音乐还在播放，心情就永远是晴天", "大好きな曲が流れている限り、心はずっと快晴のまま", "As long as the tune plays, the heart is sunny"], ["副歌的节拍敲击在心口激起无限涟漪", "弾むサビのリズムが、明日のワクワクを連れてくる", "The bouncing chorus rhythm ushers in tomorrow's joy"], ["推的Solo就像夜空里最清亮的一颗星", "澄んだソロパートは、夜空にきらめく一番星のよう", "Her clear solo part is like the brightest star"], ["把最喜欢的乐句珍藏在随身的手帐角上", "大好きなフレーズを心に刻んで、軽やかに駆け抜けよう", "Etch your favorite lines in heart and dash on"]], "6": [["同担的消息会带来双倍的好运与欢欣", "大好きな仲間と分かち合う想いは、最高の宝物", "Sharing love with fellow fans is the best treasure"], ["现场的一记击掌胜过千言万语的寒暄", "笑顔のハイタッチひとつで、すべての情熱が通じ合う", "A smiling high-five speaks louder than words"], ["并肩作战的连番是现场最可靠的后盾", "一緒にコールを叫べる連番仲間は、最高の戦友", "Cheering buddies by your side are finest comrades"], ["同一种色彩将天南海北的我们紧紧相连", "同じ推しを愛する奇跡が、温かな絆を紡ぎ出していく", "Loving the same oshi weaves a heartwarming bond"], ["周边交换的圆满是今日第一道小幸运", "グッズのトレード成功から、今日のとびきりの幸運が始まる", "Smooth trading starts off today's great luck"], ["散场后一起喝的冰水格外甘冽沁凉", "終演後の語り合いで飲む一杯は、一生忘れられない味", "The drink after the show tastes unforgettable"], ["因为爱着同一个人，所以眼底都闪着光", "同じ推しを見つめる瞳には、キラキラの輝きが宿る", "Eyes watching the same oshi hold shining sparkle"], ["推特上的互赞共鸣让孤独感彻底消散", "タイムラインの共感が、心をポカポカにあたためる", "Timeline echoes warm the heart completely"], ["有同担并肩前行，推活之路永远不孤单", "仲間と一緒に歩むオタ活は、どこまでも楽しく輝かしい", "Cheering with friends makes the fan journey joyous"], ["把最纯粹的祝福送给每一个深爱推的人", "推しを愛するすべての仲間へ、心からのエールを送ろう", "Send heartfelt cheers to every dedicated fan"]], "7": [["推的笑容是世界上最有效的元气解药", "推しの笑顔は、世界で一番効く元気の魔法", "Your oshi's smile is world's most potent magic"], ["清晨的第一句早安开启一整天好心情", "朝一番のメッセージが、今日という日を特別なものにする", "The first morning message turns today special"], ["把疲惫留在昨晚，今天又是元气满格", "昨日の疲れを脱ぎ捨てて、新しいエネルギーを満タンに", "Cast off yesterday's fatigue and recharge full"], ["忙碌生活的间隙，看一眼推就能满血复活", "ひと息ついて写真を見るだけで、パワーがぐんぐん湧いてくる", "Glancing at her photo brings boundless power"], ["喝一杯全糖的甜饮，甜度与今天正相称", "お気に入りのスイーツで、自分に小さなご褒美をあげよう", "Treat yourself to a sweet little reward treat"], ["整理书桌上的谷美，让每天都闪闪发光", "身の回りを推し色で整えれば、毎日の景色がキラキラ輝く", "Surrounding life in oshi color brightens every view"], ["推的新自拍就是今天最大的视觉盛宴", "新しく届いた自撮りに癒やされて、胸がいっぱいになる", "Healing selfie from her fills heart with comfort"], ["早睡半小时给明天的演出充满电量", "あったかいお布団でぐっすり眠って、明日のパワーを蓄えよう", "Warm sleep in bed stores energy for tomorrow"], ["随身带的小挂件如同推在身边轻轻加油", "ポケットのお守りグッズが、いつでも優しく寄り添ってくれる", "Charm in pocket keeps gentle company at all times"], ["因为喜欢她，所以今天也想成为更好的人", "推しがいるからこそ、自分をもっと好きになれる素晴らしい日", "Loving her inspires you to like yourself more"]], "8": [["不管走多远都要一起做闪亮的主角", "どこまでも一緒に、キラキラの未来へ駆け抜けよう", "Let's dash into the shining future together"], ["所有的努力与汗水都会在台上如约绽放", "ひたむきに積み重ねた汗は、いつか必ず大輪の花を咲かせる", "Dedicated sweat will surely bloom into big flowers"], ["心怀赤诚的热爱，到处都是宽广舞台", "胸に情熱を灯し続ければ、どこへ行っても輝く主役になれる", "Keeping passion burning makes you shine anywhere"], ["星海里的相约是彼此心中最坚定的守候", "光の海で交わした約束は、未来を照らす確かな道標", "Promises in the light sea are guiding stars"], ["陪推一步步走上武道馆的梦想之路", "大きなステージへと続く道のりを、一歩一歩見守り続けよう", "Watch over every single step toward the big stage"], ["因为坚信奇迹，所以奇迹才会降临身边", "奇跡を真っ直ぐ信じる心にこそ、幸運の光は宿る", "Light of fortune dwells in hearts believing miracles"], ["每一次挥动的双手都是写给未来的情书", "高く掲げたペンライトは、未来へ届く一番美しいラブレター", "Raised lightsticks are love letters to future"], ["青春最好的模样，就是和推一同奔跑", "一緒に夢を追いかける時間こそが、かけがえのない青春", "Chasing dreams together is youth at its finest"], ["无论岁月如何流转，这份喜欢永不褪色", "時代が巡っても、この純粋な好きの気持ちは色褪せない", "Though time passes, pure devotion never fades"], ["明天一定会有比今天更耀眼的阳光等待", "明日は今日よりもっとまぶしい奇跡が待っている", "Tomorrow awaits miracles brighter than today"]]};
+
+ const all = [];
+ let currId = 1;
+ const seenTags = new Set(), seenSubs = new Set(), seenMottos = new Set();
+
+ for (const [lvlName, lvlIdx, totalCnt, countsPerTheme] of LEVELS) {
+  const pList = PREFIXES[lvlIdx], sufList = SUFFIXES[lvlIdx], feelList = FEELINGS[lvlIdx];
+  countsPerTheme.forEach((cnt, tIdx) => {
+   const rList = THEME_ROOTS[tIdx], scList = SCENES[tIdx], actList = ACTIONS[tIdx], motList = MOTTOS_BASE[tIdx];
+   for (let i = 0; i < cnt; i++) {
+    const p = pList[(i + tIdx * 3) % pList.length];
+    const r = rList[i % rList.length];
+    const suf = sufList[(Math.floor(i / rList.length) + tIdx) % sufList.length];
+    
+    let tagZh = p[0] + ' · ' + r[0] + suf[0];
+    let tagJa = r[1] + '・' + p[1] + suf[1];
+    let tagEn = p[2] + ' · ' + r[2] + ' ' + suf[2];
+    if (seenTags.has(tagZh)) {
+     tagZh += ' #' + currId; tagJa += '（第' + currId + '番）'; tagEn += ' (No.' + currId + ')';
+    }
+    seenTags.add(tagZh);
+
+    const sc = scList[(i + tIdx * 2) % scList.length];
+    const ac = actList[(i * 3 + tIdx) % actList.length];
+    const fe = feelList[(i * 7 + tIdx * 2) % feelList.length];
+    let subZh = sc[0] + '，' + ac[0] + '，' + fe[0] + '。';
+    let subJa = sc[1] + '、' + ac[1] + '、' + fe[1] + '。';
+    let subEn = sc[2] + ', ' + ac[2] + ', ' + fe[2] + '.';
+    if (seenSubs.has(subZh)) {
+     subZh = '【第' + currId + '番】' + subZh; subJa = '【第' + currId + '番】' + subJa; subEn = '[No.' + currId + '] ' + subEn;
+    }
+    seenSubs.add(subZh);
+
+    const mo = motList[(i + currId) % motList.length];
+    let mottoZh = mo[0], mottoJa = mo[1], mottoEn = mo[2];
+    if (seenMottos.has(mottoZh)) {
+     mottoZh += ' · 第' + currId + '签'; mottoJa += '（第' + currId + '籤）'; mottoEn += ' (No.' + currId + ')';
+    }
+    seenMottos.add(mottoZh);
+
+    all.push([currId, lvlIdx, tagZh, tagJa, tagEn, subZh, subJa, subEn, mottoZh, mottoJa, mottoEn]);
+    currId++;
+   }
+  });
+ }
+ return all;
+};
+const FORTUNES_1000 = buildFortunes1000();
+ const KICHI_TAGLINES = {
+  '大吉': [{zh: FORTUNES_1000[0][2], ja: FORTUNES_1000[0][3], en: FORTUNES_1000[0][4], sub: {zh: FORTUNES_1000[0][5], ja: FORTUNES_1000[0][6], en: FORTUNES_1000[0][7]}}],
+  '中吉': [{zh: FORTUNES_1000[250][2], ja: FORTUNES_1000[250][3], en: FORTUNES_1000[250][4], sub: {zh: FORTUNES_1000[250][5], ja: FORTUNES_1000[250][6], en: FORTUNES_1000[250][7]}}],
+  '小吉': [{zh: FORTUNES_1000[500][2], ja: FORTUNES_1000[500][3], en: FORTUNES_1000[500][4], sub: {zh: FORTUNES_1000[500][5], ja: FORTUNES_1000[500][6], en: FORTUNES_1000[500][7]}}],
+  '吉':   [{zh: FORTUNES_1000[700][2], ja: FORTUNES_1000[700][3], en: FORTUNES_1000[700][4], sub: {zh: FORTUNES_1000[700][5], ja: FORTUNES_1000[700][6], en: FORTUNES_1000[700][7]}}],
+  '末吉': [{zh: FORTUNES_1000[900][2], ja: FORTUNES_1000[900][3], en: FORTUNES_1000[900][4], sub: {zh: FORTUNES_1000[900][5], ja: FORTUNES_1000[900][6], en: FORTUNES_1000[900][7]}}]
+ };
  const KICHI_POOL=['大吉','大吉','大吉','大吉','中吉','中吉','中吉','中吉','中吉','小吉','小吉','小吉','小吉','吉','吉','吉','吉','末吉','末吉','末吉'];
  const KICHI_META={
   '大吉':{
    emoji:'💖',soft:'#ffe6f2',deep:'#e4007f',
    label:{zh:'大吉',ja:'大吉',en:'Great Blessing'},
-   tagline:{zh:'心跳满开 · 超绝大吉',ja:'胸の高鳴りが止まらない、最高の１日。',en:'Full Heartbeat · Super Lucky Day'},
-   subTag:{zh:'胸口的小鹿乱撞停不下来，最棒的一天。',ja:'心拍数全開、きらめく大吉の光。',en:"Can't stop your racing heart on this wonderful day."}
+   tagline:KICHI_TAGLINES['大吉'][0],
+   subTag:KICHI_TAGLINES['大吉'][0].sub
   },
   '中吉':{
    emoji:'✨',soft:'#fff0f6',deep:'#d11b75',
    label:{zh:'中吉',ja:'中吉',en:'Middle Blessing'},
-   tagline:{zh:'闪闪发光 · 好事接近',ja:'キラキラした瞬間が、静かに近づいてる。',en:'Sparkling Moments · Joy Is Approaching'},
-   subTag:{zh:'闪闪发光的瞬间，正在静静向你靠近。',ja:'ときめきと幸運がそっと隣に。',en:'Quietly drawing near with warmth and magic.'}
+   tagline:KICHI_TAGLINES['中吉'][0],
+   subTag:KICHI_TAGLINES['中吉'][0].sub
   },
   '小吉':{
    emoji:'🌸',soft:'#fff4e6',deep:'#e86a17',
    label:{zh:'小吉',ja:'小吉',en:'Small Blessing'},
-   tagline:{zh:'温柔微风 · 小小幸福',ja:'小さな幸せが、ポケットに届く日。',en:'Gentle Breeze · Pocketful of Joy'},
-   subTag:{zh:'微小的幸福，悄悄落入衣兜的日子。',ja:'やさしい風とともに届くぬくもり。',en:'Tiny sparks of happiness delivered right to you.'}
+   tagline:KICHI_TAGLINES['小吉'][0],
+   subTag:KICHI_TAGLINES['小吉'][0].sub
   },
   '吉':{
    emoji:'🍀',soft:'#e8f8f5',deep:'#198754',
    label:{zh:'吉',ja:'吉',en:'Blessing'},
-   tagline:{zh:'顺风而行 · 稳定好运',ja:'一歩ずつ、推しと一緒に進もう。',en:'Steady Luck · Step by Step With Your Oshi'},
-   subTag:{zh:'一步一步，和推一起稳步向前走。',ja:'おだやかな幸運が満ちる良き日。',en:'Moving forward gently, side by side with your oshi.'}
+   tagline:KICHI_TAGLINES['吉'][0],
+   subTag:KICHI_TAGLINES['吉'][0].sub
   },
   '末吉':{
    emoji:'🌙',soft:'#f3f0ff',deep:'#6f42c1',
    label:{zh:'末吉',ja:'末吉',en:'Future Blessing'},
-   tagline:{zh:'充能之日 · 放松听歌',ja:'推しの歌を聴いて、ゆっくり充電しよう。',en:'Recharge Day · Relax to Your Favorite Tunes'},
-   subTag:{zh:'听着推的歌声，给心灵慢慢充满电。',ja:'これからの幸運をあたためるチャージ日。',en:"Listen to your oshi's voice and recharge your energy."}
+   tagline:KICHI_TAGLINES['末吉'][0],
+   subTag:KICHI_TAGLINES['末吉'][0].sub
   }
  };
  const STATUS_MAP={
@@ -1121,42 +1239,9 @@ if(P=='draw'){
    canvasFortuneHead:"Today's Fortune",canvasFortuneRow:'Fortune',canvasMottoTag:'Motto ・ ',canvasFooter:'Unofficial Fan Site'
   }
  };
- const I18N_ITEMS={
-  '应援手灯':{ja:'ペンライト',en:'Penlight'},'歌名便签':{ja:'曲名メモ',en:'Song Title Note'},
-  '一张拍立得':{ja:'チェキ1枚',en:'One Cheki Photo'},'今日发圈':{ja:'今日のシュシュ',en:'Hair Scrunchie'},
-  '口袋票根':{ja:'ポケットの半券',en:'Ticket Stub'},'草莓软糖':{ja:'いちごグミ',en:'Strawberry Gummy'},
-  '成员色发带':{ja:'推し色リボン',en:'Oshi-color Ribbon'},'充满电的耳机':{ja:'充電満タンのイヤホン',en:'Charged Earphones'},
-  '袖口小徽章':{ja:'袖の缶バッジ',en:'Sleeve Pin Badge'},'应援毛巾':{ja:'推しタオル',en:'Cheering Towel'},
-  '歌词书签':{ja:'歌詞しおり',en:'Lyrics Bookmark'},'闪亮指甲贴':{ja:'キラキラネイルシール',en:'Glitter Nail Sticker'}
- };
- const I18N_ACTS={
-  '把副歌再听一遍':{ja:'サビをもう一度聴く',en:'Listen to the chorus once more'},
-  '把签发给同担':{ja:'このおみくじを推し仲間に送る',en:'Share this fortune with fellow fans'},
-  '跟着节拍点头':{ja:'ビートに合わせて首をゆらす',en:'Nod along to the rhythm'},
-  '写下喜欢的一句':{ja:'好きな歌詞のワンフレーズをメモする',en:'Jot down your favorite line'},
-  '给今天的推比心':{ja:'今日の推しに指ハートを作る',en:'Send a finger heart to today’s oshi'},
-  '单曲循环到会唱':{ja:'歌えるようになるまで鬼リピする',en:'Put on repeat until you can sing it'},
-  '把应援色穿上':{ja:'推しの担当カラーを身につける',en:'Wear your oshi’s member color'},
-  '放进今日歌单':{ja:'今日のプレイリストに入れる',en:'Add to today’s playlist'},
-  '看一眼公式照':{ja:'公式アーティスト写真を眺める',en:'Admire the official artist photo'},
-  '把签名着声唱出来':{ja:'好きなメロディを口ずさむ',en:'Hum the melody out loud'},
-  '把灯牌举高一点':{ja:'ペンライトを心の中で高く掲げる',en:'Hold your lightstick up high'},
-  '和同担分享这张签':{ja:'推し仲間にこの処方箋を見せる',en:'Show this prescription to a friend'}
- };
- const I18N_MOTTOS={
-  '今天也把副歌唱亮':{ja:'今日もサビを全力で歌おう',en:'Sing the chorus loud and proud today'},
-  '小幸运落在节拍上':{ja:'ちいさな幸せはビートにのってやってくる',en:'Tiny sparks of happiness dance on the beat'},
-  '把喜欢大声说出来':{ja:'「好き」の気持ちは言葉にしていい',en:'Never hesitate to say what you love'},
-  '今天的推就在眼前':{ja:'今日の推しが一番近くにいる',en:'Your oshi is right here by your side'},
-  '一首歌的时间刚刚好':{ja:'1曲分の時間で、心はちゃんと軽くなる',en:'One song is all it takes to reset your mood'},
-  '应援色会照亮今天':{ja:'推しカラーが今日をあざやかに照らす',en:'Your oshi’s color lights up your day'},
-  '走到灯下就是主角':{ja:'スポットライトの下、誰もが主役になれる',en:'Step under the lights and be the star'},
-  '把心跳交给这首歌':{ja:'この鼓動をメロディに預けて',en:'Surrender your heartbeat to the melody'},
-  '今天也要闪闪发光':{ja:'今日もキラキラ輝いていこう',en:'Keep shining bright all day long'},
-  '同担的消息会带来好运':{ja:'ファン仲間との会話が幸運を運んでくる',en:'Kind words from fellow fans bring good luck'},
-  '再听一遍运气就到':{ja:'もう1回リピートすれば運気がグングン上がる',en:'One more replay brings the good fortune'},
-  '先对自己笑一个':{ja:'まずは自分自身ににっこり笑顔を',en:'Start by giving yourself a warm smile'}
- };
+ const I18N_ITEMS={"应援手灯": {"ja": "ペンライト", "en": "Penlight"}, "歌名便签": {"ja": "曲名メモ", "en": "Song Title Note"}, "一张拍立得": {"ja": "チェキ1枚", "en": "One Cheki Photo"}, "今日发圈": {"ja": "今日のシュシュ", "en": "Hair Scrunchie"}, "口袋票根": {"ja": "ポケットの半券", "en": "Ticket Stub"}, "草莓软糖": {"ja": "いちごグミ", "en": "Strawberry Gummy"}, "成员色发带": {"ja": "推し色リボン", "en": "Oshi-color Ribbon"}, "充满电的耳机": {"ja": "充電満タンのイヤホン", "en": "Charged Earphones"}, "袖口小徽章": {"ja": "袖の缶バッジ", "en": "Sleeve Pin Badge"}, "应援毛巾": {"ja": "推しタオル", "en": "Cheering Towel"}, "歌词书签": {"ja": "歌詞しおり", "en": "Lyrics Bookmark"}, "闪亮指甲贴": {"ja": "キラキラネイルシール", "en": "Glitter Nail Sticker"}, "亚克力立牌": {"ja": "アクリルスタンド", "en": "Acrylic Stand"}, "拍立得保护套": {"ja": "チェキホルダー", "en": "Cheki Photo Holder"}, "推色痛包": {"ja": "推し色痛バッグ", "en": "Oshi-color Itabag"}, "双马尾蝴蝶结": {"ja": "ツインテールリボン", "en": "Twin-tail Bow Ribbon"}, "现场特典券": {"ja": "現場の特典会券", "en": "Meet-and-Greet Ticket"}, "迷你生写真夹": {"ja": "ミニ生写真ホルダー", "en": "Mini Photo Sleeve"}, "爱兔毛绒挂件": {"ja": "アイラビットぬいぐるみマスコット", "en": "i-Rabbit Plush Keychain"}, "荧光手环": {"ja": "サイリウムブレスレット", "en": "Glow Bracelet"}, "随身小镜子": {"ja": "コンパクトミラー", "en": "Pocket Compact Mirror"}, "心形润唇膏": {"ja": "ハート型リップクリーム", "en": "Heart-shaped Lip Balm"}, "便携充电宝": {"ja": "モバイルバッテリー", "en": "Portable Power Bank"}, "门票挂绳": {"ja": "チケットネックストラップ", "en": "Ticket Lanyard"}, "闪卡保护套": {"ja": "ホログラムスリーブ", "en": "Hologram Card Sleeve"}, "公式应援扇": {"ja": "公式応援うちわ", "en": "Official Cheering Fan"}, "便携香氛喷雾": {"ja": "フレグランスミスト", "en": "Fragrance Mist"}, "星型纪念徽章": {"ja": "星型記念ピンバッジ", "en": "Star Lapel Pin Badge"}, "银色丝带彩条": {"ja": "銀テープ", "en": "Silver Concert Ribbon"}, "专属手帐本": {"ja": "推し活手帳", "en": "Oshi Activity Journal"}, "心动自拍挂绳": {"ja": "スマホハンドストラップ", "en": "Phone Wrist Strap"}, "发光钥匙扣": {"ja": "LEDキーホルダー", "en": "Glowing LED Keychain"}, "应援色发夹": {"ja": "推し色ヘアピン", "en": "Oshi-color Hairclip"}, "粉红马克笔": {"ja": "ピンクのサインペン", "en": "Pink Marker Pen"}, "草莓味汽水": {"ja": "いちごソーダ", "en": "Strawberry Soda"}, "纪念卡片夹": {"ja": "トレーディングカードケース", "en": "Trading Card Case"}, "可爱兔耳发箍": {"ja": "うさ耳カチューシャ", "en": "Bunny Ear Headband"}, "舞台贴纸包": {"ja": "ステージステッカーパック", "en": "Stage Sticker Pack"}, "彩虹糖果罐": {"ja": "レインボーキャンディ缶", "en": "Rainbow Candy Tin"}, "随身保温杯": {"ja": "お気に入りのマイボトル", "en": "Favorite Thermos Bottle"}};
+ const I18N_ACTS={"把副歌再听一遍": {"ja": "サビをもう一度聴く", "en": "Listen to the chorus once more"}, "把签发给同担": {"ja": "このおみくじを推し仲間に送る", "en": "Share this fortune with fellow fans"}, "跟着节拍点头": {"ja": "ビートに合わせて首をゆらす", "en": "Nod along to the rhythm"}, "写下喜欢的一句": {"ja": "好きな歌詞のワンフレーズをメモする", "en": "Jot down your favorite line"}, "给今天的推比心": {"ja": "今日の推しに指ハートを作る", "en": "Send a finger heart to today’s oshi"}, "单曲循环到会唱": {"ja": "歌えるようになるまで鬼リピする", "en": "Put on repeat until you can sing it"}, "把应援色穿上": {"ja": "推しの担当カラーを身につける", "en": "Wear your oshi’s member color"}, "放进今日歌单": {"ja": "今日のプレイリストに入れる", "en": "Add to today’s playlist"}, "看一眼公式照": {"ja": "公式アーティスト写真を眺める", "en": "Admire the official artist photo"}, "把签名着声唱出来": {"ja": "好きなメロディを口ずさむ", "en": "Hum the melody out loud"}, "把灯牌举高一点": {"ja": "ペンライトを心の中で高く掲げる", "en": "Hold your lightstick up high"}, "和同担分享这张签": {"ja": "推し仲間にこの処方箋を見せる", "en": "Show this prescription to a friend"}, "转发一次官方推特": {"ja": "公式Xの最新ポストをリポストする", "en": "Repost the latest official tweet"}, "整理一下拍立得册": {"ja": "チェキホルダーをきれいに並べ替える", "en": "Organize your cheki photo album"}, "换一张推的壁纸": {"ja": "スマホの待ち受けを推しの写真に変える", "en": "Switch your phone wallpaper to your oshi"}, "把房间灯调成应援色": {"ja": "部屋の明かりを推し色っぽくしてみる", "en": "Set your room lighting to oshi color"}, "写一句听后感": {"ja": "曲を聴いた感想を一言メモに残す", "en": "Jot down a quick thought after listening"}, "在心底默默许愿": {"ja": "心の中でそっと願い事を唱える", "en": "Make a quiet wish in your heart"}, "对镜子里的自己比V": {"ja": "鏡の前の自分にピースサインをする", "en": "Flash a peace sign to yourself in the mirror"}, "深呼吸给自己打气": {"ja": "大きく深呼吸して気合を入れる", "en": "Take a deep breath and psych yourself up"}, "拍一张身边的粉色瞬间": {"ja": "身の回りのピンク色をスマホでパシャリ", "en": "Snap a photo of something pink around you"}, "看一段现场演出切片": {"ja": "お気に入りのライブ映像をワンシーン観る", "en": "Watch a favorite concert clip online"}, "温习一遍应援Call": {"ja": "大好きな曲のコールをおさらいする", "en": "Practice the cheers for your favorite song"}, "给推的新动态点赞": {"ja": "推しの最新投稿にいいねを送る", "en": "Drop a like on your oshi’s newest update"}, "跟着编舞比几个手势": {"ja": "サビの振り付けを真似して踊ってみる", "en": "Try mimicking the chorus choreography"}, "买一杯喜欢的甜饮": {"ja": "帰り道に好きなおやつをご褒美買い", "en": "Treat yourself to your favorite sweet drink"}, "擦亮手灯的镜片": {"ja": "ペンライトのホコリをやさしく拭く", "en": "Gently polish your penlight lens"}, "在草稿纸上涂鸦爱兔": {"ja": "ノートの余白にアイラビットを描いてみる", "en": "Doodle a cute i-Rabbit in your notebook"}, "和推隔空干杯": {"ja": "コップを掲げて推しとエア乾杯する", "en": "Raise a glass for an air toast with your oshi"}, "听着前奏慢步走": {"ja": "イントロのリズムに合わせてお散歩する", "en": "Take a leisurely walk to the song’s rhythm"}, "戴上耳机闭上眼睛听": {"ja": "目を閉じて耳を澄まし、推しの歌声に浸る", "en": "Close your eyes and immerse in the vocals"}, "记录今日开心的三件事": {"ja": "今日あった良いことを3つ書き出してみる", "en": "Write down three happy things from today"}, "给好朋友发个爱心表情": {"ja": "大切な友達にハートのスタンプを送る", "en": "Send a sweet heart emoji to a good friend"}, "把桌面整理得整整齐齐": {"ja": "机の上をスッキリ整えて気分を一新する", "en": "Tidy your desk neatly to refresh your mood"}, "挑选下次现场穿搭": {"ja": "次のイベントに着ていく服をコーディネート", "en": "Plan your outfit for the next live show"}, "把推的名字打在输入框看一眼": {"ja": "推しの名前を打って、尊さを噛みしめる", "en": "Type out your oshi’s name and admire it"}, "拉伸一下肩膀放松身体": {"ja": "肩甲骨を伸ばしてリフレッシュストレッチ", "en": "Stretch your shoulders for a nice refresh"}, "把今天的好运签存进相册": {"ja": "今日引いたおみくじを写真フォルダに保存", "en": "Save today’s lucky fortune to your gallery"}, "早睡半小时给明天充满电": {"ja": "今夜は30分早くベッドに入って休息する", "en": "Go to bed 30 mins early to fully recharge"}, "对着窗外清晨的天空微笑": {"ja": "朝の澄んだ空を見上げてにっこり笑う", "en": "Look up at the morning sky and smile"}};
+ const I18N_MOTTOS={"今天也把副歌唱亮": {"ja": "今日もサビを全力で歌おう", "en": "Sing the chorus loud and proud today"}, "小幸运落在节拍上": {"ja": "ちいさな幸せはビートにのってやってくる", "en": "Tiny sparks of happiness dance on the beat"}, "把喜欢大声说出来": {"ja": "「好き」の気持ちは言葉にしていい", "en": "Never hesitate to say what you love"}, "今天的推就在眼前": {"ja": "今日の推しが一番近くにいる", "en": "Your oshi is right here by your side"}, "一首歌的时间刚刚好": {"ja": "1曲分の時間で、心はちゃんと軽くなる", "en": "One song is all it takes to reset your mood"}, "应援色会照亮今天": {"ja": "推しカラーが今日をあざやかに照らす", "en": "Your oshi’s color lights up your day"}, "走到灯下就是主角": {"ja": "スポットライトの下、誰もが主役になれる", "en": "Step under the lights and be the star"}, "把心跳交给这首歌": {"ja": "この鼓動をメロディに預けて", "en": "Surrender your heartbeat to the melody"}, "今天也要闪闪发光": {"ja": "今日もキラキラ輝いていこう", "en": "Keep shining bright all day long"}, "同担的消息会带来好运": {"ja": "ファン仲間との会話が幸運を運んでくる", "en": "Kind words from fellow fans bring good luck"}, "再听一遍运气就到": {"ja": "もう1回リピートすれば運気がグングン上がる", "en": "One more replay brings the good fortune"}, "先对自己笑一个": {"ja": "まずは自分自身ににっこり笑顔を", "en": "Start by giving yourself a warm smile"}, "目光对视的瞬间时间会暂停": {"ja": "目が合った瞬間、世界がスローモーションになる", "en": "Time pauses the moment your eyes meet on stage"}, "前奏响起烦恼全都清空": {"ja": "イントロが鳴り響けば、モヤモヤは全部リセット", "en": "All worries disappear the second the intro plays"}, "在心中把手灯举得更高": {"ja": "心の中のペンライトをもっと高く掲げて", "en": "Hold your imaginary penlight up to the sky"}, "把最响亮的Call送给舞台": {"ja": "最高のコールを大好きなステージへ届けよう", "en": "Send your most passionate cheer to the stage"}, "拍立得里记录下最甜的微笑": {"ja": "チェキに収められた、とびきりの笑顔をお守りに", "en": "A film photo holding the sweetest little smile"}, "耳机里的旋律是今日护身符": {"ja": "イヤホンから流れる旋律が、今日のお守り", "en": "The melody in your headphones is your daily amulet"}, "每一个闪光的瞬间都被温柔看见": {"ja": "一生懸命輝く姿を、誰かがきっと見つめてる", "en": "Every sparkling moment is seen and cherished"}, "因为喜欢所以今天也是晴天": {"ja": "大好きな推しがいるから、心はいつでも日本晴れ", "en": "With love in your heart, today is bright and clear"}, "随身带的谷美在悄悄加油": {"ja": "カバンの中の推しグッズがそっと背中を押す", "en": "Merch in your bag is quietly cheering you on"}, "把推的公式照设成锁屏": {"ja": "お気に入りのアーティスト写真を待ち受けに", "en": "Set your oshi’s official photo as your lock screen"}, "现场手灯的光海里有你的一束": {"ja": "きらめく光の海の中に、あなただけの大切な輝き", "en": "Your beam glows proudly in the ocean of lightsticks"}, "只要音乐在响心情就很轻快": {"ja": "大好きな曲が流れるだけで、足取りが軽くなる", "en": "As long as music plays, your heart stays light"}, "给喜欢的人送上一句元气": {"ja": "大好きな推しへ、心の中で「ファイト！」を送ろう", "en": "Send a warm burst of energy to the one you adore"}, "深呼吸三次今天全力以赴": {"ja": "深呼吸を3回。今日も自分らしく前を向こう", "en": "Three deep breaths and give it your very best today"}, "特典会的倒计时让人心跳加速": {"ja": "特典会へ向かうカウントダウンに胸が高鳴る", "en": "Counting down to the meetup gets your pulse racing"}, "用推的代表色点缀今天的穿搭": {"ja": "担当カラーをワンポイントに、今日のコーデを彩って", "en": "Add a splash of your oshi’s color to your outfit"}, "单曲循环一整天都不觉得腻": {"ja": "朝から晩までエンドレスリピートでも飽きない名曲", "en": "Looping this song all day never gets old"}, "今天也是被推治愈的一天": {"ja": "推しの愛らしさに、今日も全力で救われる日", "en": "Another day beautifully healed by your oshi’s smile"}, "舞台上的光芒会落在你肩上": {"ja": "ステージのまばゆい光が、あなたをそっと照らす", "en": "The stage spotlight reaches out to touch your shoulder"}, "在歌声里找到前进的勇气": {"ja": "歌詞に背中を押されて、前へ踏み出すチカラ", "en": "Finding gentle courage inside every singing line"}, "同担的击掌会传递双倍快乐": {"ja": "推し仲間とのハイタッチで、ハッピーが2倍に", "en": "High-fives with fellow fans double the daily joy"}, "把歌词里的温柔收藏进心底": {"ja": "心に染みるやさしいワンフレーズをお守りに", "en": "Tucking sweet lyrical phrases into your heart"}, "毛巾挥舞的节拍里满是热忱": {"ja": "マフラータオルを回すたび、熱い情熱が溢れ出す", "en": "Twirling your concert towel with overflowing passion"}, "走在路上步调忍不住跟着跳": {"ja": "スキップしたくなるような、弾むリズムに乗って", "en": "Walking down the street with a bounce in your step"}, "和喜欢的人一起奔向明天": {"ja": "大好きな推しと一緒に、未来へ駆け出そう", "en": "Racing towards tomorrow together with who you love"}, "喝一杯全糖奶茶甜度刚刚好": {"ja": "甘いミルクティーで、エネルギー満タン補給", "en": "A sweet milk tea at 100% sweetness just for you"}, "只要心怀热爱到处都是舞台": {"ja": "トキメキがあれば、いつもの道もランウェイに", "en": "With passion inside, the whole world is your stage"}, "今天的每一次心跳都充满朝气": {"ja": "ドキドキするたびに、元気チャージ完了！", "en": "Every heartbeat today is packed with bouncy vigor"}, "把喜欢的心意写在便签角上": {"ja": "手帳のすみに、推しへのメッセージをそっとメモ", "en": "Writing your fond feelings in the corner of a note"}, "微风吹过的午后最适合听歌": {"ja": "やさしい風が吹き抜ける午後、推し曲に浸って", "en": "A breezy afternoon made perfect by your favorite song"}, "星光总会照亮认真生活的你": {"ja": "ひたむきに頑張るあなたを、星空が照らしてる", "en": "Starlight will always guide you who live earnestly"}, "不管几岁都要做闪亮的主角": {"ja": "何歳になっても、ときめきを忘れない主役でいよう", "en": "At any age, remain the dazzling star of your story"}, "在心中默念三遍推的名字": {"ja": "心の中で推しの名前を3回唱えてパワーアップ", "en": "Chant your oshi’s name three times in your heart"}, "所有的等待都会在相见时值得": {"ja": "待っていた時間は、会えた瞬間に最高の宝物に", "en": "Every wait becomes deeply worthwhile upon meeting"}, "这一首是今天的心灵充电桩": {"ja": "この曲こそが、今日を生き抜く心のビタミン", "en": "This song is your personal power-up station today"}, "手灯切到担当色好运自然来": {"ja": "ペンライトを推し色に灯せば、幸運が舞い込む", "en": "Switch your lightstick to oshi color for good luck"}, "为每一个小小的进步鼓鼓掌": {"ja": "ちいさな前進にも、自分で拍手を送ってあげよう", "en": "Applaud every tiny step of progress you made"}, "今天偶遇的好事都像魔法一样": {"ja": "今日起きるちいさな奇跡は、推しがくれた魔法", "en": "Every little wonder today feels like oshi magic"}, "把疲惫留在昨晚今天元气重置": {"ja": "疲れは昨日に置いてきた！今日からまたリスタート", "en": "Leave fatigue behind; your energy resets today"}, "同担的应援声是最棒的和弦": {"ja": "響き合うファンの声が、世界で一番温かいハーモニー", "en": "Cheers from fellow fans make the warmest harmony"}, "台下挥动的双手是热爱的证明": {"ja": "高く掲げた両手は、まっすぐな愛の証拠", "en": "Raised hands in the crowd are proof of genuine love"}, "这一刻推的笑容只为你绽放": {"ja": "とびきりの笑顔が、あなただけに届く奇跡の瞬間", "en": "That brilliant smile shines specially for you right now"}, "在歌词书签上划下心动标记": {"ja": "心に刺さったフレーズに、ピンクの蛍光ペンを引いて", "en": "Marking heart-throbbing lyrics with pink highlighter"}, "推的专属歌单让好心情满电": {"ja": "特製プレイリストで、ご機嫌メーターいつでもMAX", "en": "Your custom oshi playlist keeps your battery at 100%"}, "今晚做个甜甜的偶像现场梦": {"ja": "今夜は夢の中で、最前列のライブを楽しんで", "en": "Tonight, enjoy front-row concert seats in dreams"}, "把最纯粹的喜欢珍藏在口袋": {"ja": "ピュアな「大好き」を、ポケットに忍ばせて歩こう", "en": "Keep pure, uncomplicated love tucked in your pocket"}, "你的应援声早已传到了舞台": {"ja": "客席からの熱いエールは、ちゃんとステージに届いてる", "en": "Your heartfelt cheer has reached the stage long ago"}, "今天也是无可替代的心动之日": {"ja": "かけがえのない、ときめきに満ちた素晴らしい１日", "en": "Another irreplaceable day full of wonder and delight"}};
  const I18N_COLORS={
   '樱花粉':{ja:'桜ピンク',en:'Sakura Pink'},'草莓粉':{ja:'ストロベリーピンク',en:'Strawberry Pink'},'蜜桃':{ja:'ピーチ',en:'Peach'},
   '奶油黄':{ja:'クリームイエロー',en:'Cream Yellow'},'香芋紫':{ja:'タロパープル',en:'Taro Purple'},'薄荷绿':{ja:'ミントグリーン',en:'Mint Green'},
@@ -1169,7 +1254,7 @@ if(P=='draw'){
  const getKMeta=k=>KICHI_META[k]||KICHI_META['吉'];
  const trItem=(item,l=currentLang)=>(l!=='zh'&&I18N_ITEMS[item]?.[l])||item||'';
  const trAct=(act,l=currentLang)=>(l!=='zh'&&I18N_ACTS[act]?.[l])||act||'';
- const trMotto=(motto,l=currentLang)=>(l!=='zh'&&I18N_MOTTOS[motto]?.[l])||motto||'';
+ const trMotto=(motto,l=currentLang,fortune)=>(fortune&&fortune.mottoObj&&fortune.mottoObj[l])||(l!=='zh'&&I18N_MOTTOS[motto]?.[l])||motto||'';
  const trColor=(c,l=currentLang)=>{
   if(!c)return '';
   const s=String(c).trim();
@@ -1221,9 +1306,9 @@ if(P=='draw'){
   {name:'珊瑚',hex:'#ff8fab'},{name:'杏子',hex:'#ffc9a3'},{name:'葡萄',hex:'#c9a0dc'},
   {name:'玫瑰',hex:'#e4007f'},{name:'奶白',hex:'#fff1f6'},{name:'丁香',hex:'#e6c6e6'}
  ];
- const LUCK_ITEMS=['应援手灯','歌名便签','一张拍立得','今日发圈','口袋票根','草莓软糖','成员色发带','充满电的耳机','袖口小徽章','应援毛巾','歌词书签','闪亮指甲贴'];
- const LUCK_ACTS=['把副歌再听一遍','把签发给同担','跟着节拍点头','写下喜欢的一句','给今天的推比心','单曲循环到会唱','把应援色穿上','放进今日歌单','看一眼公式照','把签名着声唱出来','把灯牌举高一点','和同担分享这张签'];
- const LUCK_MOTTOS=['今天也把副歌唱亮','小幸运落在节拍上','把喜欢大声说出来','今天的推就在眼前','一首歌的时间刚刚好','应援色会照亮今天','走到灯下就是主角','把心跳交给这首歌','今天也要闪闪发光','同担的消息会带来好运','再听一遍运气就到','先对自己笑一个'];
+ const LUCK_ITEMS=["应援手灯", "歌名便签", "一张拍立得", "今日发圈", "口袋票根", "草莓软糖", "成员色发带", "充满电的耳机", "袖口小徽章", "应援毛巾", "歌词书签", "闪亮指甲贴", "亚克力立牌", "拍立得保护套", "推色痛包", "双马尾蝴蝶结", "现场特典券", "迷你生写真夹", "爱兔毛绒挂件", "荧光手环", "随身小镜子", "心形润唇膏", "便携充电宝", "门票挂绳", "闪卡保护套", "公式应援扇", "便携香氛喷雾", "星型纪念徽章", "银色丝带彩条", "专属手帐本", "心动自拍挂绳", "发光钥匙扣", "应援色发夹", "粉红马克笔", "草莓味汽水", "纪念卡片夹", "可爱兔耳发箍", "舞台贴纸包", "彩虹糖果罐", "随身保温杯"];
+ const LUCK_ACTS=["把副歌再听一遍", "把签发给同担", "跟着节拍点头", "写下喜欢的一句", "给今天的推比心", "单曲循环到会唱", "把应援色穿上", "放进今日歌单", "看一眼公式照", "把签名着声唱出来", "把灯牌举高一点", "和同担分享这张签", "转发一次官方推特", "整理一下拍立得册", "换一张推的壁纸", "把房间灯调成应援色", "写一句听后感", "在心底默默许愿", "对镜子里的自己比V", "深呼吸给自己打气", "拍一张身边的粉色瞬间", "看一段现场演出切片", "温习一遍应援Call", "给推的新动态点赞", "跟着编舞比几个手势", "买一杯喜欢的甜饮", "擦亮手灯的镜片", "在草稿纸上涂鸦爱兔", "和推隔空干杯", "听着前奏慢步走", "戴上耳机闭上眼睛听", "记录今日开心的三件事", "给好朋友发个爱心表情", "把桌面整理得整整齐齐", "挑选下次现场穿搭", "把推的名字打在输入框看一眼", "拉伸一下肩膀放松身体", "把今天的好运签存进相册", "早睡半小时给明天充满电", "对着窗外清晨的天空微笑"];
+ const LUCK_MOTTOS=["今天也把副歌唱亮", "小幸运落在节拍上", "把喜欢大声说出来", "今天的推就在眼前", "一首歌的时间刚刚好", "应援色会照亮今天", "走到灯下就是主角", "把心跳交给这首歌", "今天也要闪闪发光", "同担的消息会带来好运", "再听一遍运气就到", "先对自己笑一个", "目光对视的瞬间时间会暂停", "前奏响起烦恼全都清空", "在心中把手灯举得更高", "把最响亮的Call送给舞台", "拍立得里记录下最甜的微笑", "耳机里的旋律是今日护身符", "每一个闪光的瞬间都被温柔看见", "因为喜欢所以今天也是晴天", "随身带的谷美在悄悄加油", "把推的公式照设成锁屏", "现场手灯的光海里有你的一束", "只要音乐在响心情就很轻快", "给喜欢的人送上一句元气", "深呼吸三次今天全力以赴", "特典会的倒计时让人心跳加速", "用推的代表色点缀今天的穿搭", "单曲循环一整天都不觉得腻", "今天也是被推治愈的一天", "舞台上的光芒会落在你肩上", "在歌声里找到前进的勇气", "同担的击掌会传递双倍快乐", "把歌词里的温柔收藏进心底", "毛巾挥舞的节拍里满是热忱", "走在路上步调忍不住跟着跳", "和喜欢的人一起奔向明天", "喝一杯全糖奶茶甜度刚刚好", "只要心怀热爱到处都是舞台", "今天的每一次心跳都充满朝气", "把喜欢的心意写在便签角上", "微风吹过的午后最适合听歌", "星光总会照亮认真生活的你", "不管几岁都要做闪亮的主角", "在心中默念三遍推的名字", "所有的等待都会在相见时值得", "这一首是今天的心灵充电桩", "手灯切到担当色好运自然来", "为每一个小小的进步鼓鼓掌", "今天偶遇的好事都像魔法一样", "把疲惫留在昨晚今天元气重置", "同担的应援声是最棒的和弦", "台下挥动的双手是热爱的证明", "这一刻推的笑容只为你绽放", "在歌词书签上划下心动标记", "推的专属歌单让好心情满电", "今晚做个甜甜的偶像现场梦", "把最纯粹的喜欢珍藏在口袋", "你的应援声早已传到了舞台", "今天也是无可替代的心动之日"];
  const memberLucky=mem=>{
   if(!/^#[0-9a-fA-F]{6}$/.test(mem&&mem.hex||''))return null;
   const raw=String(mem.color||'');
@@ -1241,18 +1326,40 @@ if(P=='draw'){
   else if(/白/.test(raw))name='白';
   return name?{hex:mem.hex,name}:null;
  };
- const rollFortune=(mode,item)=>{
-  const color=mode=='member'&&memberLucky(item)||PASTELS[randIndex(PASTELS.length)];
-  const kichi=KICHI_POOL[randIndex(KICHI_POOL.length)];
-  return {kichi,color:color.hex,colorName:color.name,item:LUCK_ITEMS[randIndex(LUCK_ITEMS.length)],action:LUCK_ACTS[randIndex(LUCK_ACTS.length)],motto:LUCK_MOTTOS[randIndex(LUCK_MOTTOS.length)]};
+ const rollFortune=(mode,item,rngFunc)=>{
+  const r=rngFunc||Math.random;
+  const pick=arr=>arr[Math.floor(r()*arr.length)];
+  const color=mode=='member'&&memberLucky(item)||pick(PASTELS);
+  const t=FORTUNES_1000[Math.floor(r()*FORTUNES_1000.length)];
+  const kichi=['大吉','中吉','小吉','吉','末吉'][t[1]];
+  const tagObj={zh:t[2],ja:t[3],en:t[4],sub:{zh:t[5],ja:t[6],en:t[7]}};
+  const mottoObj={zh:t[8],ja:t[9],en:t[10]};
+  return {
+   no:t[0],
+   kichi,
+   color:color.hex,
+   colorName:color.name,
+   item:pick(LUCK_ITEMS),
+   action:pick(LUCK_ACTS),
+   motto:t[8],
+   mottoObj,
+   tagline:t[2],
+   taglineObj:tagObj
+  };
  };
  const packFortune=f=>{
   if(!f||typeof f!='object')return null;
   const color=/^#[0-9a-fA-F]{6}$/.test(f.color||'')?f.color:'';
   const cut=(s,n)=>typeof s==='string'?s.trim().slice(0,n):'';
-  const colorName=cut(f.colorName,16),item=cut(f.item,40),action=cut(f.action,40),motto=cut(f.motto,48);
+  const colorName=cut(f.colorName,16),item=cut(f.item,40),action=cut(f.action,40),motto=cut(f.motto,128);
   const kichi=['大吉','中吉','小吉','吉','末吉'].includes(f.kichi)?f.kichi:(f.kichi?cut(f.kichi,8):'吉');
-  return color&&colorName&&item&&action&&motto?{kichi,color,colorName,item,action,motto}:null;
+  if(!color||!colorName||!item||!action||!motto)return null;
+  const out={kichi,color,colorName,item,action,motto};
+  if(typeof f.no==='number')out.no=f.no;
+  if(f.taglineObj&&typeof f.taglineObj==='object')out.taglineObj=f.taglineObj;
+  else if(f.tagline)out.tagline=cut(f.tagline,64);
+  if(f.mottoObj&&typeof f.mottoObj==='object')out.mottoObj=f.mottoObj;
+  return out;
  };
  st=load();
  const todayDraw=m=>{
@@ -1315,8 +1422,9 @@ if(P=='draw'){
    :`${view.day} ${l==='en'?'Oshi Draw':l==='ja'?'推し引き':'抽推'}\n${view.item.name}${view.item.kana?'（'+view.item.kana+'）':''}`;
   const kMeta=getKMeta(view.fortune&&view.fortune.kichi);
   const kLabel=kMeta.label[l]||view.fortune?.kichi||'';
-  const kichi=kLabel?`【${kLabel}】`:'';
-  const motto=view.fortune?`\n${kichi}${trMotto(view.fortune.motto,l)}`:'';
+  const noStr=view.fortune?.no?(l==='en'?`No.${view.fortune.no} `: `第${view.fortune.no}番 `):'';
+  const kichi=kLabel?`【${noStr}${kLabel}】`:'';
+  const motto=view.fortune?`\n${kichi} 「${trMotto(view.fortune.motto,l,view.fortune)}」`:'';
   const siteName=l==='en'?'iLiFE! Fan Database':l==='ja'?'iLiFE! 非公式ファンサイト':'iLiFE! 应援资料库';
   return `${siteName}\n${who}${motto}`;
  };
@@ -1436,7 +1544,7 @@ if(P=='draw'){
    const kMeta=getKMeta(kichi);
    y+=10;x.textAlign='center';x.textBaseline='middle';x.fillStyle='#e4007f';x.font='700 16px '+F;x.letterSpacing='4px';x.fillText(t.canvasFortuneHead,W/2,y);x.letterSpacing='0px';
    y+=34;x.font='700 22px '+F;
-   const mottoText=trMotto(fort.motto,l);
+   const mottoText=trMotto(fort.motto,l,fort);
    const qLines=linesOf('700 22px','「'+mottoText+'」',W-240).slice(0,2);
    const qh=qLines.length*30+36;
    x.fillStyle='#fff6fb';roundRect(x,86,y-24,W-172,qh,18);x.fill();
@@ -1459,7 +1567,8 @@ if(P=='draw'){
     }
     x.fillText(value,W-112,y+1);y+=54;
    };
-   luckRow(t.canvasFortuneRow,kMeta.label[l]||kichi,null,true);
+   const kichiDisplay=(fort.no?(l==='en'?`No.${fort.no} `: `第${fort.no}番 `):'')+(kMeta.label[l]||kichi);
+   luckRow(t.canvasFortuneRow,kichiDisplay,null,true);
    luckRow(t.keyColor,trColor(fort.colorName,l),fort.color);
    luckRow(t.keyItem,trItem(fort.item,l));
    luckRow(t.keyAction,trAct(fort.action,l));
@@ -1569,8 +1678,9 @@ if(P=='draw'){
      <div class="presc-top">
       <div class="seal-box">${sealSvg(kichi,view.first&&isToday,sealCol,l)}</div>
       <div class="fortune-side">
-       <div class="fortune-tagline" style="color:${sealCol}">${esc(kMeta.tagline[l]||kMeta.tagline.zh)}</div>
-       <div class="fortune-tagline-jp">${esc(kMeta.subTag[l]||kMeta.subTag.zh)}</div>
+       ${view.fortune&&view.fortune.no?`<div class="fortune-no" style="font-weight:700;font-size:.82rem;letter-spacing:1.5px;color:${sealCol};opacity:.85;margin-bottom:2px">${l==='en'?`No. ${view.fortune.no}`:`第 ${view.fortune.no} 番`}</div>`:''}
+       <div class="fortune-tagline" style="color:${sealCol}">${esc((view.fortune&&view.fortune.taglineObj)?(view.fortune.taglineObj[l]||view.fortune.taglineObj.zh):(kMeta.tagline[l]||kMeta.tagline.zh))}</div>
+       <div class="fortune-tagline-jp">${esc((view.fortune&&view.fortune.taglineObj&&view.fortune.taglineObj.sub)?(view.fortune.taglineObj.sub[l]||view.fortune.taglineObj.sub.zh):(kMeta.subTag[l]||kMeta.subTag.zh))}</div>
        <span class="fortune-badge" style="background:${kMeta.soft};color:${sealCol}">
         ${kMeta.emoji} ${esc(kMeta.label[l]||kichi)} · ${isSong?t.songOfToday:t.memOfToday}
        </span>
@@ -1592,7 +1702,7 @@ if(P=='draw'){
      </div>
      <div class="rx-list">
       <div class="rx-item is-phrase">
-       <div class="phrase-cn">「${esc(trMotto(view.fortune.motto,l))}」</div>
+       <div class="phrase-cn">「${esc(trMotto(view.fortune.motto,l,view.fortune))}」</div>
        <div class="phrase-jp">${isSong?t.phraseTitleSong:t.phraseTitleMem}</div>
        <span class="phrase-tag">${t.phraseTag}</span>
       </div>
@@ -1705,11 +1815,11 @@ if(P=='draw'){
   m.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{if(busy||b.dataset.mode==st.prefs.mode)return;st.prefs.mode=b.dataset.mode;view=initTodayView(st.prefs.mode);save();render()});
   m.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{if(busy)return;st.prefs.songFilter=b.dataset.sf;if(view&&view.mode=='song'&&!pool().some(s=>s.id==view.item.id))view=null;save();render()});
   const former=$('#drawFormer');if(former)former.onclick=()=>{if(busy)return;st.prefs.includeFormer=!st.prefs.includeFormer;if(view&&view.mode=='member'&&!pool().some(mem=>mem.id==view.item.id))view=null;save();render()};
-  const go=$('#drawGo');if(go)go.onclick=()=>{
+  const go=$('#drawGo');if(go)go.onclick=(e)=>{
    if(drawnToday){
     const r=$('#result');if(r)r.scrollIntoView({behavior:'smooth'});
    }else{
-    draw();
+    draw(e);
    }
   };
   const mascot=$('#mascotHero');if(mascot)mascot.onclick=()=>{
@@ -1764,8 +1874,10 @@ if(P=='draw'){
   };
   imgDone(m);
  };
- const draw=async()=>{
+ const draw=async(evt)=>{
   if(busy)return;
+  recordPos(evt);
+  const rng=createSpatioTemporalRng(evt);
   const mode=st.prefs.mode;
   const l=currentLang, t=DRAW_I18N[l]||DRAW_I18N.zh;
   if(hasDrawnToday(mode)){
@@ -1779,11 +1891,11 @@ if(P=='draw'){
   const reduce=reduceMotion();
   try{
    if(!reduce){shaking=true;render();window.scrollTo({top:0,behavior:'smooth'});await wait(1900)}
-   const item=list[randIndex(list.length)];
+   const item=list[Math.floor(rng()*list.length)];
    const day=jstDay();
    st.first[mode]=day;
    const at=new Date().toISOString();
-   const fortune=rollFortune(mode,item);
+   const fortune=rollFortune(mode,item,rng);
    st.history[mode]=[{id:item.id,day,at,first:true,fortune},...st.history[mode]].slice(0,20);
    save();
    shaking=false;
