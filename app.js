@@ -43,6 +43,24 @@ const LANG_OPTS=[
 ];
 const getLangOpt=code=>LANG_OPTS.find(o=>o.code===code)||LANG_OPTS[0];
 
+const updateLogoText=()=>{
+ const sm=document.querySelector('.logo small');if(!sm)return;
+ const l=currentLang;
+ sm.textContent=l==='ja'?'FAN DATABASE ・ 非公式ファンサイト':l==='en'?'FAN DATABASE ・ UNOFFICIAL FAN SITE':'FAN DATABASE · 应援资料库';
+};
+
+const updateFooter=()=>{
+ const f=document.querySelector('footer');if(!f)return;
+ const l=currentLang;
+ if(l==='ja'){
+  f.innerHTML='<b>iLiFE! FAN DATABASE</b>非公式ファンサイト。画像の著作権は iLiFE! / HEROINES / imaginate および原権利者に帰属します。出所：@iLiFE_official、ilife-heroines.com、日本語版ウィキペディア。';
+ }else if(l==='en'){
+  f.innerHTML='<b>iLiFE! FAN DATABASE</b>Unofficial fan database. Image copyrights belong to iLiFE! / HEROINES / imaginate & original creators. Sources: @iLiFE_official, ilife-heroines.com, Wikipedia.';
+ }else{
+  f.innerHTML='<b>iLiFE! FAN DATABASE</b>非官方粉丝站。图片版权归 iLiFE! / HEROINES / imaginate 及原发布者所有，均标注来源。数据来源：@iLiFE_official、ilife-heroines.com（Wayback 存档）、日文维基百科。';
+ }
+};
+
 const updateHeaderNav=()=>{
  const l=currentLang,cur=getLangOpt(l);
  document.querySelectorAll('nav a').forEach((a,i)=>{
@@ -54,6 +72,8 @@ const updateHeaderNav=()=>{
  document.querySelectorAll('.lang-dd-item').forEach(b=>{
   b.classList.toggle('on',b.dataset.lang===l);
  });
+ updateLogoText();
+ updateFooter();
 };
 
 const renderLangDd=()=>{
@@ -111,6 +131,7 @@ window.setLang=(lang)=>{
 };
 
 document.body.insertAdjacentHTML('beforeend',`<footer><b>iLiFE! FAN DATABASE</b>非官方粉丝站。图片版权归 iLiFE! / HEROINES / imaginate 及原发布者所有，均标注来源。数据来源：@iLiFE_official、ilife-heroines.com（Wayback 存档）、日文维基百科。</footer><div id=lb><span class=x>×</span><span class=pv>‹</span><img><p></p><span class=nx>›</span></div>`);
+updateLogoText();updateFooter();
 
 /* iLiFE! 官方吉祥物「アイラビット」悬浮抽签入口（可拖动、卡哇伊交互） */
 (()=>{
@@ -943,34 +964,66 @@ if(P=='draw'){
  };
  const KICHI_POOL=['大吉','大吉','大吉','大吉','中吉','中吉','中吉','中吉','中吉','小吉','小吉','小吉','小吉','吉','吉','吉','吉','末吉','末吉','末吉'];
  const KICHI_META={
-  '大吉':{emoji:'💖',soft:'#ffe6f2',deep:'#e4007f',label:{zh:'大吉',ja:'大吉',en:'Great Blessing'},tagline:{zh:'心跳满开 · 超绝大吉',ja:'胸の高鳴りが止まらない、最高の１日。',en:'Full Heartbeat · Super Lucky Day'},taglineJp:{zh:'胸の高鳴りが止まらない、最高の１日。',ja:'心拍数全開、きらめく大吉の光。',en:'胸の高鳴りが止まらない、最高の１日。'}},
-  '中吉':{emoji:'✨',soft:'#fff0f6',deep:'#d11b75',label:{zh:'中吉',ja:'中吉',en:'Middle Blessing'},tagline:{zh:'闪闪发光 · 好事接近',ja:'キラキラした瞬間が、静かに近づいてる。',en:'Sparkling Vibes · Joy Is Approaching'},taglineJp:{zh:'キラキラした瞬間が、静かに近づいてる。',ja:'ときめきと幸運がそっと隣に。',en:'キラキラした瞬間が、静かに近づいてる。'}},
-  '小吉':{emoji:'🌸',soft:'#fff4e6',deep:'#e86a17',label:{zh:'小吉',ja:'小吉',en:'Small Blessing'},tagline:{zh:'温柔微风 · 小小幸福',ja:'小さな幸せが、ポケットに届く日。',en:'Gentle Breeze · Pocketful of Joy'},taglineJp:{zh:'小さな幸せが、ポケットに届く日。',ja:'やさしい風とともに届くぬくもり。',en:'小さな幸せが、ポケットに届く日。'}},
-  '吉':  {emoji:'🍀',soft:'#e8f8f5',deep:'#198754',label:{zh:'吉',ja:'吉',en:'Blessing'},tagline:{zh:'顺风而行 · 稳定好运',ja:'一歩ずつ、推しと一緒に進もう。',en:'Steady Luck · Step by Step With Your Oshi'},taglineJp:{zh:'一歩ずつ、推しと一緒に進もう。',ja:'おだやかな幸運が満ちる良き日。',en:'一歩ずつ、推しと一緒に进もう。'}},
-  '末吉':{emoji:'🌙',soft:'#f3f0ff',deep:'#6f42c1',label:{zh:'末吉',ja:'末吉',en:'Future Blessing'},tagline:{zh:'充能之日 · 放松听歌',ja:'推しの歌を聴いて、ゆっくり充電しよう。',en:'Recharge Day · Relax to Your Favorite Tunes'},taglineJp:{zh:'推しの歌を聴いて、ゆっくり充電しよう。',ja:'これからの幸運をあたためるチャージ日。',en:'推しの歌を聴いて、ゆっくり充電しよう。'}}
+  '大吉':{
+   emoji:'💖',soft:'#ffe6f2',deep:'#e4007f',
+   label:{zh:'大吉',ja:'大吉',en:'Great Blessing'},
+   tagline:{zh:'心跳满开 · 超绝大吉',ja:'胸の高鳴りが止まらない、最高の１日。',en:'Full Heartbeat · Super Lucky Day'},
+   subTag:{zh:'胸口的小鹿乱撞停不下来，最棒的一天。',ja:'心拍数全開、きらめく大吉の光。',en:"Can't stop your racing heart on this wonderful day."}
+  },
+  '中吉':{
+   emoji:'✨',soft:'#fff0f6',deep:'#d11b75',
+   label:{zh:'中吉',ja:'中吉',en:'Middle Blessing'},
+   tagline:{zh:'闪闪发光 · 好事接近',ja:'キラキラした瞬間が、静かに近づいてる。',en:'Sparkling Moments · Joy Is Approaching'},
+   subTag:{zh:'闪闪发光的瞬间，正在静静向你靠近。',ja:'ときめきと幸運がそっと隣に。',en:'Quietly drawing near with warmth and magic.'}
+  },
+  '小吉':{
+   emoji:'🌸',soft:'#fff4e6',deep:'#e86a17',
+   label:{zh:'小吉',ja:'小吉',en:'Small Blessing'},
+   tagline:{zh:'温柔微风 · 小小幸福',ja:'小さな幸せが、ポケットに届く日。',en:'Gentle Breeze · Pocketful of Joy'},
+   subTag:{zh:'微小的幸福，悄悄落入衣兜的日子。',ja:'やさしい風とともに届くぬくもり。',en:'Tiny sparks of happiness delivered right to you.'}
+  },
+  '吉':{
+   emoji:'🍀',soft:'#e8f8f5',deep:'#198754',
+   label:{zh:'吉',ja:'吉',en:'Blessing'},
+   tagline:{zh:'顺风而行 · 稳定好运',ja:'一歩ずつ、推しと一緒に進もう。',en:'Steady Luck · Step by Step With Your Oshi'},
+   subTag:{zh:'一步一步，和推一起稳步向前走。',ja:'おだやかな幸運が満ちる良き日。',en:'Moving forward gently, side by side with your oshi.'}
+  },
+  '末吉':{
+   emoji:'🌙',soft:'#f3f0ff',deep:'#6f42c1',
+   label:{zh:'末吉',ja:'末吉',en:'Future Blessing'},
+   tagline:{zh:'充能之日 · 放松听歌',ja:'推しの歌を聴いて、ゆっくり充電しよう。',en:'Recharge Day · Relax to Your Favorite Tunes'},
+   subTag:{zh:'听着推的歌声，给心灵慢慢充满电。',ja:'これからの幸運をあたためるチャージ日。',en:"Listen to your oshi's voice and recharge your energy."}
+  }
  };
+ const STATUS_MAP={
+  '现役':{zh:'现役',ja:'現役',en:'Active'},
+  '前成员':{zh:'前成员',ja:'元メンバー',en:'Former'},
+  '元メンバー':{zh:'前成员',ja:'元メンバー',en:'Former'},
+  '毕业':{zh:'毕业',ja:'卒業',en:'Graduated'}
+ };
+ const trStatus=(s,l=currentLang)=>(s&&STATUS_MAP[s]?.[l])||s||'';
  const DRAW_I18N={
   zh:{
    pageTitle:'DRAW · 抽签 | iLiFE! 应援资料库',
    crumb:'首页',crumbDraw:'抽签',
    eyebrow:'✿ 非官方粉丝站 · 粉丝制作',
-   heroTitleMemJp:'今日の推しを、処方します。',
-   heroTitleMemSub:'为你开一份，今天的好运处方 💕',
-   heroTitleSongJp:'今日の曲を、処方します。',
-   heroTitleSongSub:'为你开一首，今天的心动旋律 🎵',
+   heroTitleMem:'为你开一份，今日的好运处方 💕',
+   heroTitleMemSub:'推的专属心动能量，今日份请签收 ♡',
+   heroTitleSong:'为你开一首，今日的心动旋律 🎵',
+   heroTitleSongSub:'音乐的治愈节拍，今日份请奏响 ♡',
    heroDesc:'每天一次，抽出一份属于你的 iLiFE! 好运处方。<br>收下小小的幸福，感受今天的推与音乐带来的好运。♡',
    tabMember:'抽推',tabSong:'抽歌',tagDone:'已签',tagPending:'待抽',
    filterAll:'全部',filterGroup:'团体曲',filterSolo:'个人曲',filterFormer:'🌸 已含前成员',filterActive:'✨ 仅现役',
    mascotBubbleDone:'今日已求签 ✨',mascotBubblePending:'今日抽签 💕',
    mascotTip:'今日抽签（拖动调整位置，点击求签）',
-   mascotHeroTitle:'アイラビット ♡ iLiFE! 官方吉祥物',mascotHeroBadge:'🐰 アイラビット',
-   mascotToast:'アイラビット: 今天也要和推一起元气满满！💕',
+   mascotHeroTitle:'爱兔 ♡ iLiFE! 官方吉祥物',mascotHeroBadge:'🐰 爱兔',
+   mascotToast:'爱兔: 今天也要和推一起元气满满！💕',
    ctaDrawMem:'🌸 抽取今日之推 ♡',ctaDrawSong:'🎵 抽取今日之歌 ♡',ctaDone:'✨ 今日处方已签收 ♡',
    noteDone:'今日处方已开具 ✨ 明日 0:00 (JST) 刷新',notePending:'今日处方尚未签收（每日限定 1 次）',
-   shakingHint:'正在摇出今日签文',shakingSub:'アイラビット正在摇晃签筒，请稍候片刻 ♡',
+   shakingHint:'正在摇出今日签文',shakingSub:'爱兔正在摇晃签筒，请稍候片刻 ♡',
    resTitleSong:"TODAY'S SONG · 今日之歌处方 🎵",resTitleMem:"TODAY'S PRESCRIPTION · 今日之推处方 💕",
    songOfToday:'今日之歌 🎵',memOfToday:'今日之推 💕',noPhoto:'无官方图片',
-   phraseTitleSong:'来自旋律的今日处方笺 🎵',phraseTitleMem:'来自アイラビット的心动留言 💕',phraseTag:'✎ 今日一言处方',
+   phraseTitleSong:'来自旋律的今日处方笺 🎵',phraseTitleMem:'来自爱兔的心动留言 💕',phraseTag:'✎ 今日一言处方',
    keyColor:'幸运颜色',keyItem:'幸运物品',keyAction:'今日行动',
    shareCtaHead:'💌 今天的护身符，要分享给同担吗？',shareCtaSub:'把今天的专属处方签存下来，分享给同担或者留作手机壁纸 ♡',btnSave:'保存处方签 📸',
    btnSwitchViewMem:'查看今日之推 💕 ↗',btnSwitchViewSong:'查看今日之歌 🎵 ↗',
@@ -993,9 +1046,9 @@ if(P=='draw'){
    pageTitle:'DRAW · おみくじ | iLiFE! 非公式ファンサイト',
    crumb:'ホーム',crumbDraw:'おみくじ',
    eyebrow:'✿ 非公式ファンサイト ・ ファンメイド',
-   heroTitleMemJp:'今日の推しを、処方します。',
+   heroTitleMem:'今日の推しを、処方します。',
    heroTitleMemSub:'あなたへ届ける、本日の幸運処方箋 💕',
-   heroTitleSongJp:'今日の曲を、処方します。',
+   heroTitleSong:'今日の曲を、処方します。',
    heroTitleSongSub:'あなたへ届ける、本日のときめきメロディ 🎵',
    heroDesc:'1日1回、あなただけの iLiFE! お守り処方箋をお届け。<br>ちいさな幸せを受け取って、推しと音楽のパワーで素敵な1日を。♡',
    tabMember:'推し引き',tabSong:'曲引き',tagDone:'処方済',tagPending:'未処方',
@@ -1032,10 +1085,10 @@ if(P=='draw'){
    pageTitle:'DRAW · Fortune | iLiFE! Fan Database',
    crumb:'Home',crumbDraw:'Fortune',
    eyebrow:'✿ Unofficial Fan Site ・ Fan-Made',
-   heroTitleMemJp:'今日の推しを、処方します。',
-   heroTitleMemSub:'Your daily dosage of happiness & good luck 💕',
-   heroTitleSongJp:'今日の曲を、処方します。',
-   heroTitleSongSub:'Your daily rhythm to light up the day 🎵',
+   heroTitleMem:'Prescribing Your Oshi of the Day 💕',
+   heroTitleMemSub:'Your daily dose of love, luck & happiness ♡',
+   heroTitleSong:'Prescribing Your Song of the Day 🎵',
+   heroTitleSongSub:'Your daily rhythm to light up your heart ♡',
    heroDesc:'Once a day, receive your personal iLiFE! lucky prescription.<br>Embrace a little joy and let your oshi & music brighten your day. ♡',
    tabMember:'Draw Oshi',tabSong:'Draw Song',tagDone:'Done',tagPending:'Ready',
    filterAll:'All',filterGroup:'Group Songs',filterSolo:'Solo Songs',filterFormer:'🌸 Incl. Former',filterActive:'✨ Active Only',
@@ -1117,7 +1170,43 @@ if(P=='draw'){
  const trItem=(item,l=currentLang)=>(l!=='zh'&&I18N_ITEMS[item]?.[l])||item||'';
  const trAct=(act,l=currentLang)=>(l!=='zh'&&I18N_ACTS[act]?.[l])||act||'';
  const trMotto=(motto,l=currentLang)=>(l!=='zh'&&I18N_MOTTOS[motto]?.[l])||motto||'';
- const trColor=(c,l=currentLang)=>(l!=='zh'&&I18N_COLORS[c]?.[l])||c||'';
+ const trColor=(c,l=currentLang)=>{
+  if(!c)return '';
+  const s=String(c).trim();
+  if(l==='zh'){
+   if(s==='粉（ピンク）')return '粉';
+   if(s==='橙（オレンジ）')return '橙';
+   if(s==='桃（粉）')return '桃';
+   if(s==='緑')return '绿';
+   if(s==='黄→緑')return '黄→绿';
+   if(s==='黒→緑')return '黑→绿';
+   return s;
+  }
+  if(l==='ja'){
+   if(s==='粉（ピンク）'||s==='粉')return 'ピンク';
+   if(s==='橙（オレンジ）'||s==='橙')return 'オレンジ';
+   if(s==='桃（粉）'||s==='桃')return '桃';
+   if(s==='绿')return '緑';
+   if(s==='黄→绿')return '黄→緑';
+   if(s==='黑→绿')return '黒→緑';
+   return (I18N_COLORS[s]?.ja)||s;
+  }
+  if(l==='en'){
+   if(s==='粉（ピンク）'||s==='粉'||s==='桃（粉）'||s==='桃')return 'Pink';
+   if(s==='橙（オレンジ）'||s==='橙')return 'Orange';
+   if(s==='水色')return 'Light Blue';
+   if(s==='赤')return 'Red';
+   if(s==='紫')return 'Purple';
+   if(s==='白')return 'White';
+   if(s==='緑'||s==='绿')return 'Green';
+   if(s==='黄')return 'Yellow';
+   if(s==='青')return 'Blue';
+   if(s==='黄→緑'||s==='黄→绿')return 'Yellow → Green';
+   if(s==='黒→緑'||s==='黑→绿')return 'Black → Green';
+   return (I18N_COLORS[s]?.en)||s;
+  }
+  return s;
+ };
 
  const bottleSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 280" class="bottle-svg"><defs><linearGradient id="omikujiGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffffff" stop-opacity=".96"/><stop offset="50%" stop-color="#fff0f6" stop-opacity=".94"/><stop offset="100%" stop-color="#ffd6e8" stop-opacity=".96"/></linearGradient><linearGradient id="omikujiCap" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff99c4"/><stop offset="100%" stop-color="#e4007f"/></linearGradient></defs><ellipse cx="110" cy="266" rx="62" ry="11" fill="#e4007f" opacity=".12"/><path d="M52 96 q0 -18 18 -22 h80 q18 4 18 22 v132 q0 30 -30 30 h-56 q-30 0 -30 -30Z" fill="url(#omikujiGlass)" stroke="#ffb3d6" stroke-width="3"/><g transform="translate(102, 34) rotate(-8)"><rect x="0" y="0" width="16" height="54" rx="3" fill="#fff" stroke="#ff8ab7" stroke-width="2"/><text x="8" y="24" text-anchor="middle" font-size="11" font-weight="900" fill="#e4007f" font-family="'Zen Maru Gothic',sans-serif">吉</text><line x1="3" y1="32" x2="13" y2="32" stroke="#ffb3d6" stroke-width="1.5"/></g><g opacity=".85"><circle cx="80" cy="180" r="10" fill="#ffb7d5"/><circle cx="114" cy="196" r="12" fill="#ffd0e6"/><circle cx="142" cy="178" r="9" fill="#ffe08a"/><circle cx="96" cy="220" r="11" fill="#b7e4c7"/><circle cx="132" cy="222" r="9" fill="#d4b4e8"/></g><path d="M88 146 l3 5 l5 3 l-5 3 l-3 5 l-3 -5 l-5 -3 l5 -3 Z" fill="#fff" opacity=".9"/><path d="M136 138 l2 4 l4 2 l-4 2 l-2 4 l-2 -4 l-4 -2 l4 -2 Z" fill="#fff" opacity=".85"/><rect x="66" y="120" width="88" height="70" rx="12" fill="#ffffff" stroke="#ffd1e6" stroke-width="2"/><text x="110" y="150" text-anchor="middle" font-size="20" fill="#e4007f" font-weight="900" font-family="'Zen Maru Gothic',sans-serif">御神籤</text><text x="110" y="172" text-anchor="middle" font-size="9.5" fill="#ff8ab7" font-weight="700" letter-spacing="2">iLiFE! DRAW</text><rect x="76" y="56" width="68" height="40" rx="12" fill="url(#omikujiCap)"/><rect x="70" y="88" width="80" height="12" rx="6" fill="#e4007f"/><rect x="86" y="64" width="10" height="22" rx="5" fill="#ffffff" opacity=".6"/></svg>`;
  const sealSvg=(kichi,first,col,l=currentLang)=>{
@@ -1318,7 +1407,9 @@ if(P=='draw'){
   x.restore();
   x.restore();
   let y=frameY+frameH+56;
-  const kind=song?(item.member?'个人曲 · '+item.member:'团体曲'):((item.status||'')+(item.color?' · '+item.color:''));
+  const kind=song
+   ? (item.member?(l==='en'?'Solo · '+item.member:l==='ja'?'ソロ曲 ・ '+item.member:'个人曲 · '+item.member):(l==='en'?'Group Song':l==='ja'?'グループ曲':'团体曲'))
+   : ((trStatus(item.status,l)||'')+(item.color?' · '+trColor(item.color,l):''));
   x.textAlign='center';x.fillStyle='#e4007f';x.font='700 20px '+F;x.fillText(kind,W/2,y);y+=40;
   if(!song){
    x.fillStyle=hex;roundRect(x,250,y-8,W-500,12,6);x.fill();
@@ -1337,6 +1428,7 @@ if(P=='draw'){
   };
   row(song?(l==='en'?'Type':l==='ja'?'区分':'类型'):(l==='en'?'Role':l==='ja'?'担当':'担当'),song?(item.member?(l==='en'?'Solo · '+item.member:l==='ja'?'ソロ曲 ・ '+item.member:'个人曲 · '+item.member):(l==='en'?'Group Song':l==='ja'?'グループ曲':'团体曲')):(item.color?(l==='en'?'Color: '+trColor(item.color,l):l==='ja'?'担当色: '+trColor(item.color,l):'担当色: '+item.color):(l==='en'?'Member':l==='ja'?'メンバー':'成员')));
   if(song&&item.release)row(l==='en'?'Release':l==='ja'?'リリース':'发布时期',item.release);
+  if(!song&&item.status)row(l==='en'?'Status':l==='ja'?'在籍状況':'在籍状态',trStatus(item.status,l));
   if(!song&&item.join)row(l==='en'?'Joined':l==='ja'?'加入日':'加入时间',item.join);
   const fort=view.fortune;
   if(fort){
@@ -1413,7 +1505,7 @@ if(P=='draw'){
   const hero=`<div class="hero">
    <p class="hero-eyebrow">${t.eyebrow}</p>
    <h1 class="hero-title">
-    <span class="jp">${mode=='member'?t.heroTitleMemJp:t.heroTitleSongJp}</span>
+    <span class="jp">${mode=='member'?t.heroTitleMem:t.heroTitleSong}</span>
     <span class="cn">${mode=='member'?t.heroTitleMemSub:t.heroTitleSongSub}</span>
    </h1>
    <p class="hero-desc">${t.heroDesc}</p>
@@ -1455,8 +1547,8 @@ if(P=='draw'){
    const itemSrc=isSong?songSrc(item):memberSrc(item);
    const sub=isSong
     ?`${item.member?(l==='en'?'Solo · '+item.member:l==='ja'?'ソロ曲 ・ '+item.member:'个人曲 · '+item.member):(l==='en'?'Group Song':l==='ja'?'グループ曲':'团体曲')}${item.duration?' · '+item.duration:''}`
-    :`${item.status||''}${item.color?' · '+trColor(item.color,l):''}${item.catch?' · '+item.catch:''}`;
-   const no=isSong?(item.release?(l==='en'?'Release: '+item.release:l==='ja'?'リリース: '+item.release:'作品: '+item.release):'iLiFE! SONG'):(item.color?(l==='en'?'Color: '+trColor(item.color,l):l==='ja'?'担当色: '+trColor(item.color,l):'担当色: '+item.color):'iLiFE! MEMBER');
+    :`${trStatus(item.status,l)}${item.color?' · '+trColor(item.color,l):''}${item.catch?' · '+item.catch:''}`;
+   const no=isSong?(item.release?(l==='en'?'Release: '+item.release:l==='ja'?'リリース: '+item.release:'作品: '+item.release):'iLiFE! SONG'):(item.color?(l==='en'?'Color: '+trColor(item.color,l):l==='ja'?'担当色: '+trColor(item.color,l):'担当色: '+item.color):(l==='en'?'iLiFE! MEMBER':l==='ja'?'iLiFE! メンバー':'iLiFE! 成员'));
    const kichi=(view.fortune&&view.fortune.kichi)||'吉';
    const kMeta=getKMeta(kichi);
    const hex=!isSong?safeHex(item.hex):'#e4007f';
@@ -1470,7 +1562,7 @@ if(P=='draw'){
     :`<button type="button" class="btn primary" id="drawSwitchOther">${isSong?t.btnSwitchDrawMem:t.btnSwitchDrawSong}</button>`;
    stage=`<div class="result" id="result">
     <div class="result-head">
-     <div class="result-date"><b>${esc(dl.date)}</b><span>（${esc(dl.wd)}）</span></div>
+     <div class="result-date"><b>${esc(dl.date)}</b><span>${esc(l==='ja'?`（${dl.wd}）`:l==='en'?` (${dl.wd})`:` · ${dl.wd}`)}</span></div>
      <div class="result-title">${isSong?t.resTitleSong:t.resTitleMem}</div>
     </div>
     <article class="prescription${anim?' is-in':''}" style="--kichi-col:${sealCol};--kichi-deep:${kMeta.deep};--kichi-soft:${kMeta.soft}">
@@ -1478,7 +1570,7 @@ if(P=='draw'){
       <div class="seal-box">${sealSvg(kichi,view.first&&isToday,sealCol,l)}</div>
       <div class="fortune-side">
        <div class="fortune-tagline" style="color:${sealCol}">${esc(kMeta.tagline[l]||kMeta.tagline.zh)}</div>
-       <div class="fortune-tagline-jp">${esc(kMeta.taglineJp[l]||kMeta.taglineJp.zh)}</div>
+       <div class="fortune-tagline-jp">${esc(kMeta.subTag[l]||kMeta.subTag.zh)}</div>
        <span class="fortune-badge" style="background:${kMeta.soft};color:${sealCol}">
         ${kMeta.emoji} ${esc(kMeta.label[l]||kichi)} · ${isSong?t.songOfToday:t.memOfToday}
        </span>
@@ -1573,7 +1665,7 @@ if(P=='draw'){
     </div>
     <div class="pcard-meta">
      <div class="pcard-name">${esc(label)}</div>
-     <div class="pcard-sub">${esc(dl.date)}（${esc(dl.wd)}）</div>
+     <div class="pcard-sub">${esc(dl.full)}</div>
      <span class="pcard-badge" style="background:${kMeta.soft};color:${kMeta.deep}">${kMeta.emoji} ${esc(kMeta.label[l]||kichi)}${isHDay?` ${t.histTodayTag}`:''}</span>
     </div>
    </div>`;
