@@ -26,14 +26,14 @@ window.getLang=()=>currentLang;
 try{document.documentElement.lang=(currentLang==='zh'?'zh-CN':currentLang)}catch(e){}
 
 const NAV=[
- ['index','home','HOME',{zh:'首页',ja:'ホーム',en:'Home'}],
- ['members','members','MEMBER',{zh:'成员',ja:'メンバー',en:'Members'}],
- ['songs','songs','SONG',{zh:'歌曲',ja:'曲一覧',en:'Songs'}],
- ['lives','lives','LIVE',{zh:'公演',ja:'ライブ',en:'Lives'}],
- ['venues','venues','VENUE',{zh:'场地',ja:'会場',en:'Venues'}],
- ['calendar','calendar','SCHEDULE',{zh:'日历',ja:'日程',en:'Calendar'}],
- ['eras','eras','PROFILE',{zh:'时期/公式图',ja:'歴代・公式',en:'Eras'}],
- ['gallery','gallery','PHOTO',{zh:'图库',ja:'写真',en:'Gallery'}]
+ ['index','home',{zh:'首页',ja:'ホーム',en:'Home'}],
+ ['members','members',{zh:'成员',ja:'メンバー',en:'Members'}],
+ ['songs','songs',{zh:'歌曲',ja:'曲一覧',en:'Songs'}],
+ ['lives','lives',{zh:'公演',ja:'ライブ',en:'Lives'}],
+ ['venues','venues',{zh:'场地',ja:'会場',en:'Venues'}],
+ ['calendar','calendar',{zh:'日程',ja:'日程',en:'Calendar'}],
+ ['eras','eras',{zh:'时期',ja:'歴代・公式',en:'Eras'}],
+ ['gallery','gallery',{zh:'图库',ja:'写真',en:'Gallery'}]
 ];
 
 const LANG_OPTS=[
@@ -65,7 +65,7 @@ const updateHeaderNav=()=>{
  const l=currentLang,cur=getLangOpt(l);
  document.querySelectorAll('nav a').forEach((a,i)=>{
   const item=NAV[i];if(!item)return;
-  const span=a.querySelector('span');if(span)span.textContent=item[3][l]||item[3].zh;
+  a.textContent=item[2][l]||item[2].zh;
  });
  const curSpan=document.querySelector('#langDd .lang-dd-cur');
  if(curSpan)curSpan.textContent=cur.short;
@@ -81,7 +81,7 @@ const renderLangDd=()=>{
  return `<div class="lang-dd" id="langDd"><button type="button" class="lang-dd-btn" id="langDdBtn" aria-haspopup="true" aria-expanded="false" title="Language / 语言切换"><span class="lang-dd-globe">🌐</span><span class="lang-dd-cur">${cur.short}</span><span class="lang-dd-arrow">▾</span></button><div class="lang-dd-menu" role="menu">${LANG_OPTS.map(o=>`<button type="button" class="lang-dd-item${currentLang===o.code?' on':''}" data-lang="${o.code}" role="menuitem"><span class="lang-dd-flag">${o.flag}</span><span class="lang-dd-name">${o.name}</span><span class="lang-dd-check">✓</span></button>`).join('')}</div></div>`;
 };
 
-$('header').innerHTML=`<div class=hd><a class=logo href="index.html">iLiFE<b>!</b><small>FAN DATABASE · 应援资料库</small></a><nav>${NAV.map(([f,p,e,c])=>`<a href="${f}.html" class="${p==P?'on':''}">${e}<span>${c[currentLang]||c.zh}</span></a>`).join('')}</nav>${renderLangDd()}<button id=burger aria-label=menu>☰</button></div>`;
+$('header').innerHTML=`<div class=hd><a class=logo href="index.html">iLiFE<b>!</b><small>FAN DATABASE · 应援资料库</small></a><nav>${NAV.map(([f,p,c])=>`<a href="${f}.html" class="${p==P?'on':''}">${c[currentLang]||c.zh}</a>`).join('')}</nav>${renderLangDd()}<button id=burger aria-label=menu>☰</button></div>`;
 $('#burger').onclick=()=>$('nav').classList.toggle('open');
 
 document.addEventListener('click',e=>{
@@ -284,7 +284,7 @@ const galHTML=(list,port)=>`<div class="gal${port?' port':''}">${list.map(gi).jo
 const vl=v=>`<a href="venues.html?v=${encodeURIComponent(v)}">${esc(v)}</a>`;
 const ltag=t=>{const c=t=='ワンマン'?'oneman':t=='主催'?'sponsor':t=='生誕祭'?'bday':t=='フェス'?'fes':t=='リリイベ'?'release':'';return `<span class="live-tag ${c}">${esc(t||'対バン')}</span>`};
 const ltab=a=>`<div class="box tbl-wrap"><table><tr><th>日期</th><th>类型</th><th>公演</th><th>时间</th><th>场地</th><th>地区</th><th>出处</th></tr>${a.map(l=>`<tr><td class=d>${l.date}</td><td>${ltag(l.type)}</td><td class=title-cell><a href="lives.html?l=${l.id}" style="color:inherit;text-decoration:none"><b>${esc(l.title)}</b></a>${l.note?`<div class=sub-note>${lk(l.note)}</div>`:''}</td><td style="font-size:12px;color:var(--sub)">${l.open_time||l.start_time?`${l.open_time||'-'} / ${l.start_time||'-'}`:'-'}</td><td>${l.venue=='未确认'?'未确认':vl(l.venue)}</td><td>${esc(l.pref)}</td><td>${l.source?`<a href="${l.source}" target=_blank rel=noopener class=src>出处 ↗</a>`:'-'}</td></tr>`).join('')}</table></div>`;
-const head=(en,zh,crumb)=>`<div class=crumb><a href=index.html>首页</a> / ${crumb||zh}</div><h1 class=ttl>${en}</h1><p class=sub>${zh}</p>`;
+const head=(en,zh,crumb)=>{const l=currentLang,h=l==='ja'?'ホーム':l==='en'?'Home':'首页';return `<div class=crumb><a href=index.html>${h}</a> / ${crumb||zh}</div><h1 class=ttl>${en}</h1><p class=sub>${zh}</p>`};
 const latestPhoto=(I,n)=>{const a=I.filter(i=>i.kind=='individual'&&i.member==n);return a.filter(i=>i.category=='official'&&!(i.source||'').includes('Wayback')).pop()||a.filter(i=>(i.source||'').includes('Wayback')).pop()||a.pop()};
 /* 首页封面只用团体静图：kind=group、不挂成员、非待确认、非插画。个人公式图留在成员页。 */
 const groupStill=i=>!!(i&&i.kind=='group'&&!i.member&&!i.pending&&i.category!='illustration');
