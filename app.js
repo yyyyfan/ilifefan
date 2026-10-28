@@ -770,9 +770,12 @@ if(P=='draw'){
  const empty=()=>({v:1,prefs:{mode:'member',songFilter:'all',includeFormer:false},first:{song:'',member:''},history:{song:[],member:[]}});
  const dayOk=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'');
  const dayLabel=day=>{
-  if(!dayOk(day))return '';
-  const w=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Tokyo',weekday:'short'}).format(new Date(day+'T12:00:00+09:00'));
-  return day.replace(/-/g,'.')+' · '+w;
+  if(!dayOk(day))return {date:'',wd:'',full:'',toString:()=>''};
+  const d=new Date(day+'T12:00:00+09:00');
+  const w=['日','月','火','水','木','金','土'][d.getDay()];
+  const res={date:day.replace(/-/g,'.'),wd:w,full:day.replace(/-/g,'.')+'（'+w+'）'};
+  res.toString=()=>res.full;
+  return res;
  };
  const normalize=raw=>{
   const base=empty();
@@ -808,6 +811,19 @@ if(P=='draw'){
  };
  /* 今日运势词库，改这里即可 */
  const KICHI_POOL=['大吉','大吉','大吉','大吉','中吉','中吉','中吉','中吉','中吉','小吉','小吉','小吉','小吉','吉','吉','吉','吉','末吉','末吉','末吉'];
+ const KICHI_META={
+  '大吉':{emoji:'💖',label:'大吉',tagline:'心跳满开 · 超绝大吉',taglineJp:'胸の高鳴りが止まらない、最高の１日。',soft:'#ffe6f2',deep:'#e4007f'},
+  '中吉':{emoji:'✨',label:'中吉',tagline:'闪闪发光 · 好事接近',taglineJp:'キラキラした瞬間が、静かに近づいてる。',soft:'#fff0f6',deep:'#d11b75'},
+  '小吉':{emoji:'🌸',label:'小吉',tagline:'温柔微风 · 小小幸福',taglineJp:'小さな幸せが、ポケットに届く日。',soft:'#fff4e6',deep:'#e86a17'},
+  '吉':  {emoji:'🍀',label:'吉',  tagline:'顺风而行 · 稳定好运',taglineJp:'一步ずつ、推しと一緒に進もう。',soft:'#e8f8f5',deep:'#198754'},
+  '末吉':{emoji:'🌙',label:'末吉',tagline:'充能之日 · 放松听歌',taglineJp:'推しの歌を聴いて、ゆっくり充電しよう。',soft:'#f3f0ff',deep:'#6f42c1'}
+ };
+ const bottleSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 280" class="bottle-svg"><defs><linearGradient id="omikujiGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffffff" stop-opacity=".96"/><stop offset="50%" stop-color="#fff0f6" stop-opacity=".94"/><stop offset="100%" stop-color="#ffd6e8" stop-opacity=".96"/></linearGradient><linearGradient id="omikujiCap" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff99c4"/><stop offset="100%" stop-color="#e4007f"/></linearGradient></defs><ellipse cx="110" cy="266" rx="62" ry="11" fill="#e4007f" opacity=".12"/><path d="M52 96 q0 -18 18 -22 h80 q18 4 18 22 v132 q0 30 -30 30 h-56 q-30 0 -30 -30Z" fill="url(#omikujiGlass)" stroke="#ffb3d6" stroke-width="3"/><g transform="translate(102, 34) rotate(-8)"><rect x="0" y="0" width="16" height="54" rx="3" fill="#fff" stroke="#ff8ab7" stroke-width="2"/><text x="8" y="24" text-anchor="middle" font-size="11" font-weight="900" fill="#e4007f" font-family="'Zen Maru Gothic',sans-serif">吉</text><line x1="3" y1="32" x2="13" y2="32" stroke="#ffb3d6" stroke-width="1.5"/></g><g opacity=".85"><circle cx="80" cy="180" r="10" fill="#ffb7d5"/><circle cx="114" cy="196" r="12" fill="#ffd0e6"/><circle cx="142" cy="178" r="9" fill="#ffe08a"/><circle cx="96" cy="220" r="11" fill="#b7e4c7"/><circle cx="132" cy="222" r="9" fill="#d4b4e8"/></g><path d="M88 146 l3 5 l5 3 l-5 3 l-3 5 l-3 -5 l-5 -3 l5 -3 Z" fill="#fff" opacity=".9"/><path d="M136 138 l2 4 l4 2 l-4 2 l-2 4 l-2 -4 l-4 -2 l4 -2 Z" fill="#fff" opacity=".85"/><rect x="66" y="120" width="88" height="70" rx="12" fill="#ffffff" stroke="#ffd1e6" stroke-width="2"/><text x="110" y="150" text-anchor="middle" font-size="20" fill="#e4007f" font-weight="900" font-family="'Zen Maru Gothic',sans-serif">御神籤</text><text x="110" y="172" text-anchor="middle" font-size="9.5" fill="#ff8ab7" font-weight="700" letter-spacing="2">iLiFE! DRAW</text><rect x="76" y="56" width="68" height="40" rx="12" fill="url(#omikujiCap)"/><rect x="70" y="88" width="80" height="12" rx="6" fill="#e4007f"/><rect x="86" y="64" width="10" height="22" rx="5" fill="#ffffff" opacity=".6"/></svg>`;
+ const sealSvg=(kichi,first,col)=>{
+  const meta=KICHI_META[kichi]||KICHI_META['吉'];
+  const sealCol=col||meta.deep;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" class="seal-svg"><circle cx="80" cy="80" r="72" fill="${meta.soft}" stroke="${sealCol}" stroke-width="3" stroke-dasharray="6 6"/><circle cx="80" cy="80" r="58" fill="#ffffff" opacity=".92"/><circle cx="80" cy="80" r="52" fill="none" stroke="${sealCol}" stroke-width="1.2" opacity=".4"/><text x="80" y="58" text-anchor="middle" font-size="28">${meta.emoji}</text><text x="80" y="94" text-anchor="middle" font-size="25" font-family="'Zen Maru Gothic',sans-serif" font-weight="900" fill="${sealCol}">${esc(kichi)}</text><text x="80" y="116" text-anchor="middle" font-size="9.5" font-family="'Zen Maru Gothic',sans-serif" font-weight="700" fill="${sealCol}" letter-spacing="1.5">${first?'✦ 今日限定 ✦':'処方箋'}</text></svg>`;
+ };
  const PASTELS=[
   {name:'樱花粉',hex:'#ffb7d5'},{name:'草莓粉',hex:'#e85a9b'},{name:'蜜桃',hex:'#ffc2a8'},
   {name:'奶油黄',hex:'#ffe08a'},{name:'香芋紫',hex:'#d4b4e8'},{name:'薄荷绿',hex:'#b7e4c7'},
@@ -948,7 +964,7 @@ if(P=='draw'){
   x.restore();
   x.textAlign='center';x.textBaseline='middle';
   x.fillStyle='#8a8a8a';x.font='700 18px '+F;x.letterSpacing='6px';x.fillText('iLiFE! DRAW',W/2,102);x.letterSpacing='0px';
-  x.fillStyle='#2b2b2b';x.font='500 22px '+F;x.fillText(dayLabel(view.day),W/2,142);
+  x.fillStyle='#2b2b2b';x.font='500 22px '+F;x.fillText(dayLabel(view.day).full,W/2,142);
   x.fillStyle='#e4007f';x.font='700 16px '+F;x.letterSpacing='3px';x.fillText(song?"TODAY'S SONG":"TODAY'S OSHI",W/2,176);x.letterSpacing='0px';
   x.fillStyle='#8a8a8a';x.font='500 20px '+F;x.fillText(song?'今日的歌 🎵':'今日的推 💕',W/2,206);
   const photoW=song?480:400,photoH=song?460:480,pad=22,capH=88;
@@ -1077,62 +1093,218 @@ if(P=='draw'){
   document.title='DRAW · 抽签 | iLiFE! 应援资料库';
   const mode=st.prefs.mode,list=pool(),n=counts(),anim=enterAnim&&!reduceMotion();enterAnim=false;
   const phase=shaking?'shake':view?'show':'idle';
-  const hero=!view&&!shaking?(mode=='member'
-   ?'<p class=dkick>TODAY\'S OSHI · 今日抽推</p><h1 class=dhero>今日抽一位推 💕</h1><p class=dlead>心跳指引！每天限定 1 次，抽取今天的命中之推。明日 0:00 (JST) 刷新 ✨</p>'
-   :'<p class=dkick>TODAY\'S SONG · 今日抽歌</p><h1 class=dhero>今日抽一首歌 🎵</h1><p class=dlead>单曲循环预定！每天限定 1 次，掉落今天的主题旋律。明日 0:00 (JST) 刷新 ✨</p>'):'';
-  const slip=shake=>`<div class="dslip${shake?' is-shake':''}" aria-hidden=true><div class="dslip-ears"><span></span><span></span></div><div class=dslip-seal><span class=dslip-rabbit>🐰</span></div><p class=dslip-k>${mode=='member'?'TODAY\'S OSHI':'TODAY\'S SONG'}</p><p class=dslip-t>${mode=='member'?'求一位推 💕':'求一首歌 🎵'}</p><div class="dslip-deco"><i>✨</i><i>💕</i><i>🌸</i></div></div>`;
-  const frame=(src,alt,href,mem)=>{
-   const inner=src?`<img src="${esc(src)}" alt="${esc(alt)}">`:`<span class=songph><b>${esc(alt)}</b><small>无官方图片</small></span>`;
-   return `<a class="dframe${mem?' mem':''}" href="${href}">${inner}</a>`;
-  };
-  const luckBlock=(f,sealCol)=>f?`<section class=dluck><p class=dmicro>今日运势 · 占い 💕</p><div class=dluck-q><span${sealCol?` style="color:${sealCol}"`:''}>🎀 签语 · ${esc(f.kichi||'吉')}</span><b>「${esc(f.motto)}」</b></div><div class=dluck-rows><p><span>🔮 运势</span><b class=dkichi style="${sealCol?`color:${sealCol}`:''}">${esc(f.kichi||'吉')}</b></p><p><span>🎨 幸运色</span><b><i class="dswatch${lightHex(f.color)?' light':''}" style="background:${f.color}"></i>${esc(f.colorName)}</b></p><p><span>🎀 幸运物品</span><b>${esc(f.item)}</b></p><p><span>✨ 今日行动</span><b>${esc(f.action)}</b></p></div></section>`:'';
+  const drawnToday=hasDrawnToday(mode);
+
+  const hero=`<div class="hero">
+   <p class="hero-eyebrow">✿ 非公式ファンサイト ・ ファンメイド</p>
+   <h1 class="hero-title">
+    <span class="jp">${mode=='member'?'今日の推しを、処方します。':'今日の曲を、処方します。'}</span>
+    <span class="cn">${mode=='member'?'为你开一份，今天的好运处方 💕':'为你开一首，今天的心动旋律 🎵'}</span>
+   </h1>
+   <p class="hero-desc">每天一次，抽出一份属于你的 iLiFE! 好运处方。<br>收下小小的幸福，感受今天的推与音乐带来的好运。♡</p>
+   <div class="dmode" role="tablist" aria-label="抽签模式">
+    <button type="button" role="tab" data-mode="member" aria-selected="${mode=='member'}"><i class="dico">🐰</i>抽推${hasDrawnToday('member')?'<span class="dmode-tag done">已签</span>':'<span class="dmode-tag">待抽</span>'}</button>
+    <button type="button" role="tab" data-mode="song" aria-selected="${mode=='song'}"><i class="dico">🎵</i>抽歌${hasDrawnToday('song')?'<span class="dmode-tag done">已签</span>':'<span class="dmode-tag">待抽</span>'}</button>
+   </div>
+   ${mode=='song'
+    ?`<div class="dfilter-bar" role="group" aria-label="曲目范围">${[['all','全部 '+n.all],['group','团体曲 '+n.group],['solo','个人曲 '+n.solo]].map(([k,lb])=>`<button type="button" class="pill-btn${st.prefs.songFilter==k?' active':''}" data-sf="${k}">${lb}</button>`).join('')}</div>`
+    :`<div class="dfilter-bar"><button type="button" id="drawFormer" class="pill-btn${st.prefs.includeFormer?' active':''}">${st.prefs.includeFormer?'🌸 已含前成员 ('+n.allM+'人)':'✨ 仅现役 ('+n.active+'人)'}</button></div>`
+   }
+   <div class="mascot-wrap" id="mascotHero" title="アイラビット ♡ iLiFE! 官方吉祥物">
+    <div class="mascot-avatar-hero">
+     <div class="mascot-ears"><span></span><span></span></div>
+     <div class="mascot-img-wrap">
+      <img src="https://img.ilifefan.dpdns.org/img/FtqqCumaEAMoGDY.jpg" alt="アイラビット">
+     </div>
+     <div class="mascot-badge">🐰 アイラビット</div>
+    </div>
+   </div>
+   <button type="button" class="cta${drawnToday?' is-done':''}" id="drawGo" ${busy||(!drawnToday&&!list.length)?'disabled':''}>
+    ${!drawnToday?'<span class="cta-shine"></span>':''}
+    ${drawnToday?'✨ 本日の処方は受け取り済み ♡':(mode=='member'?'🌸 今日の推しを引く ♡':'🎵 今日の曲を引く ♡')}
+   </button>
+   <p class="hero-note" id="todayNote">${drawnToday?'本日の処方は受け取り済みです ✨ 明日 0:00 (JST) に更新':'今日の処方は、まだ受け取っていません（每日限定 1 次）'}</p>
+  </div>`;
+
   let stage='';
   if(shaking){
-   stage=`${slip(true)}<p class=dshake-t>${mode=='member'?'正在为你感应命中之推… 💕':'正在为你挑选心动旋律… 🎵'}</p><p class=dshake-s>好运正在降临中 ✨</p><div class=dcharge aria-hidden=true><i></i></div><button type=button id=drawGo class=go disabled hidden>抽取</button>`;
-  }else if(view&&view.mode=='song'){
-   const s=view.item,href='songs.html?s='+s.id,kichi=(view.fortune&&view.fortune.kichi)||'吉';
-   const sealHtml=`<div class="dseal${anim?' is-pop':''}">${view.first?'<span class=dseal-sub>今日首抽</span>':''}<b class=dseal-main>${esc(kichi)}</b></div>`;
-   const isToday=view.day===jstDay();
-   const otherDone=hasDrawnToday('member');
-   const bottomActs=isToday
-    ?`<div class="dtoday-status"><span class="dtoday-tag">✨ 今日限定已出</span><p class="dtoday-p">今日之歌已定，明日 0:00 (JST) 刷新新签 🎵</p>${!otherDone?`<button type=button class="go dcta dcta-sub" id=drawSwitchOther><span class="dcta-shine"></span>去抽今日之推 🐰 💕 ↗</button>`:`<p class="dall-done-tip">今日推与歌已全部求完，明日再来找アイラビット求签吧 💕</p>`}</div><div class=dacts><a class="pill off" href="${href}">查看歌曲 ↗</a></div>`
-    :`<div class=dacts><button type=button class="go dcta dcta-sub" id=drawBackToday><span class="dcta-shine"></span>${hasDrawnToday('song')?'查看今日之歌 🎵':'✨ 抽取今日之歌 🎵'}</button><a class="pill off" href="${href}">查看歌曲 ↗</a></div>`;
-   stage=`<article class="dsheet${anim?' is-in':''}"><div class="dwashi" aria-hidden=true></div><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S SONG</p><p class=dsubk>今日的歌 🎵</p><div class=dpolaroid>${frame(songSrc(s),s.title,href,false)}${sealHtml}<p class=dcap><b>${esc(s.title)}</b>${s.kana?`<span>${esc(s.kana)}</span>`:''}</p></div><div class="drows dmeta"><p><span>种类</span><b class=dkind>${s.member?'个人曲 · '+esc(s.member):'团体曲'}</b></p><p><span>时长</span><b>${esc(s.duration||'—')}</b></p><p><span>作品</span><b>${esc(s.release||'—')}</b></p></div>${luckBlock(view.fortune)}<div class=dsharebox><p class=dask>把今天的专属签存下来 💕</p><button type=button class="go dcta" id=drawSave><span class="dcta-shine"></span>保存专属卡片 📸</button></div>${bottomActs}<div class=sr aria-live=polite>抽到 ${esc(s.title)}</div></article>`;
+   stage=`<div class="draw-stage" id="drawStage">
+    <div class="shake-wrap is-shaking">${bottleSvg}</div>
+    <p class="draw-hint">おみくじを振っています<span class="draw-dots"><span>.</span><span>.</span><span>.</span></span></p>
+    <p class="draw-sub">アイラビット正在摇晃签筒，请稍等一下 ♡</p>
+   </div>`;
   }else if(view){
-   const mem=view.item,hex=safeHex(mem.hex),href='members.html?m='+encodeURIComponent(mem.name),kichi=(view.fortune&&view.fortune.kichi)||'吉',sealCol=accentOf(hex);
-   const sealHtml=`<div class="dseal${anim?' is-pop':''}" style="border-color:${sealCol};color:${sealCol}">${view.first?'<span class=dseal-sub>今日首抽</span>':''}<b class=dseal-main>${esc(kichi)}</b></div>`;
+   const isSong=view.mode=='song',item=view.item;
+   const title=isSong?item.title:item.name,kana=item.kana||'';
+   const href=isSong?'songs.html?s='+item.id:'members.html?m='+encodeURIComponent(item.name);
+   const itemSrc=isSong?songSrc(item):memberSrc(item);
+   const sub=isSong
+    ?`${item.member?'个人曲 · '+item.member:'团体曲'}${item.duration?' · '+item.duration:''}`
+    :`${item.status||''}${item.color?' · '+item.color:''}${item.catch?' · '+item.catch:''}`;
+   const no=isSong?(item.release?'作品: '+item.release:'iLiFE! SONG'):(item.color?'担当色: '+item.color:'iLiFE! MEMBER');
+   const kichi=(view.fortune&&view.fortune.kichi)||'吉';
+   const kMeta=KICHI_META[kichi]||KICHI_META['吉'];
+   const hex=!isSong?safeHex(item.hex):'#e4007f';
+   const sealCol=!isSong?accentOf(hex):'#e4007f';
    const isToday=view.day===jstDay();
-   const otherDone=hasDrawnToday('song');
-   const bottomActs=isToday
-    ?`<div class="dtoday-status"><span class="dtoday-tag">✨ 今日限定已出</span><p class="dtoday-p">今日之推已定，明日 0:00 (JST) 刷新新签 💕</p>${!otherDone?`<button type=button class="go dcta dcta-sub" id=drawSwitchOther><span class="dcta-shine"></span>去抽今日之歌 🎵 ↗</button>`:`<p class="dall-done-tip">今日推与歌已全部求完，明日再来找アイラビット求签吧 💕</p>`}</div><div class=dacts><a class="pill off" href="${href}">查看成员 ↗</a></div>`
-    :`<div class=dacts><button type=button class="go dcta dcta-sub" id=drawBackToday><span class="dcta-shine"></span>${hasDrawnToday('member')?'查看今日之推 💕':'✨ 抽取今日之推 💕'}</button><a class="pill off" href="${href}">查看成员 ↗</a></div>`;
-   stage=`<article class="dsheet mem${anim?' is-in':''}" style="--mem-accent:${sealCol}"><div class="dwashi" aria-hidden=true></div><p class=ddate>${esc(dayLabel(view.day))}</p><p class=dkick>TODAY'S OSHI</p><p class=dsubk>今日的推 💕</p><div class="dpolaroid mem">${frame(memberSrc(mem),mem.name,href,true)}${sealHtml}<p class=dcap><b>${esc(mem.name)}</b>${mem.kana?`<span>${esc(mem.kana)}</span>`:''}</p></div><div class="dbar${lightHex(hex)?' light':''}" style="background:${hex}"></div><div class=drows><p><span>状态</span><b class=dkind>${esc(mem.status||'')}${mem.color?' · '+esc(mem.color):''}</b></p>${mem.catch?`<p><span>口号</span><b>${esc(mem.catch)}</b></p>`:''}</div>${luckBlock(view.fortune,sealCol)}<div class=dsharebox><p class=dask>把今天的专属签存下来 💕</p><button type=button class="go dcta" id=drawSave><span class="dcta-shine"></span>保存专属卡片 📸</button></div>${bottomActs}<div class=sr aria-live=polite>抽到 ${esc(mem.name)}</div></article>`;
+   const otherMode=isSong?'member':'song';
+   const otherDone=hasDrawnToday(otherMode);
+   const dl=dayLabel(view.day);
+   const switchBtnHtml=otherDone
+    ?`<button type="button" class="btn" id="drawSwitchOther">${isSong?'查看今日之推 💕 ↗':'查看今日之歌 🎵 ↗'}</button>`
+    :`<button type="button" class="btn primary" id="drawSwitchOther">${isSong?'去抽今日之推 🐰 ↗':'去抽今日之歌 🎵 ↗'}</button>`;
+   stage=`<div class="result" id="result">
+    <div class="result-head">
+     <div class="result-date"><b>${esc(dl.date)}</b><span>（${esc(dl.wd)}）</span></div>
+     <div class="result-title">${isSong?"TODAY'S SONG ・ 今日の歌処方 🎵":"TODAY'S PRESCRIPTION ・ 今日の推し処方 💕"}</div>
+    </div>
+    <article class="prescription${anim?' is-in':''}" style="--kichi-col:${sealCol};--kichi-deep:${kMeta.deep};--kichi-soft:${kMeta.soft}">
+     <div class="presc-top">
+      <div class="seal-box">${sealSvg(kichi,view.first&&isToday,sealCol)}</div>
+      <div class="fortune-side">
+       <div class="fortune-tagline" style="color:${sealCol}">${esc(kMeta.tagline)}</div>
+       <div class="fortune-tagline-jp">${esc(kMeta.taglineJp)}</div>
+       <span class="fortune-badge" style="background:${kMeta.soft};color:${sealCol}">
+        ${kMeta.emoji} ${esc(kichi)} · ${isSong?'今日之歌 🎵':'今日之推 💕'}
+       </span>
+      </div>
+     </div>
+     <div class="photo-block">
+      <div class="polaroid${!isSong?' mem':''}">
+       <div class="polaroid-art">
+        <a class="polaroid-link" href="${href}">
+         ${itemSrc?`<img src="${esc(itemSrc)}" alt="${esc(title)}">`:`<div class="polaroid-ph"><b>${esc(title)}</b><small>无官方图片</small></div>`}
+        </a>
+       </div>
+       <div class="polaroid-cap">
+        <div class="polaroid-name">${esc(title)}</div>
+        <div class="polaroid-sub">${esc(sub)}</div>
+        <div class="polaroid-no">${esc(no)}</div>
+       </div>
+      </div>
+     </div>
+     <div class="rx-list">
+      <div class="rx-item is-phrase">
+       <div class="phrase-cn">「${esc(view.fortune.motto)}」</div>
+       <div class="phrase-jp">${isSong?'心に響くメロディの処方箋 🎵':'アイラビットからのメッセージ 💕'}</div>
+       <span class="phrase-tag">✎ 今日のひとこと処方</span>
+      </div>
+      <div class="rx-item">
+       <div class="rx-emoji">🎨</div>
+       <div class="rx-key">幸运颜色</div>
+       <div class="rx-val">
+        <span class="color-chip">
+         <span class="color-dot" style="background:${view.fortune.color}"></span>
+         ${esc(view.fortune.colorName)}
+        </span>
+       </div>
+      </div>
+      <div class="rx-item">
+       <div class="rx-emoji">🍬</div>
+       <div class="rx-key">幸运物品</div>
+       <div class="rx-val">${esc(view.fortune.item)}</div>
+      </div>
+      <div class="rx-item is-action">
+       <div class="rx-emoji">🐾</div>
+       <div class="rx-key">今日行动</div>
+       <div class="rx-val">${esc(view.fortune.action)}</div>
+      </div>
+     </div>
+     <div class="share-cta${anim?' is-fresh':''}">
+      <div class="share-cta-text">
+       <b>💌 今日のお守り、シェアしない？</b>
+       <span>把今天的专属处方签存下来，分享给同担或者留作手机壁纸 ♡</span>
+      </div>
+      <button type="button" class="btn primary" id="drawSave">保存处方签 📸</button>
+     </div>
+     <div class="result-actions">
+      ${switchBtnHtml}
+      <a class="btn" href="${href}">查看档案 ↗</a>
+      ${view.hist?`<button type="button" class="btn ghost" id="drawBackToday">返回今日处方 ✦</button>`:''}
+     </div>
+     <div class="sr" aria-live="polite">抽到 ${esc(title)}</div>
+    </article>
+   </div>`;
   }
-  const showFilters=!view&&!shaking;
-  const filters=showFilters?(mode=='song'
-   ?`<p class=filters role=group aria-label=曲目范围>${[['all','全部',n.all],['group','团体曲',n.group],['solo','个人曲',n.solo]].map(([k,lb,c])=>`<button type=button class="${st.prefs.songFilter==k?'':'off'}" data-sf=${k} aria-pressed=${st.prefs.songFilter==k}>${lb} ${c}</button>`).join('')}</p><p class=dpool>${list.length?`从 ${list.length} 首里抽`:'这个范围里没有歌'}</p>`
-   :`<p class=filters><span class=lb>${st.prefs.includeFormer?'全部成员 '+n.allM+' 人':'只抽现役 '+n.active+' 人'}</span><button type=button id=drawFormer class="${st.prefs.includeFormer?'':'off'}" aria-pressed=${st.prefs.includeFormer}>${st.prefs.includeFormer?'🌸 已含前成员':'✨ 仅现役'}</button></p><p class=dpool>${list.length?`从 ${list.length} 人里抽`:'这个范围里没有成员'}</p>`):'';
-  const ctaText=mode=='member'?'✨ 抽取今日之推 💕':'✨ 抽取今日之歌 🎵';
-  const idleExtra=!view&&!shaking?`${slip(false)}<div class=dacts><button type=button class="go dcta" id=drawGo ${busy||!list.length?'disabled':''}><span class="dcta-shine"></span>${ctaText}</button></div><p class=dlimit-tip>每日限定 1 次 · 明日 0:00 (JST) 刷新 ✨</p>`:'';
-  const feats=!view&&!shaking?`<section class=dfeats><article class=dfeat><p class=k>MEMBER · 抽推</p><h3>抽一位推 🐰</h3><p>心跳求签！每天限定 1 次。现役 ${n.active} 人，含前成员一共 ${n.allM} 人。抽取今天的命中之推。</p></article><article class=dfeat><p class=k>SONG · 抽歌</p><h3>抽一首歌 🎵</h3><p>单曲循环！每天限定 1 次。曲库全部 ${n.all} 首，团体曲 ${n.group} 首，个人曲 ${n.solo} 首。</p></article><article class=dfeat><p class=k>CARD · 分享</p><h3>保存卡片 📸</h3><p>生成 9:16 卡哇伊拍立得运势签，发给同担或做手机壁纸。</p></article></section>`:'';
+
+  const feats=`<div class="feature-grid">
+   <div class="feature">
+    <div class="feature-emoji">🍶</div>
+    <h3>毎日いちど、おみくじ <span>DAILY FORTUNE</span></h3>
+    <p>一天一次正式求签，大吉/中吉/小吉/吉/末吉皆有好运祝福，不设任何负面惩罚。</p>
+   </div>
+   <div class="feature">
+    <div class="feature-emoji">🐰</div>
+    <h3>運命の推しと音楽 <span>OSHI & SONG</span></h3>
+    <p>现役与全部成员 / 团体与个人曲，双通道每日抽取专属于你的心动时刻。</p>
+   </div>
+   <div class="feature">
+    <div class="feature-emoji">💌</div>
+    <h3>お守りをシェア <span>SHARE & CARD</span></h3>
+    <p>把抽到的处方签存成 9:16 高清卡片，分享给同担或者留作手机壁纸 ♡</p>
+   </div>
+  </div>`;
+
   const hist=st.history[mode].map(h=>{
    const item=mode=='song'?songById(h.id):memberById(h.id);if(!item)return '';
    const src=mode=='song'?songSrc(item):memberSrc(item),label=mode=='song'?item.title:item.name;
    const on=view&&!shaking&&view.at===h.at,kichi=(h.fortune&&h.fortune.kichi)||'吉';
    const isHDay=h.day===jstDay();
-   return `<button type=button class="dhi${on?' on':''}" data-hid=${h.id} data-hat="${esc(h.at)}"><span class=ph>${src?`<img alt="" src="${esc(src)}">`:`<b>${esc(label.slice(0,1))}</b>`}</span><b>${esc(label)}</b><i>${esc(kichi)}${isHDay?' · 今日':(h.first?' · 首抽':'')}</i></button>`;
+   const kMeta=KICHI_META[kichi]||KICHI_META['吉'];
+   const dl=dayLabel(h.day);
+   return `<div class="pcard${on?' is-active':''}" data-hid="${h.id}" data-hat="${esc(h.at)}" role="button" tabindex="0">
+    <div class="pcard-art">
+     ${src?`<img alt="" src="${esc(src)}">`:`<b>${esc(label.slice(0,1))}</b>`}
+    </div>
+    <div class="pcard-meta">
+     <div class="pcard-name">${esc(label)}</div>
+     <div class="pcard-sub">${esc(dl.date)}（${esc(dl.wd)}）</div>
+     <span class="pcard-badge" style="background:${kMeta.soft};color:${kMeta.deep}">${kMeta.emoji} ${esc(kichi)}${isHDay?' · 今日':''}</span>
+    </div>
+   </div>`;
   }).join('');
-  const histSec=!shaking&&hist?`<section class=dhist><p class=dmicro>最近记录 · 履歴 💕</p><div class=dgrid>${hist}</div></section>`:'';
-  const arch=!shaking?`<section class=darch><p>记录只留在这台浏览器里。可以导出 JSON，换浏览器时再导入。</p><p class=dacts><button type=button class=off id=drawExport>导出存档</button><button type=button class=off id=drawImport>导入存档</button><button type=button class=off id=drawClear>清空记录</button><input id=drawFile type=file accept="application/json,.json" hidden></p></section>`:'';
-  const modeBar=`<div class=dmode role=tablist aria-label=抽签模式>`+
-   `<button type=button role=tab data-mode=member aria-selected=${mode=='member'}><i class=dico>🐰</i>抽推${hasDrawnToday('member')?'<span class="dmode-tag done">已签</span>':'<span class="dmode-tag">待抽</span>'}</button>`+
-   `<button type=button role=tab data-mode=song aria-selected=${mode=='song'}><i class=dico>🎵</i>抽歌${hasDrawnToday('song')?'<span class="dmode-tag done">已签</span>':'<span class="dmode-tag">待抽</span>'}</button>`+
-   `</div>`;
-  m.innerHTML=`<div class=dpage data-phase=${phase}><div class=crumb><a href=index.html>首页</a> / 抽签</div><div class=dcol>${hero}${shaking?'':modeBar+filters}${stage}${idleExtra}</div>${feats}${histSec}${arch}</div>`;
+  const histSec=hist?`<section class="dhist">
+   <div class="dhist-head">
+    <p class="dmicro">COLLECTION ・ 処方履歴</p>
+    <h3>最近记录 <span>PAST DRAWS</span></h3>
+   </div>
+   <div class="dgrid">${hist}</div>
+  </section>`:'';
+
+  const arch=`<section class="darch">
+   <p class="darch-title">📦 バックアップ ・ 存档备份</p>
+   <p class="darch-desc">记录只留在这台浏览器的本地存储中。换设备或清理缓存时可能会丢失。<br>建议定期点一下「导出存档」，把数据备份保存到自己的备忘录中。</p>
+   <div class="darch-acts">
+    <button type="button" class="btn" id="drawExport">⭳ 导出存档</button>
+    <button type="button" class="btn" id="drawImport">⭱ 导入存档</button>
+    <button type="button" class="btn ghost" id="drawClear">↺ 清空记录</button>
+    <input id="drawFile" type="file" accept="application/json,.json" hidden>
+   </div>
+  </section>`;
+
+  m.innerHTML=`<div class="dpage" data-phase="${phase}">
+   <div class="crumb"><a href="index.html">首页</a> / 抽签</div>
+   ${shaking?'':hero}
+   ${stage}
+   ${shaking?'':feats}
+   ${shaking?'':histSec}
+   ${shaking?'':arch}
+  </div>`;
+
   m.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{if(busy||b.dataset.mode==st.prefs.mode)return;st.prefs.mode=b.dataset.mode;view=initTodayView(st.prefs.mode);save();render()});
   m.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{if(busy)return;st.prefs.songFilter=b.dataset.sf;if(view&&view.mode=='song'&&!pool().some(s=>s.id==view.item.id))view=null;save();render()});
   const former=$('#drawFormer');if(former)former.onclick=()=>{if(busy)return;st.prefs.includeFormer=!st.prefs.includeFormer;if(view&&view.mode=='member'&&!pool().some(mem=>mem.id==view.item.id))view=null;save();render()};
-  const go=$('#drawGo');if(go)go.onclick=()=>{draw()};
+  const go=$('#drawGo');if(go)go.onclick=()=>{
+   if(drawnToday){
+    const r=$('#result');if(r)r.scrollIntoView({behavior:'smooth'});
+   }else{
+    draw();
+   }
+  };
+  const mascot=$('#mascotHero');if(mascot)mascot.onclick=()=>{
+   burst(mode=='member'?(view&&view.item&&view.item.hex||'#e4007f'):'#e4007f');
+   toast('アイラビット: 今日も推しと一緒にハッピー！💕');
+  };
   const sv=$('#drawSave');if(sv)sv.onclick=()=>saveCard();
   const swOther=$('#drawSwitchOther');
   if(swOther)swOther.onclick=()=>{
@@ -1153,7 +1325,9 @@ if(P=='draw'){
    const h=st.history[mode].find(x=>String(x.id)==b.dataset.hid&&x.at==b.dataset.hat);if(!h)return;
    const item=mode=='song'?songById(h.id):memberById(h.id);if(!item)return;
    let fortune=h.fortune;if(!fortune){fortune=rollFortune(mode,item);h.fortune=fortune;save()}
-   view={mode,item,first:!!h.first,day:h.day,at:h.at,hist:true,fortune};render();
+   view={mode,item,first:!!h.first,day:h.day,at:h.at,hist:true,fortune};
+   render();
+   const r=$('#result');if(r)r.scrollIntoView({behavior:'smooth'});
   });
   const ex=$('#drawExport');if(ex)ex.onclick=()=>{
    const blob=new Blob([JSON.stringify({key:KEY,exportedAt:new Date().toISOString(),...st},null,2)],{type:'application/json'});
@@ -1192,7 +1366,7 @@ if(P=='draw'){
   busy=true;
   const reduce=reduceMotion();
   try{
-   if(!reduce){shaking=true;render();await wait(1900)}
+   if(!reduce){shaking=true;render();window.scrollTo({top:0,behavior:'smooth'});await wait(1900)}
    const item=list[randIndex(list.length)];
    const day=jstDay();
    st.first[mode]=day;
@@ -1206,7 +1380,7 @@ if(P=='draw'){
    render();
    if(!reduce){
     burst(mode=='member'?item.hex:'#e4007f');
-    const shown=m.querySelector('.dsheet');
+    const shown=$('#result');
     if(shown)shown.scrollIntoView({block:'nearest',behavior:'smooth'});
    }
   }finally{
