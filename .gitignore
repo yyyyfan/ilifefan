@@ -26,3 +26,5 @@ db/.cache_it/
 .shot/
 # 出处页 og:image 抓取缓存与缩略图复核表（任务 029）
 db/.cache_img/
+# 成员个人 X 账号媒体时间线缓存（任务 034）
+db/.cache_member/
