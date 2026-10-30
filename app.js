@@ -885,7 +885,7 @@ if(P=='members'){
   m.querySelectorAll('[data-jd]').forEach(b=>b.onclick=()=>{set(b.dataset.jd);center()});
   $('#stkt').onclick=()=>{const k=$('#stk').classList.toggle('min');$('#stkt').textContent=k?i18n('展开'):i18n('收起')};if(innerWidth<760&&new URLSearchParams(location.search).get('min'))$('#stkt').click();
   const fixTop=()=>{$('#stk')&&($('#stk').style.top=$('header').offsetHeight+'px')};fixTop();window.__tlResize=()=>{if(!$('#cur'))return;window.__fit&&window.__fit();fixTop();set(D)};if(!window.__tlResizeBound){window.__tlResizeBound=true;addEventListener('resize',()=>window.__tlResize&&window.__tlResize())}window.__setDate=set;set(D);if(new URLSearchParams(location.search).get('d'))center()};
- const r=()=>{view=listView();$('#mbody').innerHTML=`<h1 class=ttl>MEMBERS</h1><p class=sub>${i18n('成员')}</p><p class=filters><button class="${view=='tl'?'':'off'}" data-v=tl>${i18n('时间轴')}</button><button class="${view=='cards'?'':'off'}" data-v=cards>${i18n('成员卡片')}</button></p>`+(view=='tl'?tl():cards());
+ const r=()=>{view=listView();$('#mhead').innerHTML='';$('#mbody').innerHTML=`${head('MEMBERS',i18n('成员'))}<p class=filters><button class="${view=='tl'?'':'off'}" data-v=tl>${i18n('时间轴')}</button><button class="${view=='cards'?'':'off'}" data-v=cards>${i18n('成员卡片')}</button></p>`+(view=='tl'?tl():cards());
   m.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{view=b.dataset.v;history.replaceState(null,'',urlFor('',view));r()});imgDone(m);
   if(view=='tl')cursor();const tip=$('#tip');if(!tip)return;m.querySelectorAll('.seg').forEach(el=>{const sh=e=>{const n=el.dataset.n,p=latestPhoto(I,n);tip.innerHTML=`${p?`<img src="${p.local||p.url}"${WH(p)}>`:''}<div><b>${esc(n)}</b><br>${el.dataset.l}<br>${el.dataset.f} ～ ${el.dataset.t}</div>`;tip.style.display='flex';const R=el.getBoundingClientRect(),x=Math.min(Math.max(8,(e.clientX||R.left)+12),innerWidth-250);tip.style.left=x+'px';tip.style.top=(R.bottom+8+scrollY)+'px'};
    el.onmouseenter=sh;el.onmousemove=sh;el.onmouseleave=()=>tip.style.display='none';el.ontouchstart=e=>{if(tip.style.display!='flex'||tip.dataset.k!=el.dataset.n+el.dataset.f){e.preventDefault();sh(e.touches[0]);tip.dataset.k=el.dataset.n+el.dataset.f}}})};
@@ -931,12 +931,11 @@ if(P=='members'){
   if(n&&!list.some(x=>x.name===n)){const extra=M.find(x=>x.name===n);if(extra) list.push(extra)}
   return list;
  };
- const pinSwitch=()=>{const sw=$('#msw');if(sw) sw.style.top=($('header').offsetHeight||0)+'px'};
  const paintHead=()=>{
   const name=memberName(), home=i18n('首页'), mem=i18n('成员');
   $('#mhead').innerHTML=name
    ?`<div class=crumb><a href=index.html>${home}</a> / <a href="${urlFor('',listView())}">${mem}</a> / ${esc(name)}</div>`
-   :`<div class=crumb><a href=index.html>${home}</a> / ${mem}</div>`;
+   :'';
  };
  const paintSwitcher=()=>{
   const name=memberName();
@@ -955,12 +954,12 @@ if(P=='members'){
   else if(row) row.scrollLeft=keep;
  };
  const applyTheme=hex=>{
-  const th=themeOf(hex), page=$('#mpage');
-  page.style.setProperty('--mc-r',th.r);page.style.setProperty('--mc-g',th.g);page.style.setProperty('--mc-b',th.b);
-  page.style.setProperty('--mc',th.hex);page.style.setProperty('--mc-ink',th.ink);page.style.setProperty('--mc-deep',th.deep);page.style.setProperty('--hero-ink',th.heroInk);
-  page.classList.add('has-m');page.classList.toggle('mc-light',th.light);page.classList.toggle('mc-pale',th.pale);
+  const th=themeOf(hex), card=$('#mshow');
+  if(!card) return;
+  card.style.setProperty('--mc-r',th.r);card.style.setProperty('--mc-g',th.g);card.style.setProperty('--mc-b',th.b);
+  card.style.setProperty('--mc',th.hex);card.style.setProperty('--mc-ink',th.ink);card.style.setProperty('--mc-deep',th.deep);card.style.setProperty('--hero-ink',th.heroInk);
+  card.classList.toggle('mc-light',th.light);card.classList.toggle('mc-pale',th.pale);
  };
- const clearTheme=()=>{$('#mpage').classList.remove('has-m','mc-light','mc-pale')};
  const setHeroSrc=(img,src,fade)=>{
   if(!img||!src||img.getAttribute('src')===src) return;
   const token=++heroToken;
@@ -1029,9 +1028,9 @@ if(P=='members'){
   const eraFlat=[];eras.forEach(e=>mine.filter(i=>i.era===e.id).forEach(i=>eraFlat.push(i)));
   bindLB($('#mgals'),eraFlat);if($('#rel'))bindLB($('#rel'),rel);imgDone($('#mgals'));
  };
- const ensureStage=()=>{
-  if($('#mstage')) return;
-  $('#mbody').innerHTML=`<section class=mstage id=mstage><button type=button class="mchev prev" aria-label="${i18n('上一位')}">‹</button><button type=button class="mchev next" aria-label="${i18n('下一位')}">›</button><div class=mhero id=mhero><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div><div class=mvis id=mvis hidden></div></div><div class=mmeta id=mmeta aria-live=polite></div></section><div id=mgals></div>`;
+ const ensureCard=()=>{
+  if($('#mshow')) return;
+  $('#mbody').innerHTML=`<article class=mshow id=mshow><div id=msw></div><section class=mstage id=mstage><button type=button class="mchev prev" aria-label="${i18n('上一位')}">‹</button><button type=button class="mchev next" aria-label="${i18n('下一位')}">›</button><div class=mhero id=mhero><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div><div class=mvis id=mvis hidden></div></div><div class=mmeta id=mmeta aria-live=polite></div></section></article><div id=mgals></div>`;
   $('#mstage .prev').onclick=()=>step(-1);
   $('#mstage .next').onclick=()=>step(1);
   $('#martbtn').onclick=()=>{const art=chosenArt(memberName());if(!art.img)return;LB=[art.img];LI=0;lbShow()};
@@ -1051,38 +1050,37 @@ if(P=='members'){
  };
  const paint=()=>{
   const name=memberName();
-  paintHead();
   if(!name){
-   clearTheme();
    document.title=`MEMBERS · ${i18n('成员')} | iLiFE! ${i18n('应援资料库')}`;
    r();
-  }else{
-   const x=M.find(a=>a.name===name)||{name,hex:'#b9a3ad'};
-   document.title=`${name} · MEMBER | iLiFE! ${i18n('应援资料库')}`;
-   const had=!!$('#mstage');
-   ensureStage();
-   applyTheme(x.hex);
-   const art=chosenArt(name);
-   fillHero(name,art,had);
-   fillMeta(x,had);
-   fillGalleries(name);
-   if(!had&&!reduceMotion()){
-    const stage=$('#mstage');
-    stage.classList.add('m-enter');
-    stage.addEventListener('animationend',()=>stage.classList.remove('m-enter'),{once:true});
-   }
+   return;
   }
+  paintHead();
+  const x=M.find(a=>a.name===name)||{name,hex:'#b9a3ad'};
+  document.title=`${name} · MEMBER | iLiFE! ${i18n('应援资料库')}`;
+  const had=!!$('#mshow');
+  ensureCard();
+  applyTheme(x.hex);
+  const art=chosenArt(name);
+  fillHero(name,art,had);
+  fillMeta(x,had);
+  fillGalleries(name);
   paintSwitcher();
-  pinSwitch();
+  if(!had&&!reduceMotion()){
+   const card=$('#mshow');
+   card.classList.add('m-enter');
+   card.addEventListener('animationend',()=>card.classList.remove('m-enter'),{once:true});
+  }
  };
- m.innerHTML=`<div id=mpage class=mpage><div id=mhead></div><div id=msw></div><div id=mbody></div></div>`;
- $('#msw').addEventListener('click',e=>{
+ m.innerHTML=`<div id=mpage><div id=mhead></div><div id=mbody></div></div>`;
+ $('#mpage').addEventListener('click',e=>{
+  if(!e.target.closest('#msw')) return;
   const ex=e.target.closest('[data-ex]');
   if(ex){showEx=ex.dataset.ex==='1';paintSwitcher();return}
   const chip=e.target.closest('.mchip');
   if(!chip) return;
   const n=chip.dataset.m;
-  if(n===memberName()){const stage=$('#mstage');if(stage) stage.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'nearest'});return}
+  if(n===memberName()) return;
   openMember(n,'push');
  });
  m.addEventListener('click',e=>{
@@ -1103,8 +1101,7 @@ if(P=='members'){
   if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}
   if(e.key==='ArrowRight'){e.preventDefault();step(1)}
  });
- if(!window.__mswPin){window.__mswPin=true;addEventListener('resize',pinSwitch)}
- window.__onLangChange=()=>{const body=$('#mbody');if(body) body.innerHTML='';paint()};
+ window.__onLangChange=()=>{const body=$('#mbody');if(body) body.innerHTML='';const head=$('#mhead');if(head) head.innerHTML='';paint()};
  paint();
  return}
 if(P=='lives'){const[L,M]=await Promise.all([J('lives'),J('members')]);const MM=Object.fromEntries(M.map(x=>[x.name,x])),MI=Object.fromEntries(M.map(x=>[String(x.id),x]));
