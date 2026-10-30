@@ -78,6 +78,8 @@ const UI={
 '下一位':['次のメンバー','Next'],
 '返回成员列表':['メンバー一覧に戻る','Back to members'],
 '形象切换':['ビジュアルチェンジ','Visual change'],
+'← → 切换成员，[ ] 切换形象':['← → でメンバー、[ ] でビジュアル','← → member, [ ] look'],
+'← → 切换成员':['← → でメンバー','← → member'],
 '时间轴':['タイムライン','Timeline'],'成员卡片':['メンバーカード','Cards'],
 '正式成员（成员色）':['正規メンバー（メンバーカラー）','Official member (member color)'],
 '非正式期间（支援/候补生）':['非正規期間（サポート・候補生）','Non-official period (support / trainee)'],
@@ -856,7 +858,7 @@ if(P=='members'){
  const MM=Object.fromEntries(M.map(x=>[x.name,x]));
  const tl=()=>{const yrs=[2021,2022,2023,2024,2025,2026];
   const grid=yrs.map(y=>`<i class=yl style="left:${pct(y+'-01-01')}"></i>`).join('')+E.map((e,k)=>`<i class=el style="left:${pct(e.start)}"></i>`).join('')+T.marks.map(k=>`<i class=ml style="left:${pct(k.date)}"></i>`).join('')+`<i class=today style="left:${pct(today)}"></i>`;
-  const rows=T.members.map(r=>{const x=MM[r.name]||{hex:'#999'};const light=/^#f[0-9a-f]f[0-9a-f]f/i.test(x.hex);
+  const rows=[...T.members].reverse().map(r=>{const x=MM[r.name]||{hex:'#999'};const light=/^#f[0-9a-f]f[0-9a-f]f/i.test(x.hex);
    return `<div class=tr><a class=tn href="${urlFor(r.name)}"><span class=dot style="background:${x.hex}"></span>${esc(r.name)}${r.segments.every(s=>s.type=='s')?'<em>'+i18n('支援')+'</em>':''}</a><div class=tt>${grid}${r.segments.map(sg=>{const to=sg.to||today;return `<a class="seg ${sg.type}${light&&sg.type=='r'?' light':''}" href="${urlFor(r.name)}" data-n="${esc(r.name)}" data-f="${sg.from}" data-t="${sg.to||i18n('至今')}" data-l="${esc(sg.label+(sg.color?i18n('（{c}色）',{c:sg.color}):''))}" style="left:${pct(sg.from)};width:${wid(sg.from,to)};${sg.type=='r'?'background:'+(sg.color=='绿'?'#3eb370':x.hex):''}"></a>`}).join('')}</div></div>`}).join('');
   const s0='2020-06-05',sp=d=>((new Date(d)-new Date(s0))/(new Date(today)-new Date(s0))*100).toFixed(3)+'%',ECOL=['#f6c1d9','#c9e3ec','#fde2b8','#d7ecd0','#e4d4f0','#fbd0c4','#cfe0f7','#f9d6e8','#d9f0ea','#f3e3c3','#dcd6f2','#ffd0e4'];
   const stk=`<div id=stk><div class=stkhd><b id=onh></b><button class="off sm" id=stkt>${i18n('收起')}</button></div><div id=stkb><div id=sl><div class=sltrack>${E.map((e,k)=>`<i class=sle style="left:${sp(e.start<s0?s0:e.start)};width:calc(${sp(E[k+1]?E[k+1].start:today)} - ${sp(e.start<s0?s0:e.start)});background:${ECOL[k%12]}" title="${esc(e.name)}"></i>`).join('')}${[2021,2022,2023,2024,2025,2026].map(y=>`<span class=sly style="left:${sp(y+'-01-01')}">${y}</span>`).join('')}<div id=slh><span></span></div></div></div><p class="filters eps">${E.map((e,k)=>`<button class=off data-jd=${e.start<s0?s0:e.start}>${k+1}. ${esc(e.name)}</button>`).join('')}<button class=off data-jd=${today}>${i18n('今天')}</button></p><div id=onpanel></div></div></div>`;
@@ -873,7 +875,7 @@ if(P=='members'){
   const dOfS=x=>{const R=st.getBoundingClientRect();const f=Math.min(1,Math.max(0,(x-R.left)/R.width));return new Date(+new Date(s0)+f*(new Date(today)-new Date(s0))).toISOString().slice(0,10)};
   const set=d=>{if(d>today)d=today;if(d<s0)d=s0;D=d;const R=tt(),TB=tl.getBoundingClientRect();c.style.left=(R.left-TB.left+(new Date(d)-t0)/(t1-t0)*R.width)+'px';const e=eraAt(d);c.querySelector('.hl').innerHTML=`${d}<small>${e?esc(e.name):''}</small>`;
    sh.style.left=((new Date(d)-new Date(s0))/(new Date(today)-new Date(s0))*100)+'%';sh.querySelector('span').innerHTML=`${d}<small>${e?esc(e.name):''}</small>`;
-   if(d===last)return;last=d;const on=[];T.members.forEach(r=>r.segments.forEach(sg=>{if(sg.from<=d&&(!sg.to||d<sg.to))on.push([r.name,sg])}));
+   if(d===last)return;last=d;const on=[];[...T.members].reverse().forEach(r=>r.segments.forEach(sg=>{if(sg.from<=d&&(!sg.to||d<sg.to))on.push([r.name,sg])}));
    $('#onh').innerHTML=`${d} ${i18n('在籍成员 {n} 人',{n:on.length})}`+(e?` · <a href="eras.html#${e.id}">${esc(e.name)}</a>`:'');
    $('#onpanel').innerHTML=on.map(([n,sg])=>{const x=MM[n]||{hex:'#999',kana:''},p=photoAt(n,d);return `<a class=sc href="${urlFor(n)}" title="${esc(n)} ${esc(sg.label)} ${sg.from}～${sg.to||i18n('至今')}${p?' / '+i18n('照片')+' '+p.date:''}"><div class=ph>${p?`<img src="${p.local||p.url}"${WH(p)} alt="">`:''}</div><div class=bar style="background:${sg.type=='r'?(sg.color=='绿'?'#3eb370':x.hex):'#b9a3ad'}"></div><div class=nm>${esc(n)}</div>${sg.type!='r'?`<em class=tag>${sg.type=='s'?i18n('支援'):i18n('非正式')}</em>`:''}</a>`}).join('')};
   let raf=0,pend=null;const go=d=>{pend=d;if(!raf)raf=requestAnimationFrame(()=>{raf=0;set(pend)})};
@@ -902,7 +904,7 @@ if(P=='members'){
     ||inEra[inEra.length-1];
    out.push({img:pick,label:e.name});
   });
-  if(out.length>=2) return out;
+  if(out.length>=2) return out.reverse();
   const offs=mine.filter(i=>i.category==='official');
   const pool=offs.length>=2?offs:mine;
   if(pool.length<2) return [];
@@ -912,7 +914,7 @@ if(P=='members'){
    const img=pool[idx];
    if(!picks.some(p=>p.img===img)) picks.push({img,label:img.date||''});
   }
-  return picks.length>=2?picks:[];
+  return picks.length>=2?picks.reverse():[];
  };
  const imgKey=i=>i?(i.post||'')+'|'+(i.date||'')+'|'+(i.local||i.url||''):'';
  const chosenArt=name=>{
@@ -920,7 +922,7 @@ if(P=='members'){
   let idx=heroBy.has(name)?heroBy.get(name):-1;
   if(idx<0||idx>=vars.length){
    idx=vars.findIndex(v=>imgKey(v.img)===imgKey(latest));
-   if(idx<0) idx=vars.length?vars.length-1:-1;
+   if(idx<0) idx=vars.length?0:-1;
   }
   return {img:idx>=0?vars[idx].img:(latest||null), vars, idx};
  };
@@ -993,9 +995,11 @@ if(P=='members'){
   else{img.hidden=true;img.removeAttribute('src');mono.hidden=false;mono.textContent=name.slice(0,1)}
   $('#martbtn').setAttribute('aria-label',name+' · '+i18n('照片'));
   const vis=$('#mvis');
+  const keys=$('#mkeys');
+  if(keys) keys.textContent=art.vars&&art.vars.length>=2?i18n('← → 切换成员，[ ] 切换形象'):i18n('← → 切换成员');
   if(!art.vars||art.vars.length<2){vis.hidden=true;vis.innerHTML='';return}
   vis.hidden=false;
-  vis.innerHTML=`<div class=mvis-badge><b>VISUAL</b><small>${i18n('形象切换')}</small></div><div class=mvis-row>${art.vars.map((v,i)=>{
+  vis.innerHTML=`<div class=mvis-badge><b>VISUAL</b><small>${i18n('形象切换')}</small></div><div class=mvis-row role=listbox aria-keyshortcuts="BracketLeft BracketRight" aria-label="${i18n('形象切换')}">${art.vars.map((v,i)=>{
    const im=v.img, s=im.local||im.url, on=i===art.idx;
    return `<button type=button class="mvth${on?' on':''}" data-vi=${i} aria-pressed="${on}" title="${esc(v.label)}"><span class=av><img alt="" src="${esc(s)}"></span><span class=lb>${esc(v.label)}</span></button>`;
   }).join('')}</div>`;
@@ -1020,17 +1024,18 @@ if(P=='members'){
  };
  const fillGalleries=name=>{
   const mine=mineOf(name), rel=I.filter(i=>i.related&&i.member===name).slice().reverse();
-  const eras=E.filter(e=>mine.some(i=>i.era===e.id));
-  const blocks=eras.map(e=>`<h3>${esc(e.name)} <small>${esc(e.start)}～</small></h3>${galHTML(mine.filter(i=>i.era===e.id),1)}`).join('');
+  const eras=[...E].reverse().filter(e=>mine.some(i=>i.era===e.id));
+  const photosOf=e=>mine.filter(i=>i.era===e.id).slice().reverse();
+  const blocks=eras.map(e=>`<h3>${esc(e.name)} <small>${esc(e.start)}～</small></h3>${galHTML(photosOf(e),1)}`).join('');
   const relHTML=rel.length?`<h2>${i18n('相关图片')}（${rel.length}）</h2><div id=rel><p class=mnote>${i18n('官方推文文本仅提及该成员的告知/周边/活动图，非个人公式照。')}</p>${galHTML(rel)}</div>`:'';
   $('#mgals').innerHTML=`<h2>${i18n('各时期个人图')}（${mine.length}）</h2>${blocks||`<p>${i18n('暂无收录。')}</p>`}${relHTML}`;
   let k=0;$('#mgals').querySelectorAll('.gi .ph').forEach(el=>{el.dataset.i=k++});
-  const eraFlat=[];eras.forEach(e=>mine.filter(i=>i.era===e.id).forEach(i=>eraFlat.push(i)));
+  const eraFlat=[];eras.forEach(e=>photosOf(e).forEach(i=>eraFlat.push(i)));
   bindLB($('#mgals'),eraFlat);if($('#rel'))bindLB($('#rel'),rel);imgDone($('#mgals'));
  };
  const ensureCard=()=>{
   if($('#mshow')) return;
-  $('#mbody').innerHTML=`<article class=mshow id=mshow><div id=msw></div><section class=mstage id=mstage><button type=button class="mchev prev" aria-label="${i18n('上一位')}">‹</button><button type=button class="mchev next" aria-label="${i18n('下一位')}">›</button><div class=mhero id=mhero><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div><div class=mvis id=mvis hidden></div></div><div class=mmeta id=mmeta aria-live=polite></div></section></article><div id=mgals></div>`;
+  $('#mbody').innerHTML=`<article class=mshow id=mshow><div id=msw></div><section class=mstage id=mstage><button type=button class="mchev prev" aria-label="${i18n('上一位')}">‹</button><button type=button class="mchev next" aria-label="${i18n('下一位')}">›</button><div class=mhero id=mhero><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div><div class=mvis id=mvis hidden></div></div><div class=mmeta id=mmeta aria-live=polite></div></section><p class=mkeys id=mkeys></p></article><div id=mgals></div>`;
   $('#mstage .prev').onclick=()=>step(-1);
   $('#mstage .next').onclick=()=>step(1);
   $('#martbtn').onclick=()=>{const art=chosenArt(memberName());if(!art.img)return;LB=[art.img];LI=0;lbShow()};
@@ -1047,6 +1052,17 @@ if(P=='members'){
   const list=cycle(); if(!list.length) return;
   let i=list.findIndex(x=>x.name===memberName()); if(i<0) i=0;
   openMember(list[(i+dir+list.length)%list.length].name,'push');
+ };
+ const stepVis=dir=>{
+  const name=memberName(); if(!name) return;
+  const art=chosenArt(name);
+  if(!art.vars||art.vars.length<2) return;
+  const i=art.idx<0?0:art.idx;
+  heroBy.set(name,(i+dir+art.vars.length)%art.vars.length);
+  const next=chosenArt(name);
+  fillHero(name,next,true);
+  const btn=document.querySelector(`.mvth[data-vi="${next.idx}"]`);
+  if(btn) btn.scrollIntoView({inline:'center',block:'nearest',behavior:reduceMotion()?'auto':'smooth'});
  };
  const paint=()=>{
   const name=memberName();
@@ -1095,11 +1111,24 @@ if(P=='members'){
  });
  window.addEventListener('popstate',()=>paint());
  document.addEventListener('keydown',e=>{
-  if(!memberName()||$('#lb').classList.contains('on')) return;
+  if(!memberName()||!$('#mshow')||$('#lb').classList.contains('on')) return;
   const tag=(e.target&&e.target.tagName||'').toLowerCase();
-  if(tag==='input'||tag==='textarea'||(e.target&&e.target.isContentEditable)) return;
-  if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}
-  if(e.key==='ArrowRight'){e.preventDefault();step(1)}
+  if(tag==='input'||tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable)) return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.key==='ArrowLeft'){e.preventDefault();step(-1);return}
+  if(e.key==='ArrowRight'){e.preventDefault();step(1);return}
+  if(e.code==='BracketLeft'||e.key==='['){e.preventDefault();stepVis(-1);return}
+  if(e.code==='BracketRight'||e.key===']'){e.preventDefault();stepVis(1);return}
+  if(/^[1-9]$/.test(e.key)){
+   const art=chosenArt(memberName());
+   const n=+e.key-1;
+   if(art.vars&&n<art.vars.length){e.preventDefault();heroBy.set(memberName(),n);fillHero(memberName(),chosenArt(memberName()),true)}
+   return;
+  }
+  const inLook=e.target&&e.target.closest&&e.target.closest('.mhero,.mvis');
+  if(!inLook) return;
+  if(e.key==='ArrowUp'){e.preventDefault();stepVis(-1)}
+  if(e.key==='ArrowDown'){e.preventDefault();stepVis(1)}
  });
  window.__onLangChange=()=>{const body=$('#mbody');if(body) body.innerHTML='';const head=$('#mhead');if(head) head.innerHTML='';paint()};
  paint();

@@ -964,10 +964,10 @@ button.mchip.on.ex img{filter:none}
 button.mchip:focus-visible,button.mchev:focus-visible,button.mvth:focus-visible,button#martbtn:focus-visible{
   outline:2px solid var(--mc, var(--pink));outline-offset:3px;
 }
-.mshow #msw{padding:6px 8px 8px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.mshow #msw{padding:4px 6px 6px;border-bottom:1px solid var(--line);margin-bottom:8px}
 .mstage{
-  position:relative;display:grid;grid-template-columns:minmax(280px,1.12fr) minmax(260px,.88fr);
-  gap:8px 18px;padding:8px 56px 4px;background:transparent;
+  position:relative;display:grid;grid-template-columns:minmax(360px,1.55fr) minmax(240px,.72fr);
+  gap:10px 14px;padding:4px 4px 0;background:transparent;
 }
 body[data-page=members] button.mchev{
   position:absolute;top:32%;z-index:4;width:42px;height:78px;border-radius:12px;
@@ -979,7 +979,7 @@ body[data-page=members] button.mchev:hover{background:#fff}
 button.mchev.prev{left:10px}
 button.mchev.next{right:10px}
 .mhero{
-  position:relative;border-radius:18px;min-height:0;padding:16px 14px 12px 48px;overflow:hidden;
+  position:relative;border-radius:18px;min-height:62vh;padding:12px 8px 10px 36px;overflow:hidden;
   display:flex;flex-direction:column;
   background:
     radial-gradient(circle at 84% 10%, rgba(255,255,255,.34), transparent 28%),
@@ -1008,7 +1008,7 @@ button.mchev.next{right:10px}
 .mhero:has(#mvis[hidden]) .mcatch{bottom:16px}
 .mart{position:relative;z-index:1;flex:1 1 auto;display:flex;align-items:flex-end;justify-content:center;min-height:0}
 button#martbtn{width:100%;height:100%;min-height:0;display:flex;align-items:flex-end;justify-content:center;cursor:zoom-in}
-button#martbtn img{max-width:100%;max-height:min(46vh,440px);width:auto;height:auto;object-fit:contain;transition:opacity .4s ease}
+button#martbtn img{max-width:100%;max-height:min(74vh,820px);width:auto;height:auto;object-fit:contain;transition:opacity .4s ease}
 button#martbtn img.is-out{opacity:0}
 .mmono{
   width:140px;height:140px;border-radius:50%;display:grid;place-items:center;
@@ -1057,19 +1057,20 @@ button.mvth .lb{
 .mrib b{font-weight:500;font-size:14px;min-width:0;overflow-wrap:anywhere}
 .mprose p,.mx{margin:8px 0;font-size:14px}
 .mnote{font-size:13px;color:var(--sub)}
+.mkeys{margin:10px 8px 0;font-size:12px;color:var(--sub)}
 #mgals h3 small{color:var(--sub);font-weight:400}
 .mshow.m-enter{animation:mStageIn .4s ease}
 @keyframes mStageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(max-width:760px){
-  .mshow{border-radius:16px;padding:6px 6px 12px}
-  .mstage{grid-template-columns:1fr;padding:8px 4px 4px}
-  body[data-page=members] button.mchev{top:26%;width:36px;height:56px;font-size:28px}
-  body[data-page=members] button.mchev.prev{left:4px}
-  body[data-page=members] button.mchev.next{right:4px}
-  .mhero{min-height:0;padding:12px}
-  .mcatch{position:static;writing-mode:horizontal-tb;max-width:none;letter-spacing:.06em;text-align:center;margin:0 0 8px}
-  .mart{min-height:220px}
-  button#martbtn img{max-height:50vh}
+  .mshow{margin:0 -16px;border-radius:0;padding:4px 0 10px;border-left:0;border-right:0}
+  .mstage{grid-template-columns:1fr;padding:0}
+  body[data-page=members] button.mchev{top:38%;width:36px;height:64px;font-size:28px}
+  body[data-page=members] button.mchev.prev{left:6px}
+  body[data-page=members] button.mchev.next{right:6px}
+  .mhero{min-height:0;padding:8px 0 8px}
+  .mcatch{position:static;writing-mode:horizontal-tb;max-width:none;letter-spacing:.06em;text-align:center;margin:0 8px 6px}
+  .mart{min-height:0}
+  button#martbtn img{width:100%;max-width:100%;height:auto;max-height:none}
   button.mchip{width:72px}
   button.mchip .av{width:58px;height:58px}
   button.mchip .nm{font-size:10px}
