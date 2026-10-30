@@ -79,6 +79,7 @@ const UI={
 '返回成员列表':['メンバー一覧に戻る','Back to members'],
 '形象切换':['ビジュアルチェンジ','Visual change'],
 '← → 切换成员，[ ] 切换形象':['← → でメンバー、[ ] でビジュアル','← → member, [ ] look'],
+'两侧按钮或 [ ] 切换形象，← → 切换成员':['左右のボタンか [ ] でビジュアル、← → でメンバー','Side buttons or [ ] change the look, ← → change member'],
 '上一形象':['前のビジュアル','Previous look'],
 '下一形象':['次のビジュアル','Next look'],
 '← → 切换成员':['← → でメンバー','← → member'],
@@ -981,11 +982,6 @@ if(P=='members'){
   setTimeout(()=>{waited=true;go()},220);
   setTimeout(()=>{if(done||token!==heroToken)return;ready=true;waited=true;go()},700);
  };
- const bindVis=()=>{$('#mvisin').querySelectorAll('[data-vi]').forEach(b=>b.onclick=()=>{
-  const name=memberName(); if(!name) return;
-  heroBy.set(name,+b.dataset.vi);
-  fillHero(name,chosenArt(name),true);
- })};
  const fillHero=(name,art,fade)=>{
   const x=M.find(a=>a.name===name)||{name};
   const catchEl=$('#mcatch');
@@ -996,16 +992,10 @@ if(P=='members'){
   if(src){img.hidden=false;mono.hidden=true;setHeroSrc(img,src,fade&&!!img.getAttribute('src'))}
   else{img.hidden=true;img.removeAttribute('src');mono.hidden=false;mono.textContent=name.slice(0,1)}
   $('#martbtn').setAttribute('aria-label',name+' · '+i18n('照片'));
-  const vis=$('#mvis'), box=$('#mvisin');
+  const many=!!(art.vars&&art.vars.length>=2);
+  document.querySelectorAll('#mstage .mchev').forEach(b=>{b.hidden=!many});
   const keys=$('#mkeys');
-  if(keys) keys.textContent=art.vars&&art.vars.length>=2?i18n('← → 切换成员，[ ] 切换形象'):i18n('← → 切换成员');
-  if(!art.vars||art.vars.length<2){vis.hidden=true;box.innerHTML='';return}
-  vis.hidden=false;
-  box.innerHTML=`<div class=mvis-badge><b>VISUAL</b><small>${i18n('形象切换')}</small></div><div class=mvis-row role=listbox aria-keyshortcuts="BracketLeft BracketRight" aria-label="${i18n('形象切换')}">${art.vars.map((v,i)=>{
-   const im=v.img, s=im.local||im.url, on=i===art.idx;
-   return `<button type=button class="mvth${on?' on':''}" data-vi=${i} aria-pressed="${on}" title="${esc(v.label)}"><span class=av><img alt="" src="${esc(s)}"></span><span class=lb>${esc(v.label)}</span></button>`;
-  }).join('')}</div>`;
-  bindVis();
+  if(keys) keys.textContent=many?i18n('两侧按钮或 [ ] 切换形象，← → 切换成员'):i18n('← → 切换成员');
  };
  const metaHTML=x=>{
   const n=x.name||'', S=x.sources||{};
@@ -1037,11 +1027,9 @@ if(P=='members'){
  };
  const ensureCard=()=>{
   if($('#mshow')) return;
-  $('#mbody').innerHTML=`<article class=mshow id=mshow><div id=msw></div><section class=mstage id=mstage><button type=button class="mchev prev" aria-label="${i18n('上一位')}">‹</button><button type=button class="mchev next" aria-label="${i18n('下一位')}">›</button><div class=mhero id=mhero><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div><div class=mvis id=mvis hidden><button type=button class="vchev prev" aria-label="${i18n('上一形象')}">‹</button><div id=mvisin></div><button type=button class="vchev next" aria-label="${i18n('下一形象')}">›</button></div></div><div class=mmeta id=mmeta aria-live=polite></div></section><p class=mkeys id=mkeys></p></article><div id=mgals></div>`;
-  $('#mstage .mchev.prev').onclick=()=>step(-1);
-  $('#mstage .mchev.next').onclick=()=>step(1);
-  $('#mvis .vchev.prev').onclick=()=>stepVis(-1);
-  $('#mvis .vchev.next').onclick=()=>stepVis(1);
+  $('#mbody').innerHTML=`<article class=mshow id=mshow><div id=msw></div><section class=mstage id=mstage><div class=mhero id=mhero><button type=button class="mchev prev" aria-label="${i18n('上一形象')}"><b>‹</b><small>${i18n('形象切换')}</small></button><button type=button class="mchev next" aria-label="${i18n('下一形象')}"><b>›</b><small>${i18n('形象切换')}</small></button><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div></div><div class=mmeta id=mmeta aria-live=polite></div></section><p class=mkeys id=mkeys></p></article><div id=mgals></div>`;
+  $('#mstage .mchev.prev').onclick=()=>stepVis(-1);
+  $('#mstage .mchev.next').onclick=()=>stepVis(1);
   $('#martbtn').onclick=()=>{const art=chosenArt(memberName());if(!art.img)return;LB=[art.img];LI=0;lbShow()};
  };
  const openMember=(n,how)=>{
@@ -1063,11 +1051,7 @@ if(P=='members'){
   if(!art.vars||art.vars.length<2) return;
   const i=art.idx<0?0:art.idx;
   heroBy.set(name,(i+dir+art.vars.length)%art.vars.length);
-  const next=chosenArt(name);
-  fillHero(name,next,true);
-  const btn=document.querySelector(`.mvth[data-vi="${next.idx}"]`);
-  const row=btn&&btn.closest('.mvis-row');
-  if(btn&&row) row.scrollTo({left:Math.max(0,btn.offsetLeft-row.clientWidth/2+btn.offsetWidth/2),behavior:reduceMotion()?'auto':'smooth'});
+  fillHero(name,chosenArt(name),true);
  };
  const paint=()=>{
   const name=memberName();
@@ -1127,7 +1111,7 @@ if(P=='members'){
   if(/^[1-9]$/.test(e.key)){
    const art=chosenArt(memberName());
    const n=+e.key-1;
-   if(art.vars&&n<art.vars.length){e.preventDefault();heroBy.set(memberName(),n);fillHero(memberName(),chosenArt(memberName()),true);const b=document.querySelector(`.mvth[data-vi="${n}"]`);const row=b&&b.closest('.mvis-row');if(b&&row) row.scrollTo({left:Math.max(0,b.offsetLeft-row.clientWidth/2+b.offsetWidth/2),behavior:reduceMotion()?'auto':'smooth'})}
+   if(art.vars&&n<art.vars.length){e.preventDefault();heroBy.set(memberName(),n);fillHero(memberName(),chosenArt(memberName()),true)}
   }
  });
  window.__onLangChange=()=>{const body=$('#mbody');if(body) body.innerHTML='';const head=$('#mhead');if(head) head.innerHTML='';paint()};

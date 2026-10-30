@@ -936,8 +936,6 @@ body[data-page=draw] .dmode button[aria-selected="true"] .dmode-tag.done{backgro
 .msplit{flex:0 0 1px;align-self:center;height:48px;margin:0 8px;background:var(--line)}
 body[data-page=members] button.mchip,
 body[data-page=members] button.mchev,
-body[data-page=members] button.vchev,
-body[data-page=members] button.mvth,
 body[data-page=members] button#martbtn{
   background:none;color:inherit;border-radius:0;padding:0;margin:0;box-shadow:none;
   font:inherit;line-height:inherit;cursor:pointer;
@@ -962,7 +960,7 @@ button.mchip.on.light .av{box-shadow:0 0 0 3px #fff, 0 0 0 6px var(--chip, #ccc)
 button.mchip.on .nm{background:var(--chip, var(--pink));color:var(--chip-ink, #fff);border-radius:999px}
 button.mchip.on.light .nm{box-shadow:inset 0 0 0 1px rgba(0,0,0,.28)}
 button.mchip.on.ex img{filter:none}
-button.mchip:focus-visible,button.mchev:focus-visible,button.mvth:focus-visible,button#martbtn:focus-visible{
+button.mchip:focus-visible,button.mchev:focus-visible,button#martbtn:focus-visible{
   outline:2px solid var(--mc, var(--pink));outline-offset:3px;
 }
 .mshow #msw{padding:4px 6px 6px;border-bottom:1px solid var(--line);margin-bottom:8px}
@@ -971,14 +969,16 @@ button.mchip:focus-visible,button.mchev:focus-visible,button.mvth:focus-visible,
   gap:10px 14px;padding:4px 4px 0;background:transparent;
 }
 body[data-page=members] button.mchev{
-  position:absolute;top:32%;z-index:4;width:42px;height:78px;border-radius:12px;
-  background:#fff;color:#2b2b2b;border:2px solid var(--mc);
-  font:300 34px/1 Roboto,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.12);
-  display:grid;place-items:center;
+  position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:52px;height:84px;border-radius:14px;
+  background:rgba(255,255,255,.94);color:#2b2b2b;border:2px solid var(--mc);
+  font:300 32px/1 Roboto,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.16);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
 }
+body[data-page=members] button.mchev small{font:700 10px/1.1 "Noto Sans SC","Zen Maru Gothic",sans-serif;letter-spacing:0}
+body[data-page=members] button.mchev[hidden]{display:none}
 body[data-page=members] button.mchev:hover{background:#fff}
-button.mchev.prev{left:10px}
-button.mchev.next{right:10px}
+button.mchev.prev{left:8px}
+button.mchev.next{right:8px}
 .mhero{
   position:relative;border-radius:18px;min-height:62vh;padding:12px 8px 10px 36px;overflow:hidden;
   display:flex;flex-direction:column;
@@ -1006,7 +1006,6 @@ button.mchev.next{right:10px}
 }
 .mcatch[hidden]{display:none}
 .mhero:has(.mcatch[hidden]){padding-left:16px}
-.mhero:has(#mvis[hidden]) .mcatch{bottom:16px}
 .mart{position:relative;z-index:1;flex:1 1 auto;display:flex;align-items:flex-end;justify-content:center;min-height:0}
 button#martbtn{width:100%;height:100%;min-height:0;display:flex;align-items:flex-end;justify-content:center;cursor:zoom-in}
 button#martbtn img{max-width:100%;max-height:min(74vh,820px);width:auto;height:auto;object-fit:contain;transition:opacity .4s ease}
@@ -1014,34 +1013,6 @@ button#martbtn img.is-out{opacity:0}
 .mmono{
   width:140px;height:140px;border-radius:50%;display:grid;place-items:center;
   background:rgba(255,255,255,.88);color:var(--mc-deep);font:900 48px "Zen Maru Gothic","Noto Sans SC",sans-serif;
-}
-.mvis{position:relative;z-index:2;display:flex;align-items:center;gap:8px;margin-top:8px;flex:0 0 auto}
-.mvis[hidden]{display:none}
-#mvisin{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
-body[data-page=members] button.vchev{
-  flex:none;width:42px;height:64px;border-radius:12px;background:#fff;color:#2b2b2b;
-  border:2px solid var(--mc);font:300 30px/1 Roboto,sans-serif;display:grid;place-items:center;
-  box-shadow:0 4px 14px rgba(0,0,0,.12);
-}
-body[data-page=members] button.vchev:hover{background:#fff}
-.mvis-badge{
-  flex:none;width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.94);
-  color:var(--mc-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.15;
-}
-.mvis-badge b{font:800 11px Roboto,sans-serif;letter-spacing:.06em}
-.mvis-badge small{font-size:9px;font-weight:700;margin-top:2px}
-.mvis-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;min-width:0}
-.mvis-row::-webkit-scrollbar{display:none}
-button.mvth{flex:0 0 88px;width:88px;color:var(--hero-ink);text-align:center}
-button.mvth .av{
-  width:62px;height:62px;border-radius:50%;overflow:hidden;margin:0 auto 4px;background:rgba(255,255,255,.9);
-  box-shadow:0 0 0 2px rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;
-}
-button.mvth img{width:68%;height:68%;object-fit:contain;display:block}
-button.mvth.on .av{box-shadow:0 0 0 3px var(--hero-ink)}
-button.mvth .lb{
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  font-size:10px;font-weight:700;line-height:1.35;max-height:2.8em;
 }
 .mmeta{padding:8px 8px 4px 6px;min-width:0}
 .mmeta.is-out{opacity:0}
@@ -1073,7 +1044,8 @@ button.mvth .lb{
 @media(max-width:760px){
   .mshow{margin:0 -16px;border-radius:0;padding:4px 0 10px;border-left:0;border-right:0}
   .mstage{grid-template-columns:1fr;padding:0}
-  body[data-page=members] button.mchev{top:38%;width:36px;height:64px;font-size:28px}
+  body[data-page=members] button.mchev{width:46px;height:72px;transform:translateY(-50%)}
+  body[data-page=members] button.mchev small{font-size:9px}
   body[data-page=members] button.mchev.prev{left:6px}
   body[data-page=members] button.mchev.next{right:6px}
   .mhero{min-height:0;padding:8px 0 8px}
@@ -1083,7 +1055,6 @@ button.mvth .lb{
   button.mchip{width:72px}
   button.mchip .av{width:58px;height:58px}
   button.mchip .nm{font-size:10px}
-  .mvis-badge{width:60px;height:60px}
   .mrib{grid-template-columns:96px minmax(0,1fr)}
 }
 @media(prefers-reduced-motion:reduce){
