@@ -66,6 +66,14 @@ const UI={
 '即将举行':['開催予定','Upcoming'],'最新团体公式图':['最新グループアー写','Latest group photos'],
 '查看全部时期公式图':['すべての時代のアー写を見る','View all era photos'],
 '暂无团体公式图。':['グループアー写はまだありません。','No group photos yet.'],
+'今日抽签':['今日のおみくじ','Daily Fortune'],
+'抽取今日的推与歌':['今日の推しと曲を引く','Draw today’s oshi and song'],
+'抽歌 · 抽推 · 幸运色':['曲・推し・ラッキーカラー','Song · oshi · lucky color'],
+'每天一份好运处方':['1日1回の処方箋','One lucky prescription a day'],
+'去抽签':['引いてみる','Draw'],
+'关闭':['閉じる','Close'],
+'完整页面':['ページで開く','Full page'],
+'抽签暂时打不开':['おみくじを読み込めませんでした','Could not load the fortune draw'],
 /* 成员 */
 '读音':['読み','Reading'],'罗马字':['ローマ字','Romaji'],'生日':['誕生日','Birthday'],'加入':['加入','Joined'],
 '离开':['脱退','Left'],'职务/备注':['役職・備考','Role / Notes'],'支援/候补期':['サポート期間','Support period'],
@@ -259,6 +267,8 @@ window.setLang=(lang)=>{
  updateHeaderNav();
  if(typeof window.__updateMascotLang==='function')window.__updateMascotLang();
  if(typeof window.__onLangChange==='function')window.__onLangChange(lang);
+ if(typeof window.__paintHomeDraw==='function')window.__paintHomeDraw();
+ if(typeof window.__paintDrawChrome==='function')window.__paintDrawChrome();
 };
 
 document.body.insertAdjacentHTML('beforeend',`<footer><b>iLiFE! FAN DATABASE</b>非官方粉丝站。图片版权归 iLiFE! / HEROINES / imaginate 及原发布者所有，均标注来源。数据来源：@iLiFE_official、ilife-heroines.com（Wayback 存档）、日文维基百科。</footer><div id=lb><span class=x>×</span><span class=pv>‹</span><img><p></p><span class=nx>›</span></div>`);
@@ -365,7 +375,7 @@ updateLogoText();updateFooter();
  const activateMascot=()=>{
   burstKawaii();
   if(P!='draw'){
-   setTimeout(()=>{ location.href='draw.html'; }, 320);
+   setTimeout(()=>{ if(window.openDrawModal) window.openDrawModal(m); else location.href='draw.html'; }, 320);
   }else{
    const target=$('#drawGo')||$('.dsheet');
    if(target){
@@ -804,12 +814,96 @@ async function renderVenues(m){
 }
 
 (async()=>{const m=$('#main');
+let drawBootP=null, drawLockY=0, drawReturnFocus=null;
+const homeDrawCard=()=>`<a class="hdraw" href="draw.html">
+ <span class="hdraw-ava" aria-hidden="true"></span>
+ <span class="hdraw-copy">
+  <span class="hdraw-kicker">DRAW · ${i18n('今日抽签')}</span>
+  <b class="hdraw-title">${i18n('抽取今日的推与歌')}</b>
+  <span class="hdraw-sub">${i18n('抽歌 · 抽推 · 幸运色')}</span>
+  <span class="hdraw-note">${i18n('每天一份好运处方')}</span>
+ </span>
+ <span class="hdraw-go">${i18n('去抽签')}</span>
+</a>`;
+window.__paintHomeDraw=()=>{const el=document.querySelector('a.hdraw');if(!el)return;const next=document.createElement('template');next.innerHTML=homeDrawCard().trim();const node=next.content.firstElementChild;if(node)el.replaceWith(node)};
+const paintDrawChrome=()=>{
+ const root=document.getElementById('dmodal'); if(!root) return;
+ const title=document.getElementById('dmodalTitle'); if(title) title.textContent=i18n('今日抽签');
+ const x=root.querySelector('.dmodal-x'); if(x) x.setAttribute('aria-label',i18n('关闭'));
+ const xt=root.querySelector('.dmodal-x-tx'); if(xt) xt.textContent=i18n('关闭');
+ const full=root.querySelector('.dmodal-full'); if(full) full.textContent=i18n('完整页面');
+ const sheet=root.querySelector('.dmodal-sheet'); if(sheet) sheet.setAttribute('aria-label',i18n('今日抽签'));
+};
+window.__paintDrawChrome=paintDrawChrome;
+const inertBg=on=>{document.querySelectorAll('header,main,footer,#dmascot').forEach(el=>{el.inert=!!on})};
+const closeDrawModal=()=>{
+ const root=document.getElementById('dmodal'); if(!root||root.hidden) return;
+ root.classList.remove('on'); root.hidden=true;
+ document.body.classList.remove('dmodal-open');
+ document.body.style.top='';
+ inertBg(false);
+ window.scrollTo(0, drawLockY);
+ const back=drawReturnFocus; drawReturnFocus=null;
+ if(back&&typeof back.focus==='function'&&document.contains(back)){try{back.focus()}catch(e){}}
+};
+window.closeDrawModal=closeDrawModal;
+const openDrawModal=async(trigger)=>{
+ if(P=='draw') return;
+ let root=document.getElementById('dmodal');
+ if(!root){
+  document.body.insertAdjacentHTML('beforeend',`<div id=dmodal class=dmodal hidden>
+ <div class=dmodal-back data-dclose></div>
+ <div class=dmodal-sheet role=dialog aria-modal=true aria-labelledby=dmodalTitle>
+  <div class=dmodal-bar>
+   <div class=dmodal-id><span class=dmodal-kicker>DRAW</span><strong id=dmodalTitle></strong></div>
+   <a class=dmodal-full href="draw.html"></a>
+   <button type=button class=dmodal-x data-dclose><span class=dmodal-x-mark aria-hidden=true>×</span><span class=dmodal-x-tx></span></button>
+  </div>
+  <div class=dmodal-scroll><div id=dmodalHost></div></div>
+ </div>
+</div>`);
+  root=document.getElementById('dmodal');
+  root.addEventListener('click',e=>{if(e.target.closest('[data-dclose]')) closeDrawModal()});
+ }
+ paintDrawChrome();
+ if(!root.hidden){const x=root.querySelector('.dmodal-x'); if(x) x.focus(); return}
+ drawReturnFocus=(trigger&&trigger.focus)?trigger:document.activeElement;
+ const dd=document.getElementById('langDd'); if(dd) dd.classList.remove('open');
+ drawLockY=window.scrollY||document.documentElement.scrollTop||0;
+ document.body.style.top=`-${drawLockY}px`;
+ document.body.classList.add('dmodal-open');
+ inertBg(true);
+ root.hidden=false; root.classList.add('on');
+ const host=document.getElementById('dmodalHost');
+ if(!drawBootP){
+  host.innerHTML=`<p class=dmodal-loading>${i18n('加载中…')}</p>`;
+  drawBootP=bootDraw(host,true).catch(err=>{
+   console.error(err); drawBootP=null;
+   const h=document.getElementById('dmodalHost'); if(h) h.innerHTML=`<p class=dmodal-err>${i18n('抽签暂时打不开')}</p>`;
+  });
+ }
+ const x=root.querySelector('.dmodal-x'); if(x) x.focus();
+ await drawBootP;
+ paintDrawChrome();
+};
+window.openDrawModal=openDrawModal;
+document.addEventListener('click',e=>{
+ const a=e.target.closest('a.hdraw'); if(!a) return;
+ if(e.defaultPrevented||e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+ e.preventDefault(); openDrawModal(a);
+});
+document.addEventListener('keydown',e=>{
+ if(!document.body.classList.contains('dmodal-open')||e.key!=='Escape') return;
+ const lb=document.getElementById('lb'); if(lb&&lb.classList.contains('on')) return;
+ e.preventDefault(); e.stopPropagation(); closeDrawModal();
+},true);
 if(P=='home'){document.title=`iLiFE! ${i18n('应援资料库')}`;const[M,L,I,E]=await Promise.all([J('members'),J('lives'),J('images'),J('eras')]);const t=new Date().toISOString().slice(0,10);const cur=M.filter(x=>x.status=='现役');
  const era=(E[E.length-1]||{}).id,G=I.filter(groupStill),byNew=(a,b)=>a.date<b.date?1:a.date>b.date?-1:I.indexOf(b)-I.indexOf(a);
  const pref=G.filter(i=>i.era==era&&i.category=='official'&&arsha(i)),pool=pref.length?pref:G,last=pool.slice().sort(byNew)[0];
  const g=last&&(I.find(i=>i.post==last.post&&pool.includes(i))||last);
  const N=G.slice().sort(byNew).slice(0,8);
  m.innerHTML=`${g?`<div class=hero><div class=bg style="background-image:url('${g.local||g.url}')"></div><img src="${g.local||g.url}"${WH(g)} data-i=0 alt="iLiFE!"></div>`:''}
+ ${homeDrawCard()}
  <div class=stats><div class=stat><b>${cur.length}</b>${i18n('现役成员')}</div><div class=stat><b>${L.length}</b>${i18n('收录公演')}</div><div class=stat><b>${E.length}</b>${i18n('时期')}</div><div class=stat><b>${I.length}</b>${i18n('收录图片')}</div></div>
  <h2>UPCOMING · ${i18n('即将举行')}</h2>${ltab(L.filter(l=>l.date>=t).slice(0,8))}
  <h2>MEMBER · ${i18n('现役成员')}</h2><div class=mgrid>${cur.map(x=>mcard(x,I)).join('')}</div>
@@ -1115,6 +1209,7 @@ if(P=='members'){
  });
  window.addEventListener('popstate',()=>paint());
  document.addEventListener('keydown',e=>{
+  if(document.body.classList.contains('dmodal-open')) return;
   if(!memberName()||!$('#mshow')||$('#lb').classList.contains('on')) return;
   const tag=(e.target&&e.target.tagName||'').toLowerCase();
   if(tag==='input'||tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable)) return;
@@ -1310,11 +1405,24 @@ if(P=='songs'){const S=await J('songs');let filter=q.get('f')||'all';
  };
  window.addEventListener('popstate',render);
  render();return}
-if(P=='draw'){
+async function bootDraw(host,asModal){const m=host;
  const [S,M,I]=await Promise.all([J('songs'),J('members'),J('images')]);
  const KEY='ilifefan-draw-v1';
  const wait=ms=>new Promise(r=>setTimeout(r,ms));
  const reduceMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const scrollDraw=(el,opt)=>{
+  const behavior=(opt&&opt.behavior)||'smooth';
+  if(asModal){
+   const sc=host.closest('.dmodal-scroll');
+   if(!sc)return;
+   if(!el){sc.scrollTo({top:0,behavior});return}
+   const top=el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-12;
+   sc.scrollTo({top:Math.max(0,top),behavior});
+   return;
+  }
+  if(el)el.scrollIntoView(opt||{behavior:'smooth'});
+  else window.scrollTo({top:0,behavior:'smooth'});
+ };
  const jstDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const empty=()=>({v:1,prefs:{mode:'member',songFilter:'all',includeFormer:false},first:{song:'',member:''},history:{song:[],member:[]}});
  const dayOk=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'');
@@ -1357,7 +1465,7 @@ if(P=='draw'){
  };
  const load=()=>{try{return normalize(JSON.parse(localStorage.getItem(KEY)||''))}catch(e){return empty()}};
  let st,view=null,busy=false,enterAnim=false,shaking=false,toastT=0;
- const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){const l=currentLang;toast(l==='ja'?'このブラウザでは履歴を保存できません':l==='en'?'Could not save draw history':'这个浏览器无法保存抽签记录')}};
+ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){const l=currentLang;toast(l==='ja'?'このブラウザでは履歴を保存できません':l==='en'?'Could not save draw history':'这个浏览器无法保存抽签记录')}if(window.__updateMascotLang)window.__updateMascotLang()};
  const toast=msg=>{let t=$('#dtoast');if(!t){document.body.insertAdjacentHTML('beforeend','<div id=dtoast role=status></div>');t=$('#dtoast')}t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2400)};
  if(!$('#dpetals'))document.body.insertAdjacentHTML('beforeend','<div id=dpetals aria-hidden=true></div>');
  const safeHex=h=>/^#[0-9a-fA-F]{6}$/.test(h||'')?h:'#e4007f';
@@ -2013,7 +2121,7 @@ const FORTUNES_1000 = buildFortunes1000();
  };
  const render=()=>{
   const l=currentLang, t=DRAW_I18N[l]||DRAW_I18N.zh;
-  document.title=t.pageTitle;
+  if(!asModal) document.title=t.pageTitle;
   const mode=st.prefs.mode,list=pool(),n=counts(),anim=enterAnim&&!reduceMotion();enterAnim=false;
   const phase=shaking?'shake':view?'show':'idle';
   const drawnToday=hasDrawnToday(mode);
@@ -2206,8 +2314,8 @@ const FORTUNES_1000 = buildFortunes1000();
    </div>
   </section>`;
 
-  m.innerHTML=`<div class="dpage" data-phase="${phase}">
-   <div class="crumb"><a href="index.html">${t.crumb}</a> / ${t.crumbDraw}</div>
+  m.innerHTML=`<div class="dpage${asModal?' is-modal':''}" data-phase="${phase}">
+   ${asModal?'':`<div class="crumb"><a href="index.html">${t.crumb}</a> / ${t.crumbDraw}</div>`}
    ${shaking?'':hero}
    ${stage}
    ${shaking?'':feats}
@@ -2215,16 +2323,12 @@ const FORTUNES_1000 = buildFortunes1000();
    ${shaking?'':arch}
   </div>`;
 
-  window.__onLangChange=()=>{
-   render();
-  };
-
   m.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{if(busy||b.dataset.mode==st.prefs.mode)return;st.prefs.mode=b.dataset.mode;view=initTodayView(st.prefs.mode);save();render()});
   m.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{if(busy)return;st.prefs.songFilter=b.dataset.sf;if(view&&view.mode=='song'&&!pool().some(s=>s.id==view.item.id))view=null;save();render()});
   const former=$('#drawFormer');if(former)former.onclick=()=>{if(busy)return;st.prefs.includeFormer=!st.prefs.includeFormer;if(view&&view.mode=='member'&&!pool().some(mem=>mem.id==view.item.id))view=null;save();render()};
   const go=$('#drawGo');if(go)go.onclick=(e)=>{
    if(drawnToday){
-    const r=$('#result');if(r)r.scrollIntoView({behavior:'smooth'});
+    const r=$('#result');if(r)scrollDraw(r,{behavior:'smooth',block:'start'});
    }else{
     draw(e);
    }
@@ -2240,13 +2344,13 @@ const FORTUNES_1000 = buildFortunes1000();
    st.prefs.mode=targetMode;
    view=initTodayView(targetMode);
    save();render();
-   window.scrollTo({top:0,behavior:'smooth'});
+   scrollDraw();
   };
   const bkToday=$('#drawBackToday');
   if(bkToday)bkToday.onclick=()=>{
    view=initTodayView(st.prefs.mode);
    render();
-   window.scrollTo({top:0,behavior:'smooth'});
+   scrollDraw();
   };
   m.querySelectorAll('[data-hid]').forEach(b=>b.onclick=()=>{
    if(busy)return;
@@ -2255,7 +2359,7 @@ const FORTUNES_1000 = buildFortunes1000();
    let fortune=h.fortune;if(!fortune){fortune=rollFortune(mode,item);h.fortune=fortune;save()}
    view={mode,item,first:!!h.first,day:h.day,at:h.at,hist:true,fortune};
    render();
-   const r=$('#result');if(r)r.scrollIntoView({behavior:'smooth'});
+   const r=$('#result');if(r)scrollDraw(r,{behavior:'smooth',block:'start'});
   });
   const ex=$('#drawExport');if(ex)ex.onclick=()=>{
    const blob=new Blob([JSON.stringify({key:KEY,exportedAt:new Date().toISOString(),...st},null,2)],{type:'application/json'});
@@ -2297,7 +2401,7 @@ const FORTUNES_1000 = buildFortunes1000();
   busy=true;
   const reduce=reduceMotion();
   try{
-   if(!reduce){shaking=true;render();window.scrollTo({top:0,behavior:'smooth'});await wait(1900)}
+   if(!reduce){shaking=true;render();scrollDraw();await wait(1900)}
    const item=list[Math.floor(rng()*list.length)];
    const day=jstDay();
    st.first[mode]=day;
@@ -2312,7 +2416,7 @@ const FORTUNES_1000 = buildFortunes1000();
    if(!reduce){
     burst(mode=='member'?item.hex:'#e4007f');
     const shown=$('#result');
-    if(shown)shown.scrollIntoView({block:'nearest',behavior:'smooth'});
+    if(shown)scrollDraw(shown,{block:'nearest',behavior:'smooth'});
    }
   }finally{
    const failed=shaking;
@@ -2321,8 +2425,15 @@ const FORTUNES_1000 = buildFortunes1000();
    else{const b=$('#drawGo');if(b)b.disabled=false}
   }
  };
+ if(!bootDraw.hooked){
+  const prev=window.__onLangChange;
+  window.__onLangChange=()=>{if(typeof prev==='function')prev();render()};
+  bootDraw.hooked=true;
+ }
  view=initTodayView(st.prefs.mode);
- render();return}
+ render();
+}
+if(P=='draw'){await bootDraw(m,false);return}
 })();
 /* column control: one shared control per page type, saved in localStorage */
 (()=>{const T={members:'members',gallery:'gallery',eras:'eras',songs:'songs'}[P];if(!T)return;const mob=()=>innerWidth<=760,opts=()=>mob()?[1,2,3,4]:[2,3,4,5,6,8];
