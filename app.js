@@ -996,6 +996,21 @@ if(P=='members'){
   document.querySelectorAll('#mstage .mchev').forEach(b=>{b.hidden=!many});
   const keys=$('#mkeys');
   if(keys) keys.textContent=many?i18n('两侧按钮或 [ ] 切换形象，← → 切换成员'):i18n('← → 切换成员');
+  const box=$('#mthumbs');
+  if(!box) return;
+  if(!many){box.hidden=true;box.innerHTML='';return}
+  box.hidden=false;
+  box.innerHTML=art.vars.map((v,i)=>{
+   const im=v.img, s=im.local||im.url, on=i===art.idx;
+   return `<button type=button class="mth${on?' on':''}" data-vi=${i} aria-pressed="${on}" title="${esc(v.label)}"><span class=av><img alt="" src="${esc(s)}"></span><span class=lb>${esc(v.label)}</span></button>`;
+  }).join('');
+  box.querySelectorAll('[data-vi]').forEach(b=>b.onclick=()=>{
+   const who=memberName(); if(!who) return;
+   heroBy.set(who,+b.dataset.vi);
+   fillHero(who,chosenArt(who),true);
+  });
+  const on=box.querySelector('.on');
+  if(on&&box.scrollHeight>box.clientHeight+4) box.scrollTo({top:Math.max(0,on.offsetTop-box.clientHeight/2+on.offsetHeight/2),behavior:reduceMotion()?'auto':'smooth'});
  };
  const metaHTML=x=>{
   const n=x.name||'', S=x.sources||{};
@@ -1027,7 +1042,7 @@ if(P=='members'){
  };
  const ensureCard=()=>{
   if($('#mshow')) return;
-  $('#mbody').innerHTML=`<article class=mshow id=mshow><div id=msw></div><section class=mstage id=mstage><div class=mhero id=mhero><button type=button class="mchev prev" aria-label="${i18n('上一形象')}"><b>‹</b><small>${i18n('形象切换')}</small></button><button type=button class="mchev next" aria-label="${i18n('下一形象')}"><b>›</b><small>${i18n('形象切换')}</small></button><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div></div><div class=mmeta id=mmeta aria-live=polite></div></section><p class=mkeys id=mkeys></p></article><div id=mgals></div>`;
+  $('#mbody').innerHTML=`<article class=mshow id=mshow><div id=msw></div><section class=mstage id=mstage><div class=mhero id=mhero><button type=button class="mchev prev" aria-label="${i18n('上一形象')}"><b>‹</b><small>${i18n('形象切换')}</small></button><button type=button class="mchev next" aria-label="${i18n('下一形象')}"><b>›</b><small>${i18n('形象切换')}</small></button><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div></div><div class=mcol><div class=mmeta id=mmeta aria-live=polite></div><div class=mthumbs id=mthumbs hidden></div></div></section><p class=mkeys id=mkeys></p></article><div id=mgals></div>`;
   $('#mstage .mchev.prev').onclick=()=>stepVis(-1);
   $('#mstage .mchev.next').onclick=()=>stepVis(1);
   $('#martbtn').onclick=()=>{const art=chosenArt(memberName());if(!art.img)return;LB=[art.img];LI=0;lbShow()};

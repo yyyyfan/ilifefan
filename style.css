@@ -936,6 +936,7 @@ body[data-page=draw] .dmode button[aria-selected="true"] .dmode-tag.done{backgro
 .msplit{flex:0 0 1px;align-self:center;height:48px;margin:0 8px;background:var(--line)}
 body[data-page=members] button.mchip,
 body[data-page=members] button.mchev,
+body[data-page=members] button.mth,
 body[data-page=members] button#martbtn{
   background:none;color:inherit;border-radius:0;padding:0;margin:0;box-shadow:none;
   font:inherit;line-height:inherit;cursor:pointer;
@@ -960,7 +961,7 @@ button.mchip.on.light .av{box-shadow:0 0 0 3px #fff, 0 0 0 6px var(--chip, #ccc)
 button.mchip.on .nm{background:var(--chip, var(--pink));color:var(--chip-ink, #fff);border-radius:999px}
 button.mchip.on.light .nm{box-shadow:inset 0 0 0 1px rgba(0,0,0,.28)}
 button.mchip.on.ex img{filter:none}
-button.mchip:focus-visible,button.mchev:focus-visible,button#martbtn:focus-visible{
+button.mchip:focus-visible,button.mchev:focus-visible,button.mth:focus-visible,button#martbtn:focus-visible{
   outline:2px solid var(--mc, var(--pink));outline-offset:3px;
 }
 .mshow #msw{padding:4px 6px 6px;border-bottom:1px solid var(--line);margin-bottom:8px}
@@ -1014,7 +1015,25 @@ button#martbtn img.is-out{opacity:0}
   width:140px;height:140px;border-radius:50%;display:grid;place-items:center;
   background:rgba(255,255,255,.88);color:var(--mc-deep);font:900 48px "Zen Maru Gothic","Noto Sans SC",sans-serif;
 }
+.mcol{display:flex;flex-direction:column;min-width:0;align-self:stretch}
 .mmeta{padding:8px 8px 4px 6px;min-width:0}
+.mthumbs{
+  margin-top:auto;padding:12px 4px 4px;display:flex;flex-wrap:wrap;gap:8px 6px;
+  align-content:flex-end;justify-content:flex-start;max-height:46%;overflow:hidden auto;scrollbar-width:none;
+}
+.mthumbs::-webkit-scrollbar{display:none}
+.mthumbs[hidden]{display:none}
+button.mth{flex:0 0 62px;width:62px;text-align:center;color:var(--ink)}
+button.mth .av{
+  width:52px;height:52px;border-radius:50%;margin:0 auto 3px;overflow:hidden;background:#fff;
+  box-shadow:inset 0 0 0 1px var(--line);display:flex;align-items:center;justify-content:center;
+}
+button.mth img{width:68%;height:68%;object-fit:contain;display:block}
+button.mth.on .av{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--mc)}
+button.mth .lb{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:9px;font-weight:700;line-height:1.25;max-height:2.5em;color:var(--sub);
+}
 .mmeta.is-out{opacity:0}
 .mmeta{transition:opacity .28s ease}
 .mkana{margin:0;color:var(--sub);letter-spacing:.14em;font-size:13px}
@@ -1055,7 +1074,9 @@ button#martbtn img.is-out{opacity:0}
   button.mchip{width:72px}
   button.mchip .av{width:58px;height:58px}
   button.mchip .nm{font-size:10px}
-  .mrib{grid-template-columns:96px minmax(0,1fr)}
+  .mthumbs{max-height:none;justify-content:flex-end;margin-top:14px;padding-top:8px}
+  button.mth{flex-basis:56px;width:56px}
+  button.mth .av{width:46px;height:46px}
 }
 @media(prefers-reduced-motion:reduce){
   .mshow,body[data-page=members] .mmeta,body[data-page=members] button#martbtn img{transition:none}
