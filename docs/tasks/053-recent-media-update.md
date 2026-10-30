@@ -11,7 +11,7 @@
 
 - 改：`db/ilife.sqlite` 的 `lives` / `sources` / `live_members`，以及成功上传并核对过的 `images` 与关联表；`db/r2_manifest.json` 只记已上传对象；`db/export.py` 导出的 `data/*.json` 与页面版本号；本任务脚本 `db/task053_apply.py`。
 - 不改：页面样式、`app.js` 文案、歌曲表结构。不把粉丝影像自动写进 `song_videos`。不使用 Eventernote / LiveFans 的图。不合并 main，不部署。
-- 图片字节只放本地 `img/`（已 gitignore）和 R2。Cloudflare 连接器在本环境需要重新登录，`wrangler` 也未登录，因此本分支**还没有**把新图写入清单或数据库。上传命令和校验值在 `053-result.md`。
+- 图片字节不进 Git。36 张已在 R2，清单与数据库都已写入。校验值见 `053-result.md`。
 
 ## 数据来源
 
@@ -31,10 +31,10 @@
 - [x] 867 备注补上 11/14 线上签名与宾果（图上没有开始时刻，不填时间）
 - [x] 868 开演改为官方图上的 14:00
 - [x] 新增 2026-11-18「YANFES 2026」（豊洲PIT，开场 10:30、开演 11:00）；裏会场没有 iLiFE!，不建场
-- [ ] 36 张已转好的 webp 上传到 R2 并 `r2_images.py verify` 通过后，再跑 `python3 db/task053_apply.py` 入库。本环境 Cloudflare 未登录，这一步未做，数据库里没有新图片行
+- [x] 36 张 webp 已在 R2。逐个 `r2_images.py add` 后抽查 4 张公开地址通过，`python3 db/task053_apply.py` 已入库
 - [x] 官方 YouTube 没有新的曲名影像需要写入 `song_videos`
 - [x] 只推送本分支；未合并 main，未部署
 
 ## 状态
 
-待验收。公演事实已入库。图片转码完成但未上 R2，明细见 `docs/tasks/053-result.md`。
+待验收。公演与 36 张图已入库，导出版本 `0685780f`。明细见 `docs/tasks/053-result.md`。

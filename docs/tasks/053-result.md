@@ -2,7 +2,7 @@
 
 分支：`cursor/053-recent-media-update-e7b2`（只推这个分支，没有合并 main，没有部署，没有 force push）
 
-`python3 db/export.py --check` 通过。导出版本 `d113d8d9`。公演 872→873。图片行数仍是 4500：新图还没上 R2，所以没有写入 `images`，也没有写入 `db/r2_manifest.json`。
+`python3 db/export.py --check` 通过。导出版本 `0685780f`。公演 872→873。图片 4500→4536（新增 36）。36 张已由本机上传到 R2 桶 `ilife-images`，记入 `db/r2_manifest.json`。公开地址抽查 4 张（`live-856-HVoRGPuaAAAUhl3`、`live-872-HVPLxcNaMAEaWns`、`member-5-HVoyc_Ja0AAmDZr`、`group-e12-HV4xj_9bkAApTfC`）为 HTTP 200、`image/webp`，字节数与 md5 与清单一致。前缀 `https://img.ilifefan.dpdns.org/img/`。
 
 脚本：`db/task053_apply.py`。公演备注是定稿，重复跑会写成同一段。图片只在清单里已经有对应键时才入库。`task028_live_members.py` 重算后，相对 main 只多了 872 的 9 名现役成员，没有改其他场的出演状态。23、24 的あいす仍是「出演」（公告只休息特典会）。
 
@@ -21,7 +21,7 @@
 
 裏会场已打开 https://t-dv.com/YANFES_ura-261118 ：标题「YANFES 2026 -裏-」，duo MUSIC EXCHANGE，出演名单没有 iLiFE!，开场开演页面上是 0:00。不建场。主办方双会场帖 https://x.com/heroines_idol/status/2113256751164522638 只作备注，那张双会场海报没有入库，避免把没有 iLiFE! 的半张当成这场的图。
 
-856、872 目前没有封面：对应 webp 还在本地 `img/`。
+856 的封面是札幌时间表 `img/live-856-HVoRGPuaAAAUhl3.webp`。872 的封面是丰洲告知图 `img/live-872-HVPLxcNaMAEaWns.webp`。23、24 的封面换成主办方演后感谢（`category=live`）。852、853 原告知图封面未换。
 
 ## 图片
 
@@ -127,9 +127,7 @@ python3 db/task053_apply.py
 python3 db/export.py --rebuild-derived
 ```
 
-`r2_images.py add` 会把同目录里其他无关 webp 也记进去。上传后应对着上表的 36 个文件名逐个 `add`，不要用通配符扫到 `stage-` 或 `org-` 临时文件。
-
-本环境 `npx wrangler whoami` 是未登录。Cloudflare 连接器第一次能列出账号，随后返回需要重新认证，`execute` 无法再传对象。公开地址因此还不能核对。没有把这些键写进清单。
+上传已完成（本机逐个 `wrangler r2 object put`，不是通配符）。随后按上表文件名逐个 `python3 db/r2_images.py add`，没有扫到 `stage-` / `org-` 临时文件。`python3 db/task053_apply.py` 写入 36 行。公开核对 4 张，0 个问题。
 
 ## 故意不收
 
@@ -143,4 +141,4 @@ python3 db/export.py --rebuild-derived
 
 ## 页面
 
-本地 `python3 -m http.server` 打开过 `lives.html`（HTTP 200）。导出的 `data/lives.json` 里 856、852、853、868、872 的标题和时间与上表一致；856 和 872 的 `images` 仍是空的。图库里还看不到这批万圣节新图，因为它们不在 JSON 里。桌面 / 手机宽度下的新图灯箱要等 R2 入库后再看。
+导出的 `data/lives.json` 里 856、852、853、868、872 的标题和时间与上表一致。856 有 2 张图，封面是时间表；872 有 1 张图，封面是告知图。新图在 `data/images.json`（id 4610–4645）：衣装单人 10、衣装全员 4、演后/舞台 4、告知 18。公开地址前缀 `https://img.ilifefan.dpdns.org/img/`。
