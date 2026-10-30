@@ -48,7 +48,7 @@ const UI={
 '首页':['ホーム','Home'],'成员':['メンバー','Members'],'歌曲':['曲','Songs'],'公演':['ライブ','Lives'],
 '场地':['会場','Venues'],'日历':['日程','Calendar'],'时期':['時代','Eras'],'图库':['写真','Gallery'],
 '全部':['すべて','All'],'未确认':['未確認','Unknown'],'未找到':['見つかりません','Not found'],'未收录':['未収録','Not listed'],
-'来源':['出典','Source'],'出处':['出典','Source'],'展开':['開く','Expand'],'收起':['たたむ','Collapse'],
+'来源':['出典','Source'],'出处':['出典','Source'],'源':['出典','src'],'展开':['開く','Expand'],'收起':['たたむ','Collapse'],
 '今天':['今日','Today'],'现役':['現役','Active'],'现在':['現在','Present'],'至今':['現在','present'],
 '类型':['種類','Type'],'年份':['年','Year'],'分类':['分類','Category'],'会场':['会場','Venue'],'地区':['地域','Region'],
 '加载中…':['読み込み中…','Loading…'],'Language / 语言切换':['言語の切り替え','Switch language'],
@@ -73,6 +73,16 @@ const UI={
 '个人 X':['個人 X','Personal X'],'各时期个人图':['時代別ソロアー写','Solo photos by era'],
 '相关图片':['関連画像','Related photos'],'暂无收录。':['まだ収録がありません。','Nothing recorded yet.'],
 '前成员・支援成员':['元メンバー・サポート','Former & support members'],
+'前成员':['元メンバー','Former'],
+'上一位':['前のメンバー','Previous'],
+'下一位':['次のメンバー','Next'],
+'返回成员列表':['メンバー一覧に戻る','Back to members'],
+'形象切换':['ビジュアルチェンジ','Visual change'],
+'← → 切换成员，[ ] 切换形象':['← → でメンバー、[ ] でビジュアル','← → member, [ ] look'],
+'两侧按钮或 [ ] 切换形象，← → 切换成员':['左右のボタンか [ ] でビジュアル、← → でメンバー','Side buttons or [ ] change the look, ← → change member'],
+'上一形象':['前のビジュアル','Previous look'],
+'下一形象':['次のビジュアル','Next look'],
+'← → 切换成员':['← → でメンバー','← → member'],
 '时间轴':['タイムライン','Timeline'],'成员卡片':['メンバーカード','Cards'],
 '正式成员（成员色）':['正規メンバー（メンバーカラー）','Official member (member color)'],
 '非正式期间（支援/候补生）':['非正規期間（サポート・候補生）','Non-official period (support / trainee)'],
@@ -806,17 +816,53 @@ if(P=='home'){document.title=`iLiFE! ${i18n('应援资料库')}`;const[M,L,I,E]=
  <h2>NEW PHOTO · ${i18n('最新团体公式图')}</h2>${N.length?galHTML(N):`<p style="color:var(--sub)">${i18n('暂无团体公式图。')}</p>`}
  <p style="text-align:center;margin-top:24px"><a class=pill href=eras.html>${i18n('查看全部时期公式图')}</a> <a class="pill off" href=gallery.html>${i18n('图库')}</a></p>`;
  const gal=m.querySelector('.gal');if(gal)bindLB(gal,N);const hero=m.querySelector('.hero [data-i]');if(hero)hero.onclick=()=>{LB=[g];LI=0;lbShow()};imgDone(m);return}
-if(P=='members'&&q.get('m')){const[M,I,E]=await Promise.all([J('members'),J('images'),J('eras')]);const n=q.get('m'),x=M.find(a=>a.name==n)||{name:n,hex:'#999'};const mine=I.filter(i=>i.kind=='individual'&&i.member==n);const p=latestPhoto(I,n);
- m.innerHTML=`${head('MEMBER',esc(n),`<a href=members.html>${i18n('成员')}</a> / `+esc(n))}<div style="display:grid;grid-template-columns:minmax(200px,320px) 1fr;gap:32px" class=mdet><div class=mcard><div class=ph>${p?`<img src="${p.local||p.url}"${WH(p)}>`:''}</div><div class=bar style="background:${x.hex}"></div></div><div><h3 style="font-size:30px;margin:0"><span class=dot style="background:${x.hex};width:16px;height:16px"></span>${esc(n)}</h3><p style="color:var(--sub)">${esc(x.kana||'')}</p><dl class=info>${(()=>{const S=x.sources||{},L=k=>S[k]?` <a class=src href="${S[k]}" target=_blank title="${i18n('来源')}">[源]</a>`:'',R=(lb,k,v)=>`<dt>${lb}</dt><dd>${v?esc(v):`<span class=unk>${i18n('未确认')}</span>`}${L(k)}</dd>`;return R(i18n('读音'),'kana',x.kana)+(x.romaji?R(i18n('罗马字'),'romaji',x.romaji):'')+`<dt>${i18n('应援色')}</dt><dd><span class="dot" style="background:${x.hex}"></span>${esc(x.color||i18n('未确认'))} <small class=unk>${esc(x.hex||'')}${x.hex_note?' · '+esc(x.hex_note):''}</small>${L('color')}${S.hex&&S.hex!=S.color?` <a class=src href="${S.hex}" target=_blank>[HEX源]</a>`:''}</dd>`+R(i18n('生日'),'birthday',x.birthday)+R(i18n('加入'),'joined',x.joined)+(x.left?R(i18n('离开'),'left',x.left):'')+`<dt>${i18n('出演公演')}</dt><dd>${x.lives?`<a href="lives.html?m=${encodeURIComponent(n)}">${i18n('{n} 场',{n:x.lives})}</a>`:'<span class=unk>—</span>'}</dd>`+(x.role||x.note?R(i18n('职务/备注'),'role',x.role||x.note):'')+(x.support?R(i18n('支援/候补期'),'support',x.support):'')+(x.catch?R(i18n('官方口号'),'catch',x.catch):'')+`<dt>${i18n('个人 X')}</dt><dd>${x.x?`<a href="https://x.com/${x.x}" target=_blank>@${esc(x.x)}</a>`:'<span class=unk>'+i18n('未找到')+'</span>'} <small class=unk>${esc(x.x_status||'')}</small>${L('x')}</dd><dt>${i18n('状态')}</dt><dd>${esc(x.status==='现役'?i18n('现役'):x.status||'')}</dd>`})()}</dl></div></div>
- <h2>${i18n('各时期个人图')}（${mine.length}）</h2>${E.filter(e=>mine.some(i=>i.era==e.id)).map(e=>`<h3>${esc(e.name)} <small style="color:var(--sub);font-weight:400">${e.start}～</small></h3>${galHTML(mine.filter(i=>i.era==e.id),1)}`).join('')||`<p>${i18n('暂无收录。')}</p>`}${(()=>{const rel=I.filter(i=>i.related&&i.member==n);return rel.length?`<h2>${i18n('相关图片')}（${rel.length}）</h2><div id=rel><p style="font-size:13px;color:var(--sub)">${i18n('官方推文文本仅提及该成员的告知/周边/活动图，非个人公式照。')}</p>${galHTML(rel.slice().reverse())}</div>`:''})()}`;
- let k=0;const flat=[];m.querySelectorAll('.gi .ph').forEach(el=>el.dataset.i=k++);E.forEach(e=>mine.filter(i=>i.era==e.id).forEach(i=>flat.push(i)));bindLB(m,flat);if($('#rel'))bindLB($('#rel'),I.filter(i=>i.related&&i.member==n).reverse());imgDone(m);if(innerWidth<760)m.querySelector('.mdet').style.gridTemplateColumns='1fr';return}
-if(P=='members'){document.title=`MEMBERS · ${i18n('成员')} | iLiFE! ${i18n('应援资料库')}`;const[M,I,T,E]=await Promise.all([J('members'),J('images'),J('timeline'),J('eras')]);let view=q.get('view')||'tl';
+if(P=='members'){
+ const [M,I,T,E]=await Promise.all([J('members'),J('images'),J('timeline'),J('eras')]);
+ const reduceMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const liveQ=()=>new URLSearchParams(location.search);
+ const memberName=()=>liveQ().get('m')||'';
+ const listView=()=>liveQ().get('view')==='cards'?'cards':'tl';
+ const isMembersPath=p=>/\/members(?:\.html)?$/.test(p)||p==='members.html';
+ const urlFor=(name,view)=>{
+  const p=new URLSearchParams();
+  const lang=liveQ().get('lang');
+  if(lang&&VALID_LANGS.includes(lang)) p.set('lang',lang);
+  const v=view==null?listView():view;
+  if(name){p.set('m',name);if(v==='cards')p.set('view','cards')}
+  else if(v==='cards') p.set('view','cards');
+  const s=p.toString();
+  return location.pathname+(s?'?'+s:'');
+ };
+ const hexRgb=hex=>{
+  let h=String(hex||'').replace('#','').trim();
+  if(!/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(h)) return [185,163,173];
+  if(h.length===3) h=h.split('').map(c=>c+c).join('');
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
+ };
+ const relLum=(r,g,b)=>{const f=c=>{c/=255;return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4)};return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b)};
+ const themeOf=hex=>{
+  const [r,g,b]=hexRgb(hex);
+  const L=relLum(r,g,b), light=L>0.62, pale=L>0.84;
+  /* 白字对比够用就用白字（红、蓝）；浅色应援色改深字，避免绿/黄底看不清 */
+  const ink=(1.05)/(L+0.05)>=3.3?'#fff':'#1a1a1a';
+  const d=L>0.5?[r,g,b].map(c=>Math.max(0,Math.round(c*(pale?0.42:0.58)))):[r,g,b];
+  const deep='#'+d.map(c=>c.toString(16).padStart(2,'0')).join('');
+  const raw=String(hex||'').trim();
+  return {r,g,b,hex:/^#/.test(raw)?raw:'#'+(raw||'b9a3ad'),light,pale,ink,deep,heroInk:ink};
+ };
+ let showEx=false;
+ const n0=memberName(), hit0=M.find(x=>x.name===n0);
+ if(hit0&&hit0.status!=='现役') showEx=true;
+ const heroBy=new Map();
+ let heroToken=0, metaToken=0;
+ let view=listView();
+
  const t0=new Date('2020-06-01'),t1=new Date('2026-12-31'),today=new Date().toISOString().slice(0,10),pct=d=>((new Date(d)-t0)/(t1-t0)*100).toFixed(3)+'%',wid=(a,b)=>((new Date(b)-new Date(a))/(t1-t0)*100).toFixed(3)+'%';
  const MM=Object.fromEntries(M.map(x=>[x.name,x]));
  const tl=()=>{const yrs=[2021,2022,2023,2024,2025,2026];
   const grid=yrs.map(y=>`<i class=yl style="left:${pct(y+'-01-01')}"></i>`).join('')+E.map((e,k)=>`<i class=el style="left:${pct(e.start)}"></i>`).join('')+T.marks.map(k=>`<i class=ml style="left:${pct(k.date)}"></i>`).join('')+`<i class=today style="left:${pct(today)}"></i>`;
-  const rows=T.members.map(r=>{const x=MM[r.name]||{hex:'#999'};const light=/^#f[0-9a-f]f[0-9a-f]f/i.test(x.hex);
-   return `<div class=tr><a class=tn href="members.html?m=${encodeURIComponent(r.name)}"><span class=dot style="background:${x.hex}"></span>${esc(r.name)}${r.segments.every(s=>s.type=='s')?'<em>'+i18n('支援')+'</em>':''}</a><div class=tt>${grid}${r.segments.map(sg=>{const to=sg.to||today;return `<a class="seg ${sg.type}${light&&sg.type=='r'?' light':''}" href="members.html?m=${encodeURIComponent(r.name)}" data-n="${esc(r.name)}" data-f="${sg.from}" data-t="${sg.to||i18n('至今')}" data-l="${esc(sg.label+(sg.color?i18n('（{c}色）',{c:sg.color}):''))}" style="left:${pct(sg.from)};width:${wid(sg.from,to)};${sg.type=='r'?'background:'+(sg.color=='绿'?'#3eb370':x.hex):''}"></a>`}).join('')}</div></div>`}).join('');
+  const rows=[...T.members].reverse().map(r=>{const x=MM[r.name]||{hex:'#999'};const light=/^#f[0-9a-f]f[0-9a-f]f/i.test(x.hex);
+   return `<div class=tr><a class=tn href="${urlFor(r.name)}"><span class=dot style="background:${x.hex}"></span>${esc(r.name)}${r.segments.every(s=>s.type=='s')?'<em>'+i18n('支援')+'</em>':''}</a><div class=tt>${grid}${r.segments.map(sg=>{const to=sg.to||today;return `<a class="seg ${sg.type}${light&&sg.type=='r'?' light':''}" href="${urlFor(r.name)}" data-n="${esc(r.name)}" data-f="${sg.from}" data-t="${sg.to||i18n('至今')}" data-l="${esc(sg.label+(sg.color?i18n('（{c}色）',{c:sg.color}):''))}" style="left:${pct(sg.from)};width:${wid(sg.from,to)};${sg.type=='r'?'background:'+(sg.color=='绿'?'#3eb370':x.hex):''}"></a>`}).join('')}</div></div>`}).join('');
   const s0='2020-06-05',sp=d=>((new Date(d)-new Date(s0))/(new Date(today)-new Date(s0))*100).toFixed(3)+'%',ECOL=['#f6c1d9','#c9e3ec','#fde2b8','#d7ecd0','#e4d4f0','#fbd0c4','#cfe0f7','#f9d6e8','#d9f0ea','#f3e3c3','#dcd6f2','#ffd0e4'];
   const stk=`<div id=stk><div class=stkhd><b id=onh></b><button class="off sm" id=stkt>${i18n('收起')}</button></div><div id=stkb><div id=sl><div class=sltrack>${E.map((e,k)=>`<i class=sle style="left:${sp(e.start<s0?s0:e.start)};width:calc(${sp(E[k+1]?E[k+1].start:today)} - ${sp(e.start<s0?s0:e.start)});background:${ECOL[k%12]}" title="${esc(e.name)}"></i>`).join('')}${[2021,2022,2023,2024,2025,2026].map(y=>`<span class=sly style="left:${sp(y+'-01-01')}">${y}</span>`).join('')}<div id=slh><span></span></div></div></div><p class="filters eps">${E.map((e,k)=>`<button class=off data-jd=${e.start<s0?s0:e.start}>${k+1}. ${esc(e.name)}</button>`).join('')}<button class=off data-jd=${today}>${i18n('今天')}</button></p><div id=onpanel></div></div></div>`;
   return stk+`<div class=tlwrap><div class=tl><div class="tr th"><div class=tn></div><div class=tt>${yrs.map(y=>`<b style="left:${pct(y+'-01-01')}">${y}</b>`).join('')}${T.marks.map(k=>`<span class=mk style="left:${pct(k.date)};${k.date<'2020-07'?'transform:none':''}" title="${esc(k.label)}">${esc(k.label)}</span>`).join('')}</div></div>
@@ -827,14 +873,14 @@ if(P=='members'){document.title=`MEMBERS · ${i18n('成员')} | iLiFE! ${i18n('�
 
  const photoAt=(n,d)=>{const a=I.filter(i=>i.kind=='individual'&&i.member==n);return a.filter(i=>i.date<=d).pop()||a[0]};
  const eraAt=d=>{let r=E[0];E.forEach(e=>{if(d>=e.start)r=e});return d<E[0].start?null:r};
- const cursor=()=>{const tl=m.querySelector('.tl'),c=$('#cur'),tt=()=>m.querySelector('.tr:not(.th) .tt').getBoundingClientRect();let D=q.get('d')||today,last='';const s0='2020-06-05',sh=$('#slh'),st=m.querySelector('.sltrack');
+ const cursor=()=>{const tl=m.querySelector('.tl'),c=$('#cur'),tt=()=>m.querySelector('.tr:not(.th) .tt').getBoundingClientRect();let D=new URLSearchParams(location.search).get('d')||today,last='';const s0='2020-06-05',sh=$('#slh'),st=m.querySelector('.sltrack');
   const dOf=x=>{const R=tt();const f=Math.min(1,Math.max(0,(x-R.left)/R.width));return new Date(+t0+f*(t1-t0)).toISOString().slice(0,10)};
   const dOfS=x=>{const R=st.getBoundingClientRect();const f=Math.min(1,Math.max(0,(x-R.left)/R.width));return new Date(+new Date(s0)+f*(new Date(today)-new Date(s0))).toISOString().slice(0,10)};
   const set=d=>{if(d>today)d=today;if(d<s0)d=s0;D=d;const R=tt(),TB=tl.getBoundingClientRect();c.style.left=(R.left-TB.left+(new Date(d)-t0)/(t1-t0)*R.width)+'px';const e=eraAt(d);c.querySelector('.hl').innerHTML=`${d}<small>${e?esc(e.name):''}</small>`;
    sh.style.left=((new Date(d)-new Date(s0))/(new Date(today)-new Date(s0))*100)+'%';sh.querySelector('span').innerHTML=`${d}<small>${e?esc(e.name):''}</small>`;
-   if(d===last)return;last=d;const on=[];T.members.forEach(r=>r.segments.forEach(sg=>{if(sg.from<=d&&(!sg.to||d<sg.to))on.push([r.name,sg])}));
+   if(d===last)return;last=d;const on=[];[...T.members].reverse().forEach(r=>r.segments.forEach(sg=>{if(sg.from<=d&&(!sg.to||d<sg.to))on.push([r.name,sg])}));
    $('#onh').innerHTML=`${d} ${i18n('在籍成员 {n} 人',{n:on.length})}`+(e?` · <a href="eras.html#${e.id}">${esc(e.name)}</a>`:'');
-   $('#onpanel').innerHTML=on.map(([n,sg])=>{const x=MM[n]||{hex:'#999',kana:''},p=photoAt(n,d);return `<a class=sc href="members.html?m=${encodeURIComponent(n)}" title="${esc(n)} ${esc(sg.label)} ${sg.from}～${sg.to||i18n('至今')}${p?' / '+i18n('照片')+' '+p.date:''}"><div class=ph>${p?`<img src="${p.local||p.url}"${WH(p)} alt="">`:''}</div><div class=bar style="background:${sg.type=='r'?(sg.color=='绿'?'#3eb370':x.hex):'#b9a3ad'}"></div><div class=nm>${esc(n)}</div>${sg.type!='r'?`<em class=tag>${sg.type=='s'?i18n('支援'):i18n('非正式')}</em>`:''}</a>`}).join('')};
+   $('#onpanel').innerHTML=on.map(([n,sg])=>{const x=MM[n]||{hex:'#999',kana:''},p=photoAt(n,d);return `<a class=sc href="${urlFor(n)}" title="${esc(n)} ${esc(sg.label)} ${sg.from}～${sg.to||i18n('至今')}${p?' / '+i18n('照片')+' '+p.date:''}"><div class=ph>${p?`<img src="${p.local||p.url}"${WH(p)} alt="">`:''}</div><div class=bar style="background:${sg.type=='r'?(sg.color=='绿'?'#3eb370':x.hex):'#b9a3ad'}"></div><div class=nm>${esc(n)}</div>${sg.type!='r'?`<em class=tag>${sg.type=='s'?i18n('支援'):i18n('非正式')}</em>`:''}</a>`}).join('')};
   let raf=0,pend=null;const go=d=>{pend=d;if(!raf)raf=requestAnimationFrame(()=>{raf=0;set(pend)})};
   const drag=(h,f,el)=>h.addEventListener('pointerdown',e=>{e.preventDefault();h.setPointerCapture(e.pointerId);el.classList.add('drag');const mv=ev=>go(f(ev.clientX)),up=()=>{el.classList.remove('drag');h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up)};h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)});
   drag(c.querySelector('.hl'),dOf,c);drag(sh,dOfS,sh);
@@ -842,12 +888,250 @@ if(P=='members'){document.title=`MEMBERS · ${i18n('成员')} | iLiFE! ${i18n('�
   m.querySelectorAll('.tr.th .tt').forEach(a=>a.addEventListener('click',e=>{if(e.target.closest('a'))return;go(dOf(e.clientX))}));
   const center=()=>{const w=m.querySelector('.tlwrap');w.scrollLeft=Math.max(0,c.offsetLeft-w.clientWidth/2)};
   m.querySelectorAll('[data-jd]').forEach(b=>b.onclick=()=>{set(b.dataset.jd);center()});
-  $('#stkt').onclick=()=>{const k=$('#stk').classList.toggle('min');$('#stkt').textContent=k?i18n('展开'):i18n('收起')};if(innerWidth<760&&q.get('min'))$('#stkt').click();
-  const fixTop=()=>{$('#stk').style.top=$('header').offsetHeight+'px'};fixTop();addEventListener('resize',()=>{window.__fit&&window.__fit();fixTop();set(D)});window.__setDate=set;set(D);if(q.get('d'))center()};
- const r=()=>{m.innerHTML=`${head('MEMBERS',i18n('成员'))}<p class=filters><button class="${view=='tl'?'':'off'}" data-v=tl>${i18n('时间轴')}</button><button class="${view=='cards'?'':'off'}" data-v=cards>${i18n('成员卡片')}</button></p>`+(view=='tl'?tl():cards());
-  m.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{view=b.dataset.v;history.replaceState(null,'','?view='+view);r()});imgDone(m);
+  $('#stkt').onclick=()=>{const k=$('#stk').classList.toggle('min');$('#stkt').textContent=k?i18n('展开'):i18n('收起')};if(innerWidth<760&&new URLSearchParams(location.search).get('min'))$('#stkt').click();
+  const fixTop=()=>{$('#stk')&&($('#stk').style.top=$('header').offsetHeight+'px')};fixTop();window.__tlResize=()=>{if(!$('#cur'))return;window.__fit&&window.__fit();fixTop();set(D)};if(!window.__tlResizeBound){window.__tlResizeBound=true;addEventListener('resize',()=>window.__tlResize&&window.__tlResize())}window.__setDate=set;set(D);if(new URLSearchParams(location.search).get('d'))center()};
+ const r=()=>{view=listView();$('#mhead').innerHTML='';$('#mbody').innerHTML=`${head('MEMBERS',i18n('成员'))}<p class=filters><button class="${view=='tl'?'':'off'}" data-v=tl>${i18n('时间轴')}</button><button class="${view=='cards'?'':'off'}" data-v=cards>${i18n('成员卡片')}</button></p>`+(view=='tl'?tl():cards());
+  m.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{view=b.dataset.v;history.replaceState(null,'',urlFor('',view));r()});imgDone(m);
   if(view=='tl')cursor();const tip=$('#tip');if(!tip)return;m.querySelectorAll('.seg').forEach(el=>{const sh=e=>{const n=el.dataset.n,p=latestPhoto(I,n);tip.innerHTML=`${p?`<img src="${p.local||p.url}"${WH(p)}>`:''}<div><b>${esc(n)}</b><br>${el.dataset.l}<br>${el.dataset.f} ～ ${el.dataset.t}</div>`;tip.style.display='flex';const R=el.getBoundingClientRect(),x=Math.min(Math.max(8,(e.clientX||R.left)+12),innerWidth-250);tip.style.left=x+'px';tip.style.top=(R.bottom+8+scrollY)+'px'};
-   el.onmouseenter=sh;el.onmousemove=sh;el.onmouseleave=()=>tip.style.display='none';el.ontouchstart=e=>{if(tip.style.display!='flex'||tip.dataset.k!=el.dataset.n+el.dataset.f){e.preventDefault();sh(e.touches[0]);tip.dataset.k=el.dataset.n+el.dataset.f}}})};r();return}
+   el.onmouseenter=sh;el.onmousemove=sh;el.onmouseleave=()=>tip.style.display='none';el.ontouchstart=e=>{if(tip.style.display!='flex'||tip.dataset.k!=el.dataset.n+el.dataset.f){e.preventDefault();sh(e.touches[0]);tip.dataset.k=el.dataset.n+el.dataset.f}}})};
+ const mineOf=n=>I.filter(i=>i.kind=='individual'&&i.member===n);
+ const variantsOf=name=>{
+  const mine=mineOf(name).filter(i=>i.category!=='illustration');
+  const out=[];
+  E.forEach(e=>{
+   const inEra=mine.filter(i=>i.era===e.id);
+   if(!inEra.length) return;
+   const pick=inEra.filter(i=>i.category==='official'&&!(i.source||'').includes('Wayback')).pop()
+    ||inEra.filter(i=>i.category==='official').pop()
+    ||inEra.filter(i=>i.category==='costume').pop()
+    ||inEra[inEra.length-1];
+   out.push({img:pick,label:e.name});
+  });
+  if(out.length>=2) return out.reverse();
+  const offs=mine.filter(i=>i.category==='official');
+  const pool=offs.length>=2?offs:mine;
+  if(pool.length<2) return [];
+  const want=Math.min(6,pool.length), picks=[];
+  for(let k=0;k<want;k++){
+   const idx=Math.round(k*(pool.length-1)/Math.max(1,want-1));
+   const img=pool[idx];
+   if(!picks.some(p=>p.img===img)) picks.push({img,label:img.date||''});
+  }
+  return picks.length>=2?picks.reverse():[];
+ };
+ const imgKey=i=>i?(i.post||'')+'|'+(i.date||'')+'|'+(i.local||i.url||''):'';
+ const chosenArt=name=>{
+  const vars=variantsOf(name), latest=latestPhoto(I,name);
+  let idx=heroBy.has(name)?heroBy.get(name):-1;
+  if(idx<0||idx>=vars.length){
+   idx=vars.findIndex(v=>imgKey(v.img)===imgKey(latest));
+   if(idx<0) idx=vars.length?0:-1;
+  }
+  return {img:idx>=0?vars[idx].img:(latest||null), vars, idx};
+ };
+ const cycle=()=>{
+  const cur=M.filter(x=>x.status==='现役'), ex=M.filter(x=>x.status!=='现役');
+  const list=showEx?cur.concat(ex):cur.slice();
+  const n=memberName();
+  if(n&&!list.some(x=>x.name===n)){const extra=M.find(x=>x.name===n);if(extra) list.push(extra)}
+  return list;
+ };
+ const paintHead=()=>{
+  const name=memberName(), home=i18n('首页'), mem=i18n('成员');
+  $('#mhead').innerHTML=name
+   ?`<div class=crumb><a href=index.html>${home}</a> / <a href="${urlFor('',listView())}">${mem}</a> / ${esc(name)}</div>`
+   :'';
+ };
+ const paintSwitcher=()=>{
+  const name=memberName();
+  const row0=$('#msw .mswitch');
+  const keep=row0?row0.scrollLeft:0;
+  const cur=M.filter(x=>x.status==='现役'), ex=M.filter(x=>x.status!=='现役');
+  const list=showEx?cur.concat(ex):cur;
+  const chip=mem=>{
+   const p=latestPhoto(I,mem.name), th=themeOf(mem.hex), on=mem.name===name;
+   return `<button type=button role=option class="mchip${on?' on':''}${mem.status!=='现役'?' ex':''}${th.light?' light':''}" data-m="${esc(mem.name)}" aria-selected="${on}" style="--chip:${th.hex};--chip-ink:${th.ink}"><span class=av>${p?`<img alt="" src="${esc(p.local||p.url)}">`:`<span class=mmono>${esc(mem.name.slice(0,1))}</span>`}</span><span class=nm>${esc(mem.name)}</span></button>`;
+  };
+  const back=name?`<a class=mback href="${urlFor('',listView())}">‹ ${i18n('返回成员列表')}</a>`:'';
+  $('#msw').innerHTML=`<div class=msw-hd><span class=lb>${i18n('成员')}</span><button type=button class="${showEx?'off':''}" data-ex=0>${i18n('现役')} ${cur.length}</button><button type=button class="${showEx?'':'off'}" data-ex=1>${i18n('前成员')} ${ex.length}</button>${back}</div><div class=mswitch role=listbox aria-label="${i18n('成员')}">${list.map((mem,i)=>`${showEx&&i===cur.length?'<span class=msplit aria-hidden=true></span>':''}${chip(mem)}`).join('')}</div>`;
+  const row=$('#msw .mswitch'), on=row&&row.querySelector('.mchip.on');
+  if(on) row.scrollLeft=Math.max(0,on.offsetLeft-(row.clientWidth-on.offsetWidth)/2);
+  else if(row) row.scrollLeft=keep;
+ };
+ const applyTheme=hex=>{
+  const th=themeOf(hex), card=$('#mshow');
+  if(!card) return;
+  card.style.setProperty('--mc-r',th.r);card.style.setProperty('--mc-g',th.g);card.style.setProperty('--mc-b',th.b);
+  card.style.setProperty('--mc',th.hex);card.style.setProperty('--mc-ink',th.ink);card.style.setProperty('--mc-deep',th.deep);card.style.setProperty('--hero-ink',th.heroInk);
+  card.classList.toggle('mc-light',th.light);card.classList.toggle('mc-pale',th.pale);
+ };
+ const setHeroSrc=(img,src,fade)=>{
+  if(!img||!src||img.getAttribute('src')===src) return;
+  const token=++heroToken;
+  const show=()=>{if(token!==heroToken)return;img.src=src;img.classList.remove('is-out')};
+  if(!fade||reduceMotion()){show();return}
+  img.classList.add('is-out');
+  const pre=new Image();
+  let ready=false,waited=false,done=false;
+  const go=()=>{
+   if(done||token!==heroToken||!ready||!waited) return;
+   done=true; img.src=src;
+   requestAnimationFrame(()=>{if(token===heroToken) img.classList.remove('is-out')});
+  };
+  pre.onload=()=>{ready=true;go()}; pre.onerror=()=>{ready=true;go()}; pre.src=src;
+  setTimeout(()=>{waited=true;go()},220);
+  setTimeout(()=>{if(done||token!==heroToken)return;ready=true;waited=true;go()},700);
+ };
+ const fillHero=(name,art,fade)=>{
+  const x=M.find(a=>a.name===name)||{name};
+  const catchEl=$('#mcatch');
+  if(x.catch){catchEl.hidden=false;catchEl.textContent=x.catch}else{catchEl.hidden=true;catchEl.textContent=''}
+  const src=art.img?(art.img.local||art.img.url):'';
+  const img=$('#martimg'), mono=$('#mmono');
+  img.alt=name;
+  if(src){img.hidden=false;mono.hidden=true;setHeroSrc(img,src,fade&&!!img.getAttribute('src'))}
+  else{img.hidden=true;img.removeAttribute('src');mono.hidden=false;mono.textContent=name.slice(0,1)}
+  $('#martbtn').setAttribute('aria-label',name+' · '+i18n('照片'));
+  const many=!!(art.vars&&art.vars.length>=2);
+  document.querySelectorAll('#mstage .mchev').forEach(b=>{b.hidden=!many});
+  const keys=$('#mkeys');
+  if(keys) keys.textContent=many?i18n('两侧按钮或 [ ] 切换形象，← → 切换成员'):i18n('← → 切换成员');
+  const box=$('#mthumbs');
+  if(!box) return;
+  if(!many){box.hidden=true;box.innerHTML='';return}
+  box.hidden=false;
+  box.innerHTML=art.vars.map((v,i)=>{
+   const im=v.img, s=im.local||im.url, on=i===art.idx;
+   return `<button type=button class="mth${on?' on':''}" data-vi=${i} aria-pressed="${on}" title="${esc(v.label)}"><span class=av><img alt="" src="${esc(s)}"></span><span class=lb>${esc(v.label)}</span></button>`;
+  }).join('');
+  box.querySelectorAll('[data-vi]').forEach(b=>b.onclick=()=>{
+   const who=memberName(); if(!who) return;
+   heroBy.set(who,+b.dataset.vi);
+   fillHero(who,chosenArt(who),true);
+  });
+  const on=box.querySelector('.on');
+  if(on&&box.scrollHeight>box.clientHeight+4) box.scrollTo({top:Math.max(0,on.offsetTop-box.clientHeight/2+on.offsetHeight/2),behavior:reduceMotion()?'auto':'smooth'});
+ };
+ const metaHTML=x=>{
+  const n=x.name||'', S=x.sources||{};
+  const src=k=>S[k]?` <a class=src href="${esc(S[k])}" target=_blank rel=noopener title="${i18n('来源')}">${i18n('源')}</a>`:'';
+  const rib=(lb,val)=>`<div class=mrib><span>${lb}</span><b>${val}</b></div>`;
+  const status=x.status==='现役'?i18n('现役'):x.status==='前成员'?i18n('前成员'):esc(x.status||i18n('未确认'));
+  const prose=[];
+  if(x.role||x.note) prose.push(`<p>${esc(x.role||x.note)}${src('role')}</p>`);
+  if(x.support) prose.push(`<p><b>${i18n('支援/候补期')}</b> ${esc(x.support)}${src('support')}</p>`);
+  return `${x.kana?`<p class=mkana>${esc(x.kana)}${src('kana')}</p>`:''}<h1 class=mname>${esc(n)}</h1>${x.romaji?`<p class=mromaji>${esc(x.romaji)}${src('romaji')}</p>`:''}<p class=mcolorline><i></i><span>${esc(x.color||i18n('未确认'))}</span><small>${esc(x.hex||'')}</small>${src('color')}${S.hex&&S.hex!==S.color?` <a class=src href="${esc(S.hex)}" target=_blank rel=noopener>HEX</a>`:''}</p>${x.hex_note?`<p class=mhexnote>${esc(x.hex_note)}</p>`:''}<div class=mribs>${rib(i18n('生日'),esc(x.birthday||i18n('未确认'))+src('birthday'))}${rib(i18n('加入'),esc(x.joined||i18n('未确认'))+src('joined'))}${x.left?rib(i18n('离开'),esc(x.left)+src('left')):''}${rib(i18n('出演公演'),x.lives?`<a href="lives.html?m=${encodeURIComponent(n)}">${i18n('{n} 场',{n:x.lives})}</a>`:'—')}${rib(i18n('状态'),status)}</div><div class=mprose>${prose.join('')}</div><p class=mx>${i18n('个人 X')}：${x.x?`<a href="https://x.com/${esc(x.x)}" target=_blank rel=noopener>@${esc(x.x)}</a>`:`<span class=unk>${i18n('未找到')}</span>`}${x.x_status?` <small class=unk>${esc(x.x_status)}</small>`:''}${src('x')}</p>`;
+ };
+ const fillMeta=(x,fade)=>{
+  const token=++metaToken, html=metaHTML(x), el=$('#mmeta');
+  if(!el) return;
+  if(!fade||reduceMotion()){el.innerHTML=html;el.classList.remove('is-out');return}
+  el.classList.add('is-out');
+  setTimeout(()=>{if(token!==metaToken||!$('#mmeta'))return;$('#mmeta').innerHTML=html;$('#mmeta').classList.remove('is-out')},180);
+ };
+ const fillGalleries=name=>{
+  const mine=mineOf(name), rel=I.filter(i=>i.related&&i.member===name).slice().reverse();
+  const eras=[...E].reverse().filter(e=>mine.some(i=>i.era===e.id));
+  const photosOf=e=>mine.filter(i=>i.era===e.id).slice().reverse();
+  const blocks=eras.map(e=>`<h3>${esc(e.name)} <small>${esc(e.start)}～</small></h3>${galHTML(photosOf(e),1)}`).join('');
+  const relHTML=rel.length?`<h2>${i18n('相关图片')}（${rel.length}）</h2><div id=rel><p class=mnote>${i18n('官方推文文本仅提及该成员的告知/周边/活动图，非个人公式照。')}</p>${galHTML(rel)}</div>`:'';
+  $('#mgals').innerHTML=`<h2>${i18n('各时期个人图')}（${mine.length}）</h2>${blocks||`<p>${i18n('暂无收录。')}</p>`}${relHTML}`;
+  let k=0;$('#mgals').querySelectorAll('.gi .ph').forEach(el=>{el.dataset.i=k++});
+  const eraFlat=[];eras.forEach(e=>photosOf(e).forEach(i=>eraFlat.push(i)));
+  bindLB($('#mgals'),eraFlat);if($('#rel'))bindLB($('#rel'),rel);imgDone($('#mgals'));
+ };
+ const ensureCard=()=>{
+  if($('#mshow')) return;
+  $('#mbody').innerHTML=`<article class=mshow id=mshow><div id=msw></div><section class=mstage id=mstage><div class=mhero id=mhero><button type=button class="mchev prev" aria-label="${i18n('上一形象')}"><b>‹</b><small>${i18n('形象切换')}</small></button><button type=button class="mchev next" aria-label="${i18n('下一形象')}"><b>›</b><small>${i18n('形象切换')}</small></button><p class=mcatch id=mcatch hidden></p><div class=mart><button type=button id=martbtn><img id=martimg alt=""><span class=mmono id=mmono hidden></span></button></div></div><div class=mcol><div class=mmeta id=mmeta aria-live=polite></div><div class=mthumbs id=mthumbs hidden></div></div></section><p class=mkeys id=mkeys></p></article><div id=mgals></div>`;
+  $('#mstage .mchev.prev').onclick=()=>stepVis(-1);
+  $('#mstage .mchev.next').onclick=()=>stepVis(1);
+  $('#martbtn').onclick=()=>{const art=chosenArt(memberName());if(!art.img)return;LB=[art.img];LI=0;lbShow()};
+ };
+ const openMember=(n,how)=>{
+  const mem=M.find(x=>x.name===n);
+  if(mem&&mem.status!=='现役') showEx=true;
+  const href=urlFor(n);
+  if(how==='replace') history.replaceState(null,'',href); else history.pushState(null,'',href);
+  paint();
+  window.scrollTo({top:0,behavior:reduceMotion()?'auto':'smooth'});
+ };
+ const step=dir=>{
+  const list=cycle(); if(!list.length) return;
+  let i=list.findIndex(x=>x.name===memberName()); if(i<0) i=0;
+  openMember(list[(i+dir+list.length)%list.length].name,'push');
+ };
+ const stepVis=dir=>{
+  const name=memberName(); if(!name) return;
+  const art=chosenArt(name);
+  if(!art.vars||art.vars.length<2) return;
+  const i=art.idx<0?0:art.idx;
+  heroBy.set(name,(i+dir+art.vars.length)%art.vars.length);
+  fillHero(name,chosenArt(name),true);
+ };
+ const paint=()=>{
+  const name=memberName();
+  if(!name){
+   document.title=`MEMBERS · ${i18n('成员')} | iLiFE! ${i18n('应援资料库')}`;
+   r();
+   return;
+  }
+  paintHead();
+  const x=M.find(a=>a.name===name)||{name,hex:'#b9a3ad'};
+  document.title=`${name} · MEMBER | iLiFE! ${i18n('应援资料库')}`;
+  const had=!!$('#mshow');
+  ensureCard();
+  applyTheme(x.hex);
+  const art=chosenArt(name);
+  fillHero(name,art,had);
+  fillMeta(x,had);
+  fillGalleries(name);
+  paintSwitcher();
+  if(!had&&!reduceMotion()){
+   const card=$('#mshow');
+   card.classList.add('m-enter');
+   card.addEventListener('animationend',()=>card.classList.remove('m-enter'),{once:true});
+  }
+ };
+ m.innerHTML=`<div id=mpage><div id=mhead></div><div id=mbody></div></div>`;
+ $('#mpage').addEventListener('click',e=>{
+  if(!e.target.closest('#msw')) return;
+  const ex=e.target.closest('[data-ex]');
+  if(ex){showEx=ex.dataset.ex==='1';paintSwitcher();return}
+  const chip=e.target.closest('.mchip');
+  if(!chip) return;
+  const n=chip.dataset.m;
+  if(n===memberName()) return;
+  openMember(n,'push');
+ });
+ m.addEventListener('click',e=>{
+  if(e.defaultPrevented||e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+  const a=e.target.closest('a'); if(!a) return;
+  let u; try{u=new URL(a.getAttribute('href'),location.href)}catch{return}
+  if(!isMembersPath(u.pathname)) return;
+  const n=u.searchParams.get('m');
+  e.preventDefault();
+  if(!n){history.pushState(null,'',urlFor('',u.searchParams.get('view')||listView()));paint();window.scrollTo(0,0);return}
+  openMember(n,'push');
+ });
+ window.addEventListener('popstate',()=>paint());
+ document.addEventListener('keydown',e=>{
+  if(!memberName()||!$('#mshow')||$('#lb').classList.contains('on')) return;
+  const tag=(e.target&&e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable)) return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.key==='ArrowLeft'){e.preventDefault();step(-1);return}
+  if(e.key==='ArrowRight'){e.preventDefault();step(1);return}
+  if(e.code==='BracketLeft'||e.key==='['){e.preventDefault();stepVis(-1);return}
+  if(e.code==='BracketRight'||e.key===']'){e.preventDefault();stepVis(1);return}
+  if(/^[1-9]$/.test(e.key)){
+   const art=chosenArt(memberName());
+   const n=+e.key-1;
+   if(art.vars&&n<art.vars.length){e.preventDefault();heroBy.set(memberName(),n);fillHero(memberName(),chosenArt(memberName()),true)}
+  }
+ });
+ window.__onLangChange=()=>{const body=$('#mbody');if(body) body.innerHTML='';const head=$('#mhead');if(head) head.innerHTML='';paint()};
+ paint();
+ return}
 if(P=='lives'){const[L,M]=await Promise.all([J('lives'),J('members')]);const MM=Object.fromEntries(M.map(x=>[x.name,x])),MI=Object.fromEntries(M.map(x=>[String(x.id),x]));
  const TYPES=['全部','ワンマン','主催','対バン','フェス','リリイベ','生誕祭','配信','その他'].filter(t=>t=='全部'||L.some(l=>l.type==t));
  const YEARS=['全部',...[...new Set(L.map(l=>l.date.slice(0,4)))].sort()];
