@@ -36856,18 +36856,18 @@
   "pref": "埼玉",
   "open_time": "10:00",
   "start_time": "11:00",
-  "note": "官方时间表 DAY2（10/31）OPEN 10:00 / START 11:00，会场埼玉スタジアム2002 野外特設会場。iLiFE! 在 PUMPKIN STAGE 19:35–20:10。https://x.com/iLiFE_official/status/2114706138067542338 订正后衣装为新作キョンシー。https://x.com/iLiFE_official/status/2114703934472556591 （初版 https://x.com/iLiFE_official/status/2114639685347930522 曾把 11/1 写成バニー第二回）。工作人员：两日出演日物贩约 14:00–17:30；10/31 前特典会 17:00–18:00（16:30 整列）。https://x.com/iLiFE_STAFF/status/2115413983310356649 特典会时间表 https://x.com/iLiFE_STAFF/status/2115734045342707806 。10/29 主办方公告特典会ブース变更、实施时间不变：https://x.com/heroines_idol/status/2115760570104209779 变更图将左侧区域标为 27〜30，iLiFE! 时间仍是 17:00–18:00。CD 预约者抽选会：https://x.com/iLiFE_official/status/2116103182489399418 。售票页 https://t-dv.com/IHJ2026 有一处仍写开场开演调整中；第三方补充里的 00:00 不采用。补充核验会场：https://www.eventernote.com/events/491702 ；https://www.livefans.jp/events/2014021",
-  "setlist": null,
+  "note": "官方时间表 DAY2（10/31）OPEN 10:00 / START 11:00，会场埼玉スタジアム2002 野外特設会場。iLiFE! 在 PUMPKIN STAGE 19:35–20:10。https://x.com/iLiFE_official/status/2114706138067542338 订正后衣装为新作キョンシー。https://x.com/iLiFE_official/status/2114703934472556591 （初版 https://x.com/iLiFE_official/status/2114639685347930522 曾把 11/1 写成バニー第二回）。工作人员：两日出演日物贩约 14:00–17:30；10/31 前特典会 17:00–18:00（16:30 整列）。https://x.com/iLiFE_STAFF/status/2115413983310356649 特典会时间表 https://x.com/iLiFE_STAFF/status/2115734045342707806 。10/29 主办方公告特典会ブース变更、实施时间不变：https://x.com/heroines_idol/status/2115760570104209779 变更图将左侧区域标为 27〜30，iLiFE! 时间仍是 17:00–18:00。CD 预约者抽选会：https://x.com/iLiFE_official/status/2116103182489399418 。11/1 工作人员写抽选会在入场门内左侧 HEROINES 抽选帐篷旁，当日继续：https://x.com/iLiFE_STAFF/status/2116718380137021901 。售票页 https://t-dv.com/IHJ2026 有一处仍写开场开演调整中；第三方补充里的 00:00 不采用。补充核验会场：https://www.eventernote.com/events/491702 ；https://www.livefans.jp/events/2014021 10/31 演后官方感谢（キョンシー九人台阶合影、舞台背影、会场远景）：https://x.com/iLiFE_official/status/2116528186276372746 。工作人员歌单：https://x.com/iLiFE_STAFF/status/2116530730633515138 （i REVOLUTION 标撮影可）。主办方 DAY2 感谢图是 PUMPKIN STAGE 三个团体拼贴，另一张是 VAMPIRE STAGE，未收。",
+  "setlist": "SE\n会いにKiTE!\nサイクロンライフ！\nきゃわぽっぴんどぅー\nsweet timer\nアイドルライフブースターパック\ni REVOLUTION 📸🉑\nガンバッテンダー\nアイドルライフメガパック\nメッセージ",
   "is_headliner": 0,
   "source": "https://idolhalloweenjapan.com/",
   "cover": {
-   "id": 4081,
-   "local": "https://img.ilifefan.dpdns.org/img/live-2026-852-dd704eb5.webp",
-   "w": 1200,
-   "h": 630,
-   "url": "https://idolhalloweenjapan.com/images/common/ogp.jpg",
-   "post": "https://idolhalloweenjapan.com/",
-   "source": "IDOL HALLOWEEN JAPAN 官网"
+   "id": 4648,
+   "local": "https://img.ilifefan.dpdns.org/img/live-852-HV9rKbFacAA--g1.webp",
+   "w": 2048,
+   "h": 1365,
+   "url": "https://pbs.twimg.com/media/HV9rKbFacAA--g1.jpg?name=large",
+   "post": "https://x.com/iLiFE_official/status/2116528186276372746",
+   "source": "X @iLiFE_official"
   },
   "images": [
    {
@@ -36959,6 +36959,42 @@
     "url": "https://pbs.twimg.com/media/HVyr8dCbcAArpKn.jpg?name=large",
     "post": "https://x.com/heroines_idol/status/2115760570104209779",
     "source": "X @heroines_idol"
+   },
+   {
+    "id": 4646,
+    "local": "https://img.ilifefan.dpdns.org/img/group-e12-HV9rKa6bEAAdTkv.webp",
+    "w": 2048,
+    "h": 1365,
+    "url": "https://pbs.twimg.com/media/HV9rKa6bEAAdTkv.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116528186276372746",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4647,
+    "local": "https://img.ilifefan.dpdns.org/img/live-852-HV9rKbEbcAACEO3.webp",
+    "w": 2048,
+    "h": 1365,
+    "url": "https://pbs.twimg.com/media/HV9rKbEbcAACEO3.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116528186276372746",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4648,
+    "local": "https://img.ilifefan.dpdns.org/img/live-852-HV9rKbFacAA--g1.webp",
+    "w": 2048,
+    "h": 1365,
+    "url": "https://pbs.twimg.com/media/HV9rKbFacAA--g1.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116528186276372746",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4649,
+    "local": "https://img.ilifefan.dpdns.org/img/live-852-HV9rKbIa0AAt5et.webp",
+    "w": 2048,
+    "h": 1365,
+    "url": "https://pbs.twimg.com/media/HV9rKbIa0AAt5et.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116528186276372746",
+    "source": "X @iLiFE_official"
    }
   ],
   "members": {
@@ -36982,18 +37018,18 @@
   "pref": "埼玉",
   "open_time": "10:00",
   "start_time": "11:00",
-  "note": "官方时间表 DAY3（11/1）OPEN 10:00 / START 11:00，会场埼玉スタジアム2002 野外特設会場。iLiFE! 在 PUMPKIN STAGE 19:20–19:55。https://x.com/iLiFE_official/status/2114706138067542338 订正后 11/1 衣装为 iLiVE! 着用の海賊衣装（初版曾写成バニー第二回）。https://x.com/iLiFE_official/status/2114703934472556591 しなこ特别合作：时间表上しなこ为 PUMPKIN STAGE 13:35–13:55，官方图写「13:35〜のしなこちゃんのステージ」与 iLiFE! 合作，不另建场次。https://x.com/iLiFE_official/status/2116101817176367411 工作人员：11/1 前特典会 17:10–18:10（16:40 整列），物贩约 14:00–17:30。https://x.com/iLiFE_STAFF/status/2115413983310356649 特典会时间表 https://x.com/iLiFE_STAFF/status/2115734045342707806 。10/29 ブース变更、时间不变：https://x.com/heroines_idol/status/2115760570104209779 变更图左侧标 27〜30，iLiFE! 时间仍是 17:10–18:10。CD 预约者抽选会：https://x.com/iLiFE_official/status/2116103182489399418 。第三方补充里的开场开演 00:00 不采用。补充核验会场：https://www.eventernote.com/events/491703",
-  "setlist": null,
+  "note": "官方时间表 DAY3（11/1）OPEN 10:00 / START 11:00，会场埼玉スタジアム2002 野外特設会場。iLiFE! 在 PUMPKIN STAGE 19:20–19:55。https://x.com/iLiFE_official/status/2114706138067542338 订正后 11/1 夜场衣装为 iLiVE! 着用の海賊衣装（初版曾写成バニー第二回）。https://x.com/iLiFE_official/status/2114703934472556591 しなこ特别合作：时间表上しなこ为 PUMPKIN STAGE 13:35–13:55，官方图写「13:35〜のしなこちゃんのステージ」与 iLiFE! 合作，不另建场次。https://x.com/iLiFE_official/status/2116101817176367411 合作感谢合影是兔耳衣装，与夜场海盗衣装不同：https://x.com/iLiFE_official/status/2116833162743689697 。工作人员：11/1 前特典会 17:10–18:10（16:40 整列），物贩约 14:00–17:30。https://x.com/iLiFE_STAFF/status/2115413983310356649 特典会时间表 https://x.com/iLiFE_STAFF/status/2115734045342707806 。10/29 ブース变更、时间不变：https://x.com/heroines_idol/status/2115760570104209779 变更图左侧标 27〜30，iLiFE! 时间仍是 17:10–18:10。CD 预约者抽选会：https://x.com/iLiFE_official/status/2116103182489399418 。抽选会在入场门内左侧 HEROINES 抽选帐篷旁，11/1 继续：https://x.com/iLiFE_STAFF/status/2116718380137021901 。第三方补充里的开场开演 00:00 不采用。补充核验会场：https://www.eventernote.com/events/491703 11/1 演后官方感谢（海盗九人合影、舞台焰火、会场远景）：https://x.com/iLiFE_official/status/2116889696349602273 。主办方 PUMPKIN STAGE DAY3 拍照区九人：https://x.com/IDOLHJ_official/status/2116870593605968037 。主办方白天合作会场远景：https://x.com/IDOLHJ_official/status/2116801059310178480 。工作人员歌单：https://x.com/iLiFE_STAFF/status/2116907365933170757 。开演前工作人员写撮影可能曲为第 2 首：https://x.com/iLiFE_STAFF/status/2116825798355419628 （歌单不计 SE 时第 2 首为 #ラブコード，标撮影可）。",
+  "setlist": "SE\n初恋リバイバル\n#ラブコード 📸🉑\nBRAVE GROOVE\nアイドルライフエクストラパック\nLOML\nサイクロンライフ！\ni REVOLUTION\nLiMiT STRiKER!\nアイドルライフメガパック",
   "is_headliner": 0,
   "source": "https://idolhalloweenjapan.com/",
   "cover": {
-   "id": 4081,
-   "local": "https://img.ilifefan.dpdns.org/img/live-2026-852-dd704eb5.webp",
-   "w": 1200,
-   "h": 630,
-   "url": "https://idolhalloweenjapan.com/images/common/ogp.jpg",
-   "post": "https://idolhalloweenjapan.com/",
-   "source": "IDOL HALLOWEEN JAPAN 官网"
+   "id": 4652,
+   "local": "https://img.ilifefan.dpdns.org/img/live-853-HWCz892aAAAXxHx.webp",
+   "w": 2048,
+   "h": 1365,
+   "url": "https://pbs.twimg.com/media/HWCz892aAAAXxHx.jpg?name=large",
+   "post": "https://x.com/iLiFE_official/status/2116889696349602273",
+   "source": "X @iLiFE_official"
   },
   "images": [
    {
@@ -37094,6 +37130,60 @@
     "url": "https://pbs.twimg.com/media/HVyr8ctbQAADiaf.jpg?name=large",
     "post": "https://x.com/heroines_idol/status/2115760570104209779",
     "source": "X @heroines_idol"
+   },
+   {
+    "id": 4650,
+    "local": "https://img.ilifefan.dpdns.org/img/group-e12-HWCz89waAAAHrIw.webp",
+    "w": 2048,
+    "h": 1365,
+    "url": "https://pbs.twimg.com/media/HWCz89waAAAHrIw.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116889696349602273",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4651,
+    "local": "https://img.ilifefan.dpdns.org/img/live-853-HWCz89ybcAEGA-Q.webp",
+    "w": 2048,
+    "h": 1365,
+    "url": "https://pbs.twimg.com/media/HWCz89ybcAEGA-Q.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116889696349602273",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4652,
+    "local": "https://img.ilifefan.dpdns.org/img/live-853-HWCz892aAAAXxHx.webp",
+    "w": 2048,
+    "h": 1365,
+    "url": "https://pbs.twimg.com/media/HWCz892aAAAXxHx.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116889696349602273",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4653,
+    "local": "https://img.ilifefan.dpdns.org/img/live-853-HWCAhYebMAAMHI2.webp",
+    "w": 2048,
+    "h": 1365,
+    "url": "https://pbs.twimg.com/media/HWCAhYebMAAMHI2.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116833162743689697",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4654,
+    "local": "https://img.ilifefan.dpdns.org/img/live-853-HWCilDraUAAZbHg.webp",
+    "w": 1080,
+    "h": 604,
+    "url": "https://pbs.twimg.com/media/HWCilDraUAAZbHg.jpg?name=large",
+    "post": "https://x.com/IDOLHJ_official/status/2116870593605968037",
+    "source": "X @IDOLHJ_official"
+   },
+   {
+    "id": 4655,
+    "local": "https://img.ilifefan.dpdns.org/img/live-853-HWBiOcAbYAAIkx4.webp",
+    "w": 2048,
+    "h": 1366,
+    "url": "https://pbs.twimg.com/media/HWBiOcAbYAAIkx4.jpg?name=large",
+    "post": "https://x.com/IDOLHJ_official/status/2116801059310178480",
+    "source": "X @IDOLHJ_official"
    }
   ],
   "members": {

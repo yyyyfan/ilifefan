@@ -4162,10 +4162,10 @@
   "kana": "あい れぼりゅーしょん",
   "member": null,
   "duration": "3:19",
-  "mv_date": "2026-08-26",
+  "mv_date": "2026-10-31",
   "release_date": "2026-08-26",
   "release": "i REVOLUTION",
-  "note": "楽曲提供：Fear, and Loathing in Las Vegas。配信限定シングル。2026-08-26 MV公開。",
+  "note": "楽曲提供：Fear, and Loathing in Las Vegas。配信限定シングル（发行日维持 2026-08-26）。YouTube 官方 MV 于 2026-10-31 公开：https://www.youtube.com/watch?v=-IOtOZJutdk 。公开帖写当日 18:30 プレミア公开，并写这首歌曾在 Kアリーナお披露目：https://x.com/iLiFE_official/status/2116379742752620866 。此前备注里的「2026-08-26 MV公开」改为这次的上传日；2026-08-26 仍留在发行日，不作为 YouTube MV 的公开日。",
   "source": "https://ja.wikipedia.org/wiki/ILiFE!",
   "cover": {
    "id": 3955,
@@ -4175,6 +4175,16 @@
    "url": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/15/e0/d3/15e0d387-9086-906d-b936-e83ad00cef57/1200214845070.jpg/1200x1200bb.jpg"
   },
   "videos": [
+   {
+    "id": "-IOtOZJutdk",
+    "kind": "MV",
+    "title": "【MV】i REVOLUTION / iLiFE!【Fear, and Loathing in Las Vegas collaboration】",
+    "date": "2026-10-31",
+    "url": "https://www.youtube.com/watch?v=-IOtOZJutdk",
+    "thumb": "https://i.ytimg.com/vi/-IOtOZJutdk/maxresdefault.jpg",
+    "official": true,
+    "channel": null
+   },
    {
     "id": "XfbKyRvVYhc",
     "kind": "Other",
@@ -4205,6 +4215,24 @@
     "url": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/15/e0/d3/15e0d387-9086-906d-b936-e83ad00cef57/1200214845070.jpg/1200x1200bb.jpg",
     "post": "https://music.apple.com/jp/album/i-revolution-single/6802605792",
     "source": "Apple Music"
+   },
+   {
+    "id": 4657,
+    "local": "https://img.ilifefan.dpdns.org/img/official-HV8pKDsaMAAhr7J.webp",
+    "w": 2048,
+    "h": 1152,
+    "url": "https://pbs.twimg.com/media/HV8pKDsaMAAhr7J.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116455610179047864",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4658,
+    "local": "https://img.ilifefan.dpdns.org/img/official-HV7kJtDaEAALkGM.webp",
+    "w": 2048,
+    "h": 1152,
+    "url": "https://pbs.twimg.com/media/HV7kJtDaEAALkGM.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2116379742752620866",
+    "source": "X @iLiFE_official"
    }
   ],
   "costumes": []
