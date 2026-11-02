@@ -1089,7 +1089,7 @@ button.mth .lb{
   box-shadow:0 10px 28px rgba(228,0,127,.1);
   color:inherit;text-decoration:none;
 }
-.hero+.hdraw{margin:-42px 10px 4px}
+.hero+.hdraw{margin:20px 0 4px}
 .hdraw:hover{color:inherit;border-color:#ff99c4;box-shadow:0 14px 32px rgba(228,0,127,.18)}
 .hdraw-ava{
   flex:none;width:64px;height:64px;border-radius:50%;
@@ -1113,7 +1113,7 @@ button.mth .lb{
 @media(max-width:760px){
   .hdraw{gap:12px;padding:12px;border-radius:16px}
   .hdraw-sub,.hdraw-note{font-size:12px}
-  .hero+.hdraw{margin:-28px 0 2px}
+  .hero+.hdraw{margin:16px 0 2px}
   .hdraw-ava{width:52px;height:52px}
   .hdraw-title{font-size:16px}
   .hdraw-go{padding:8px 12px}
