@@ -1457,6 +1457,7 @@ async function bootDraw(host,asModal){const m=host;
    base.history[k]=arr.filter(x=>x&&Number.isFinite(Number(x.id))&&dayOk(x.day)).slice(0,20).map(x=>{
     const o={id:Number(x.id),day:x.day,at:typeof x.at=='string'?x.at:'',first:!!x.first};
     const fortune=packFortune(x.fortune);if(fortune)o.fortune=fortune;
+    if(k==='member'&&typeof x.look==='string'&&/^https:\/\//.test(x.look)&&x.look.length<=500)o.look=x.look;
     return o;
    });
   });
@@ -1884,7 +1885,7 @@ const FORTUNES_1000 = buildFortunes1000();
  const initTodayView=m=>{
   const td=todayDraw(m);if(!td)return null;
   const item=m=='song'?songById(td.id):memberById(td.id);
-  return item?{mode:m,item,first:true,day:td.day,at:td.at,hist:false,fortune:td.fortune}:null;
+  return item?{mode:m,item,first:true,day:td.day,at:td.at,hist:false,fortune:td.fortune,look:td.look||''}:null;
  };
  const isSq=im=>im&&im.w&&im.h&&Math.abs(im.w/im.h-1)<0.08;
  const songSrc=s=>{
@@ -1897,7 +1898,34 @@ const FORTUNES_1000 = buildFortunes1000();
   const im=(s.images||[])[0];
   return im?(im.local||im.url||''):'';
  };
- const memberSrc=mem=>{const p=latestPhoto(I,mem.name);return p?(p.local||p.url||''):''};
+ /* 抽推照片：该成员的个人公式图和打歌服里随机一套造型。
+    抽到时选定并写入 history.look，同一条结果刷新不变。没有 look 的旧记录按日期和成员稳定挑选。 */
+ const lookUrl=i=>i?(i.local||i.url||''):'';
+ const memberLooks=mem=>{
+  const raw=I.filter(i=>i&&i.kind==='individual'&&i.member===mem.name&&(i.category==='costume'||i.category==='official')&&!i.pending&&lookUrl(i));
+  const g=new Map();
+  raw.forEach(i=>{const k=i.post||lookUrl(i);if(!g.has(k))g.set(k,[]);g.get(k).push(i)});
+  return [...g.keys()].sort().map(k=>g.get(k).slice().sort((a,b)=>lookUrl(a).localeCompare(lookUrl(b))));
+ };
+ const hash32=s=>{let h=2166136261;for(const ch of String(s)){h^=ch.codePointAt(0);h=Math.imul(h,16777619)}return h>>>0};
+ const pickMemberLook=(mem,rng)=>{
+  const groups=memberLooks(mem);
+  if(!groups.length){const p=latestPhoto(I,mem.name);return lookUrl(p)}
+  const group=groups[Math.floor(rng()*groups.length)%groups.length];
+  return lookUrl(group[Math.floor(rng()*group.length)%group.length]);
+ };
+ const memberSrc=(mem,rec)=>{
+  if(!mem)return '';
+  if(rec&&typeof rec.look==='string'){
+   const hit=I.find(i=>i&&i.member===mem.name&&lookUrl(i)===rec.look&&!i.pending&&i.category!=='illustration');
+   if(hit)return rec.look;
+  }
+  const groups=memberLooks(mem);
+  if(!groups.length){const p=latestPhoto(I,mem.name);return lookUrl(p)}
+  const h=hash32(`${rec&&rec.day||''}|${mem.id}|${rec&&rec.at||''}`);
+  const group=groups[h%groups.length];
+  return lookUrl(group[(Math.imul(h,0x9e3779b1)>>>0)%group.length]);
+ };
  const songById=id=>S.find(s=>s.id==id);
  const memberById=id=>M.find(mem=>mem.id==id);
  const pool=()=>{
@@ -1969,7 +1997,7 @@ const FORTUNES_1000 = buildFortunes1000();
   const W=900,H=1600,F='"Noto Sans SC",Roboto,"PingFang SC",sans-serif';
   const song=view.mode=='song',item=view.item;
   const hex=song?'#e4007f':safeHex(item.hex);
-  const src=song?songSrc(item):memberSrc(item);
+  const src=song?songSrc(item):memberSrc(item,view);
   const img=await loadImg(src);
   const c=document.createElement('canvas');c.width=W;c.height=H;
   const x=c.getContext('2d');
@@ -2167,7 +2195,7 @@ const FORTUNES_1000 = buildFortunes1000();
    const isSong=view.mode=='song',item=view.item;
    const title=isSong?item.title:item.name,kana=item.kana||'';
    const href=isSong?'songs.html?s='+item.id:'members.html?m='+encodeURIComponent(item.name);
-   const itemSrc=isSong?songSrc(item):memberSrc(item);
+   const itemSrc=isSong?songSrc(item):memberSrc(item,view);
    const sub=isSong
     ?`${item.member?(l==='en'?'Solo · '+item.member:l==='ja'?'ソロ曲 ・ '+item.member:'个人曲 · '+item.member):(l==='en'?'Group Song':l==='ja'?'グループ曲':'团体曲')}${item.duration?' · '+item.duration:''}`
     :`${trStatus(item.status,l)}${item.color?' · '+trColor(item.color,l):''}${item.catch?' · '+item.catch:''}`;
@@ -2278,7 +2306,7 @@ const FORTUNES_1000 = buildFortunes1000();
 
   const hist=st.history[mode].map(h=>{
    const item=mode=='song'?songById(h.id):memberById(h.id);if(!item)return '';
-   const src=mode=='song'?songSrc(item):memberSrc(item),label=mode=='song'?item.title:item.name;
+   const src=mode=='song'?songSrc(item):memberSrc(item,h),label=mode=='song'?item.title:item.name;
    const on=view&&!shaking&&view.at===h.at,kichi=(h.fortune&&h.fortune.kichi)||'吉';
    const isHDay=h.day===jstDay();
    const kMeta=getKMeta(kichi);
@@ -2356,7 +2384,7 @@ const FORTUNES_1000 = buildFortunes1000();
    const h=st.history[mode].find(x=>String(x.id)==b.dataset.hid&&x.at==b.dataset.hat);if(!h)return;
    const item=mode=='song'?songById(h.id):memberById(h.id);if(!item)return;
    let fortune=h.fortune;if(!fortune){fortune=rollFortune(mode,item);h.fortune=fortune;save()}
-   view={mode,item,first:!!h.first,day:h.day,at:h.at,hist:true,fortune};
+   view={mode,item,first:!!h.first,day:h.day,at:h.at,hist:true,fortune,look:h.look||''};
    render();
    const r=$('#result');if(r)scrollDraw(r,{behavior:'smooth',block:'start'});
   });
@@ -2406,10 +2434,11 @@ const FORTUNES_1000 = buildFortunes1000();
    st.first[mode]=day;
    const at=new Date().toISOString();
    const fortune=rollFortune(mode,item,rng);
-   st.history[mode]=[{id:item.id,day,at,first:true,fortune},...st.history[mode]].slice(0,20);
+   const look=mode==='member'?pickMemberLook(item,rng):'';
+   st.history[mode]=[{id:item.id,day,at,first:true,fortune,...(look?{look}:{})},...st.history[mode]].slice(0,20);
    save();
    shaking=false;
-   view={mode,item,first:true,day,at,hist:false,fortune};
+   view={mode,item,first:true,day,at,hist:false,fortune,look};
    enterAnim=!reduce;
    render();
    if(!reduce){
