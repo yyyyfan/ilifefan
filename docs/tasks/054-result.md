@@ -2,15 +2,21 @@
 
 分支：`cursor/054-recent-media-update-1386`（只推这个分支，没有合并 main，没有部署，没有 force push）
 
-`python3 db/export.py --check` 通过。导出版本 `669aa4dc`。公演仍是 873。图片仍是 4536（新图未入库）。`song_videos` 增加 1 条官方 MV。
+`python3 db/export.py --check` 通过。导出版本 `95c9f791`。公演仍是 873。图片 4536→4549（新增 13，id 4646–4658）。`song_videos` 增加 1 条官方 MV。
 
-脚本：`db/task054_apply.py`，分类在 `db/task054_plan.json`。公演备注和歌单是定稿，重复跑会写成同一段。图片只在 `db/r2_manifest.json` 已有对应键时才入库。本次清单里没有这 13 个键，所以脚本跳过了图片，封面也还是原来的告知图。
+脚本：`db/task054_apply.py`，分类在 `db/task054_plan.json`。公演备注和歌单是定稿，重复跑会写成同一段。图片只在 `db/r2_manifest.json` 已有对应键时才入库。13 个键已逐个 `r2_images.py add`，随后 `task054_apply.py` 写入 13 行。
 
-## 上传没有完成
+## R2
 
-wrangler 未登录（`npx wrangler whoami` 要求 `wrangler login`）。Cloudflare 连接器开头能读到账号 `f471c568f7b69f1707c2c95fef3003ff`，随后 `whoami` / `execute` 都返回需要重新认证，没有发出 R2 PUT。13 张终稿在仓库根目录 `img/`（不进 Git），并复制到 `/opt/cursor/artifacts/054-webp/`。帖子 JSON 与计划在 `/opt/cursor/artifacts/054-cache/`。
+13 张已在桶 `ilife-images`。公开地址抽查 3 张为 HTTP 200、`image/webp`，字节数与 md5 与清单一致：
 
-上传后（在仓库根目录，文件还在 `img/` 时），逐个执行，不要用 `img/*.webp`：
+- `img/live-852-HV9rKbFacAA--g1.webp`（852 封面）
+- `img/live-853-HWCz892aAAAXxHx.webp`（853 封面）
+- `img/official-HV7kJtDaEAALkGM.webp`
+
+前缀 `https://img.ilifefan.dpdns.org/img/`。登记是逐个 `python3 db/r2_images.py add`，没有用通配符。852 封面现为舞台背影 `live-852-HV9rKbFacAA--g1.webp`（image 4648）。853 封面现为焰火舞台 `live-853-HWCz892aAAAXxHx.webp`（image 4652）。
+
+当初上传前暂存的命令（已执行 add / verify / apply，不再需要重跑）：
 
 ```bash
 npx wrangler r2 object put ilife-images/img/group-e12-HV9rKa6bEAAdTkv.webp --file "img/group-e12-HV9rKa6bEAAdTkv.webp" --content-type image/webp --remote
@@ -44,7 +50,7 @@ python3 db/task054_apply.py
 python3 db/export.py --rebuild-derived
 ```
 
-入库之后，852 的封面会换成舞台背影 `live-852-HV9rKbFacAA--g1.webp`，853 的封面会换成焰火舞台 `live-853-HWCz892aAAAXxHx.webp`。现在封面仍是官网告知图（image 4081）。
+上面的 add、verify、apply 已经跑过。`verify` 核对 3 个对象，问题 0 个。852、853 的封面已换成舞台照，不再是 image 4081。
 
 ## 公演
 
@@ -100,4 +106,4 @@ python3 db/export.py --rebuild-derived
 
 ## 页面
 
-本地 `lives.html?l=852`（桌面）和 `lives.html?l=853`（宽 390）能看到歌单、开场 10:00 / 开演 11:00，相关图片仍是原来的告知图，没有空白图。`songs.html?s=44` 显示 MV 公开日 2026-10-31、发行日 2026-08-26，官方影像 1 条，缩略图能加载。
+导出的 `data/lives.json` 里 852 有 14 张图，封面是 `live-852-HV9rKbFacAA--g1.webp`；853 有 17 张图，封面是 `live-853-HWCz892aAAAXxHx.webp`。新图在 `data/images.json`（id 4646–4658）。歌曲 44 相关图片 1→3（配信 jacket 之外加上两张引号点名「i REVOLUTION」的 MV 告知图）。公开地址前缀 `https://img.ilifefan.dpdns.org/img/`。
