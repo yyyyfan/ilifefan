@@ -3926,7 +3926,7 @@
   "mv_date": "2026-08-16",
   "release_date": "2026-08-26",
   "release": "アイドルライフメガパック",
-  "note": "作詞・作曲・編曲：Medansy（TRIFRONTIER）。4th配信アルバム『アイドルライフメガパック』表題曲（2026-08-26 配信）。2026-08-16 MV公開。メジャー1stシングルとして 2027-01-11（月・祝）に Sony Music Labels から CD 発売（3 形態・全 3 曲収録：アイドルライフメガパック / LiMiT STRiKER! / きゃわぽっぴんどぅー）：初回生産限定盤（CD+Blu-ray）SRCL-13950〜13951 2,500 円、メンバー盤 全 9 種 SRCL-13952〜13960 各 1,500 円（各盤にメンバーセレクト曲 1 首）、通常盤 SRCL-13961 1,500 円。各形態の CD ジャケット写真は公式で「決まり次第掲載」のため未反映（現封面为配信版 jacket）。",
+  "note": "作詞・作曲・編曲：Medansy（TRIFRONTIER）。4th配信アルバム『アイドルライフメガパック』表題曲（2026-08-26 配信）。2026-08-16 MV公開。メジャー1stシングルとして 2027-01-11（月・祝）に Sony Music Labels から CD 発売（3 形態・全 3 曲収録：アイドルライフメガパック / LiMiT STRiKER! / きゃわぽっぴんどぅー）：初回生産限定盤（CD+Blu-ray）SRCL-13950〜13951 2,500 円、メンバー盤 全 9 種 SRCL-13952〜13960 各 1,500 円（各盤にメンバーセレクト曲 1 首）、通常盤 SRCL-13961 1,500 円。2026-11-05 官方公开了两张 CD 封面设计：九人合影与九人分格。https://x.com/iLiFE_official/status/2118282312316240064 正文标语为「好き超えてちゅき♡」。帖文没有写明哪一张对应初回生产限定盘、通常盘或成员盘，成员盘也没有拆成 9 个单独文件。歌曲封面仍用配信 jacket。",
   "source": "https://www.sonymusic.co.jp/artist/iLiFE/info/587699",
   "cover": {
    "id": 4008,
@@ -4010,6 +4010,24 @@
     "h": 675,
     "url": "https://pbs.twimg.com/media/HTD4eRsaAAAKbcZ.jpg?name=medium",
     "post": "https://x.com/i/status/2103454235606352369",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4659,
+    "local": "https://img.ilifefan.dpdns.org/img/group-e12-HWWmhXsawAE_O3m.webp",
+    "w": 2048,
+    "h": 2048,
+    "url": "https://pbs.twimg.com/media/HWWmhXsawAE_O3m.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2118282312316240064",
+    "source": "X @iLiFE_official"
+   },
+   {
+    "id": 4660,
+    "local": "https://img.ilifefan.dpdns.org/img/official-HWWmhXeaQAAryE6.webp",
+    "w": 2048,
+    "h": 2048,
+    "url": "https://pbs.twimg.com/media/HWWmhXeaQAAryE6.jpg?name=large",
+    "post": "https://x.com/iLiFE_official/status/2118282312316240064",
     "source": "X @iLiFE_official"
    }
   ],
